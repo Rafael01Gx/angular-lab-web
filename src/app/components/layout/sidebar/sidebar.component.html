@@ -1,0 +1,87 @@
+<aside
+  class="fixed overflow-hidden lg:static top-16 left-0 h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] bg-gradient-to-b from-white to-slate-50/80 border-r border-slate-200/60 shadow-xl backdrop-blur-sm z-10 flex flex-col transition-all duration-300 ease-in-out"
+  [ngClass]="{
+    'w-64': isExpanded,
+    'w-16': !isExpanded
+  }"
+>
+  <div
+    class="flex items-center justify-between p-2 border-b border-slate-200/60 flex-shrink-0"
+  >
+    <div
+      *ngIf="isExpanded"
+      class="flex justify-center flex-1 items-center space-x-2"
+    >
+      <span
+        class="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+      >
+        Menu
+      </span>
+    </div>
+    <button
+      (click)="toggleSidebar()"
+      class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
+      [attr.aria-label]="isExpanded ? 'Retrair menu' : 'Expandir menu'"
+    >
+      <ng-icon
+        [name]="isExpanded ? 'heroXMark' : 'heroBars3'"
+        size="18"
+      ></ng-icon>
+    </button>
+  </div>
+
+  <nav class="flex-1 p-2 space-y-1 overflow-y-auto">
+    <div *ngFor="let item of menuItems" class="space-y-1">
+      <button
+        (click)="handleMenuClick(item)"
+        [class]="getMenuItemClasses(item)"
+        [attr.aria-expanded]="item.children ? item.expanded : null"
+      >
+        <div class="flex items-center space-x-3 min-w-0">
+          <ng-icon [name]="item.icon" size="20" class="flex-shrink-0"></ng-icon>
+          <span *ngIf="isExpanded" class="truncate font-medium text-sm">
+            {{ item.label }}
+          </span>
+        </div>
+
+        <ng-icon
+          *ngIf="isExpanded && item.children"
+          name="heroChevronDown"
+          size="16"
+          [class]="
+            'flex-shrink-0 transition-transform duration-200 ' +
+            (item.expanded ? 'rotate-180' : '')
+          "
+        >
+        </ng-icon>
+      </button>
+
+      <div
+        *ngIf="item.children && item.expanded && isExpanded"
+        class="ml-4 space-y-1 overflow-hidden transition-all duration-300"
+      >
+        <button
+          *ngFor="let subItem of item.children"
+          (click)="navigateToRoute(subItem.route!)"
+          [class]="getSubMenuItemClasses(subItem)"
+        >
+          <div class="flex items-center space-x-3 min-w-0">
+            <ng-icon
+              [name]="subItem.icon"
+              size="16"
+              class="flex-shrink-0"
+            ></ng-icon>
+            <span class="truncate text-sm">{{ subItem.label }}</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="p-4 border-t border-slate-200/60 flex-shrink-0">
+    <div *ngIf="isExpanded" class="text-xs text-slate-500 text-center">
+      LabManager v1.0
+    </div>
+    <div *ngIf="!isExpanded" class="w-6 h-1 bg-slate-300 rounded mx-auto"></div>
+  </div>
+</aside>

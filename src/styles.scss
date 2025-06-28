@@ -1,2 +1,8 @@
 @use "tailwindcss";
 
+*{
+  @apply box-border;
+}
+body {
+  @apply overflow-hidden;
+}
