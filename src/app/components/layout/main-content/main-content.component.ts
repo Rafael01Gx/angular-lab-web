@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -16,7 +16,6 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
         overflow: hidden;
       }
 
-      /* Custom scrollbar styling */
       .overflow-y-auto::-webkit-scrollbar {
         width: 6px;
       }
@@ -33,7 +32,6 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
         @apply bg-slate-400;
       }
 
-      /* Smooth transitions for layout changes */
       main {
         transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
       }
@@ -41,8 +39,8 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
   ],
 })
 export class MainContentComponent {
-  sidebarExpanded = true;
-  notificationCount = 3; // Exemplo
+  sidebarExpanded = signal(true);
+  notificationCount = 3;
   platformID = inject(PLATFORM_ID);
   currentUser = {
     name: 'Dr. João Silva',
@@ -59,12 +57,12 @@ export class MainContentComponent {
   }
 
   onSidebarToggle(expanded: boolean): void {
-    this.sidebarExpanded = expanded;
+    this.sidebarExpanded.set(expanded);
   }
 
   private checkInitialSidebarState(): void {
     if (window.innerWidth < 1024) {
-      this.sidebarExpanded = false;
+      this.sidebarExpanded.set(false);
     }
   }
 }

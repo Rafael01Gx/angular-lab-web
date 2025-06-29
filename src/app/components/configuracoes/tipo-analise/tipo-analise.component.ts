@@ -10,17 +10,8 @@ import {
   heroPlus,
   heroMagnifyingGlass
 } from '@ng-icons/heroicons/outline';
+import { IClasseItem, ITipoAnalise } from '../../../interfaces/settings.interface';
 
-export interface TipoAnalise {
-  id: number;
-  tipo: string;
-  classe: string;
-}
-
-export interface ClasseItem {
-  value: string;
-  label: string;
-}
 
 @Component({
   selector: 'app-tipo-analise',
@@ -40,7 +31,7 @@ viewProviders: [
 })
 export class TipoAnaliseComponent implements OnInit {
   // Dados mock
-  classe_itens: ClasseItem[] = [
+  classe_itens: IClasseItem[] = [
     { value: 'microbiologica', label: 'Microbiológica' },
     { value: 'fisico-quimica', label: 'Físico-Química' },
     { value: 'sensorial', label: 'Sensorial' },
@@ -51,7 +42,7 @@ export class TipoAnaliseComponent implements OnInit {
     { value: 'toxicologica', label: 'Toxicológica' }
   ];
 
-  tiposAnalise: TipoAnalise[] = [
+  tiposAnalise: ITipoAnalise[] = [
     { id: 1, tipo: 'Análise de Coliformes', classe: 'microbiologica' },
     { id: 2, tipo: 'Teste de pH', classe: 'fisico-quimica' },
     { id: 3, tipo: 'Avaliação de Cor', classe: 'sensorial' },
@@ -67,8 +58,8 @@ export class TipoAnaliseComponent implements OnInit {
   ];
 
   // Formulário
-  novoItem: Partial<TipoAnalise> = { tipo: '', classe: '' };
-  editingItem: TipoAnalise | null = null;
+  novoItem: Partial<ITipoAnalise> = { tipo: '', classe: '' };
+  editingItem: ITipoAnalise | null = null;
 
   // Paginação
   paginaAtual = 1;
@@ -79,7 +70,7 @@ export class TipoAnaliseComponent implements OnInit {
     return Math.ceil(this.tiposAnalise.length / this.itensPorPagina);
   }
 
-  get itensPaginados(): TipoAnalise[] {
+  get itensPaginados(): ITipoAnalise[] {
     const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
     const fim = inicio + this.itensPorPagina;
     return this.tiposAnalise.slice(inicio, fim);
@@ -127,7 +118,7 @@ export class TipoAnaliseComponent implements OnInit {
     }
   }
 
-  editarItem(item: TipoAnalise): void {
+  editarItem(item: ITipoAnalise): void {
     this.editingItem = item;
     this.novoItem = { tipo: item.tipo, classe: item.classe };
   }

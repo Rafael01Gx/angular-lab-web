@@ -1,0 +1,210 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { 
+  heroEye, 
+  heroEyeSlash,
+  heroEnvelope,
+  heroLockClosed,
+  heroArrowRight,
+  heroSparkles,
+  heroShieldCheck,
+  heroUsers
+} from '@ng-icons/heroicons/outline';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgIconComponent],
+  viewProviders: [
+    provideIcons({
+      heroEye,
+      heroEyeSlash,
+      heroEnvelope,
+      heroLockClosed,
+      heroArrowRight,
+      heroSparkles,
+      heroShieldCheck,
+      heroUsers
+    })
+  ],
+  template: `
+    <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex">
+      <!-- Left Side - Login Form -->
+      <div class="flex-1 flex items-center justify-center p-8 lg:p-12">
+        <div class="w-full max-w-md">
+          <!-- Logo/Brand -->
+          <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
+              <ng-icon name="heroSparkles" size="24" class="text-white"></ng-icon>
+            </div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Bem-vindo
+            </h1>
+            <p class="text-slate-500 mt-2">Faça login para continuar</p>
+          </div>
+
+          <!-- Login Form -->
+          <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-6">
+            <!-- Email Field -->
+            <div class="space-y-2">
+              <label for="email" class="block text-sm font-medium text-slate-700">
+                Email
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <ng-icon name="heroEnvelope" size="18" class="text-slate-400"></ng-icon>
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  [(ngModel)]="loginData.email"
+                  name="email"
+                  required
+                  email
+                  class="w-full pl-12 pr-4 py-3 rounded-sm border border-slate-200 bg-white/70 
+                         focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400
+                         placeholder-slate-400 text-slate-700 transition-all duration-200
+                         hover:bg-white/80"
+                  placeholder="seu@email.com"
+                />
+              </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="space-y-2">
+              <label for="password" class="block text-sm font-medium text-slate-700">
+                Senha
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <ng-icon name="heroLockClosed" size="18" class="text-slate-400"></ng-icon>
+                </div>
+                <input
+                  id="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="loginData.password"
+                  name="password"
+                  required
+                  minlength="6"
+                  class="w-full pl-12 pr-12 py-3 rounded-sm border border-slate-200 bg-white/70
+                         focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400
+                         placeholder-slate-400 text-slate-700 transition-all duration-200
+                         hover:bg-white/80"
+                  placeholder="Sua senha"
+                />
+                <button
+                  type="button"
+                  (click)="togglePassword()"
+                  class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <ng-icon [name]="showPassword ? 'heroEyeSlash' : 'heroEye'" size="18"></ng-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center justify-between">
+              <label class="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="rememberMe"
+                  name="rememberMe"
+                  class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20"
+                />
+                <span class="text-sm text-slate-600">Lembrar-me</span>
+              </label>
+              <a href="#" class="text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+                Esqueceu a senha?
+              </a>
+            </div>
+
+            <!-- Login Button -->
+            <button
+              type="submit"
+              [disabled]="!loginForm.valid || isLoading"
+              class="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl
+                     font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
+                     transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
+                     disabled:transform-none disabled:shadow-md flex items-center justify-center gap-2"
+            >
+              <span *ngIf="!isLoading">Entrar</span>
+              <span *ngIf="isLoading">Entrando...</span>
+              <ng-icon 
+                *ngIf="!isLoading" 
+                name="heroArrowRight" 
+                size="18" 
+                class="transform group-hover:translate-x-1 transition-transform"
+              ></ng-icon>
+              <div *ngIf="isLoading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            </button>
+          </form>
+
+
+
+
+        </div>
+      </div>
+
+      <!-- Right Side - Image/Brand Section -->
+      <div class="hidden lg:flex flex-3 relative overflow-hidden">
+        <!-- Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-400"></div>
+        
+    
+
+        <!-- Content -->
+       
+      </div>
+    </div>
+  `,
+  styleUrls: []
+})
+export class LoginComponent implements OnInit {
+  loginData = {
+    email: '',
+    password: ''
+  };
+  
+  showPassword = false;
+  rememberMe = false;
+  isLoading = false;
+  
+  // Grid items for background animation
+
+
+  ngOnInit(): void {
+    // Component initialization
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  async onLogin(): Promise<void> {
+    if (!this.loginData.email || !this.loginData.password) {
+      return;
+    }
+
+    this.isLoading = true;
+    
+    try {
+      // Simular chamada de API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      console.log('Login realizado:', {
+        email: this.loginData.email,
+        rememberMe: this.rememberMe
+      });
+      
+      // Aqui você implementaria a lógica real de login
+      // Por exemplo: this.authService.login(this.loginData)
+      
+    } catch (error) {
+      console.error('Erro no login:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+}

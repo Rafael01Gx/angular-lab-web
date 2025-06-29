@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, input, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { 
+import {
   heroBeaker,
   heroBell,
   heroUser,
@@ -11,7 +11,7 @@ import {
   heroClipboardDocumentList,
   heroChartBarSquare,
   heroCog6Tooth,
-  heroUserGroup
+  heroUserGroup,
 } from '@ng-icons/heroicons/outline';
 
 @Component({
@@ -20,7 +20,7 @@ import {
   templateUrl: './header.component.html',
   viewProviders: [
     provideIcons({
-        heroBeaker,
+      heroBeaker,
       heroBell,
       heroUser,
       heroArrowRightOnRectangle,
@@ -28,20 +28,18 @@ import {
       heroClipboardDocumentList,
       heroChartBarSquare,
       heroCog6Tooth,
-      heroUserGroup
-    })
+      heroUserGroup,
+    }),
   ],
-  host: {class: 'block'}
-
+  host: { class: 'block' },
 })
 export class HeaderComponent {
- @Input() userName: string = 'Usuário';
-  @Input() notificationCount: number = 0;
-
-  constructor(private router: Router) {}
+  userName = input<string>('Usuário');
+  notificationCount = input<number>(0);
+  #router = inject(Router);
 
   getCurrentRouteName(): string {
-    const url = this.router.url;
+    const url = this.#router.url;
     const routeMap: { [key: string]: string } = {
       '/dashboard': 'Dashboard',
       '/orders': 'Ordens de Serviço',
@@ -59,24 +57,23 @@ export class HeaderComponent {
       '/settings': 'Configurações',
     };
 
-    // Find the best match for nested routes
     const matchingRoute = Object.keys(routeMap)
       .sort((a, b) => b.length - a.length)
-      .find(route => url.startsWith(route));
-    
+      .find((route) => url.startsWith(route));
+
     return matchingRoute ? routeMap[matchingRoute] : 'Sistema';
   }
 
   getCurrentRouteIcon(): string {
-    const url = this.router.url;
-    
-    if (url.includes('/dashboard')) return 'heroChartBarSquare';
-    if (url.includes('/orders')) return 'heroClipboardDocumentList';
-    if (url.includes('/samples')) return 'heroBeaker';
-    if (url.includes('/analysis')) return 'heroBeaker';
-    if (url.includes('/access-management')) return 'heroUserGroup';
-    if (url.includes('/settings')) return 'heroCog6Tooth';
-    
+    const url = this.#router.url;
+
+    if (url.includes('/dashboard/')) return 'heroChartBarSquare';
+    if (url.includes('/orders/')) return 'heroClipboardDocumentList';
+    if (url.includes('/samples/')) return 'heroBeaker';
+    if (url.includes('/analysis/')) return 'heroBeaker';
+    if (url.includes('/access-management/')) return 'heroUserGroup';
+    if (url.includes('/settings/')) return 'heroCog6Tooth';
+
     return 'heroHome';
   }
 
@@ -86,7 +83,7 @@ export class HeaderComponent {
   }
 
   onProfileClick(): void {
-    this.router.navigate(['/profile']);
+    this.#router.navigate(['/profile']);
   }
 
   onLogout(): void {

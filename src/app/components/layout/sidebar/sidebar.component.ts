@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, HostListener, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { Component, Output, EventEmitter, HostListener, OnInit, inject, PLATFORM_ID, OutputEmitterRef, output } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
@@ -24,15 +24,7 @@ import {
   heroCube
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
-
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: string;
-  route?: string;
-  children?: MenuItem[];
-  expanded?: boolean;
-}
+import { IMenuItem } from '../../../interfaces/layout.interfaces';
 
 @Component({
   selector: 'app-sidebar',
@@ -65,7 +57,8 @@ interface MenuItem {
   },
 })
 export class SidebarComponent implements OnInit {
-@Output() sidebarToggled = new EventEmitter<boolean>();
+
+sidebarToggled: OutputEmitterRef<boolean> = output<boolean>();
 
 platformID = inject(PLATFORM_ID);
 router = inject(Router);
@@ -74,7 +67,7 @@ router = inject(Router);
   isMobile = false;
   currentRoute = '';
 
-  menuItems: MenuItem[] = [
+  menuItems: IMenuItem[] = [
     {
       id: 'dashboard',
       label: 'Dashboard',
@@ -187,7 +180,7 @@ router = inject(Router);
     this.sidebarToggled.emit(this.isExpanded);
   }
 
-  handleMenuClick(item: MenuItem): void {
+  handleMenuClick(item: IMenuItem): void {
     if (item.children) {
       item.expanded = !item.expanded;
     } else if (item.route) {
@@ -205,9 +198,7 @@ router = inject(Router);
     }
   }
 
- 
-
-  getMenuItemClasses(item: MenuItem): string {
+  getMenuItemClasses(item: IMenuItem): string {
     const isActive = this.isRouteActive(item);
     return `
       w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200
@@ -219,7 +210,7 @@ router = inject(Router);
     `;
   }
 
-  getSubMenuItemClasses(subItem: MenuItem): string {
+  getSubMenuItemClasses(subItem: IMenuItem): string {
     const isActive = this.currentRoute === subItem.route;
     return `
       w-full flex items-center p-2 rounded-lg transition-all duration-200
@@ -230,7 +221,7 @@ router = inject(Router);
     `;
   }
 
-  private isRouteActive(item: MenuItem): boolean {
+  private isRouteActive(item: IMenuItem): boolean {
     if (item.route) {
       return this.currentRoute === item.route;
     }

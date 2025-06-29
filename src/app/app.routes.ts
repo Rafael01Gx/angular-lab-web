@@ -1,18 +1,31 @@
 import { Routes } from '@angular/router';
+import { HomeComponent } from './pages/home/home.component';
+import { LoginComponent } from './pages/login/login.component';
 
-export const routes: Routes =  [
-      { 
-        path: '', 
-        loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
-        children: [
-      { path: 'configuracoes', redirectTo: 'tipo-analise', pathMatch: 'full' },
-      { 
-        path: 'tipo-analise', 
-        loadComponent: () => import('./components/configuracoes/tipo-analise/tipo-analise.component').then(m => m.TipoAnaliseComponent)
-      },]
-      }
-
-]
+export const routes: Routes = [
+  {
+    path: '',
+    component: HomeComponent,
+    children: [
+      {
+        path: 'settings',
+        redirectTo: 'settings/analysis-type',
+        pathMatch: 'full',
+      },
+      {
+        path: 'settings/analysis-type',
+        loadComponent: () =>
+          import(
+            './components/configuracoes/tipo-analise/tipo-analise.component'
+          ).then((m) => m.TipoAnaliseComponent),
+      },
+    ],
+  },
+  {
+    path: 'login',
+    component: LoginComponent,
+  },
+];
 
 /*
 [
