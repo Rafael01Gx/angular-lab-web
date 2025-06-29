@@ -24,7 +24,7 @@ import {
   heroCube
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
-import { IMenuItem } from '../../../interfaces/layout.interfaces';
+import { IMenuItem } from '../../../interfaces/layout.interface';
 
 @Component({
   selector: 'app-sidebar',
