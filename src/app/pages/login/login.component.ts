@@ -13,6 +13,7 @@ import {
   heroUsers,
 } from '@ng-icons/heroicons/outline';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -198,7 +199,10 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent implements OnInit {
   #authService = inject(AuthService);
-  platformId = inject(PLATFORM_ID);
+  #router = inject(Router);
+  #platformId = inject(PLATFORM_ID);
+
+
   loginData = {
     email: '',
     password: '',
@@ -223,14 +227,16 @@ export class LoginComponent implements OnInit {
       return;
     }
     this.isLoading = true;
-    if (isPlatformBrowser(this.platformId)) {
+    if (isPlatformBrowser(this.#platformId)) {
       try {
         this.#authService
           .login(this.loginData.email, this.loginData.password)
           .subscribe({
-            next: (res) => console.log(res),
-            complete: () => (this.isLoading = false),
-            error: () => (this.isLoading = false),
+            next: () => {
+              this.isLoading = false
+              this.#router.navigate(['/']);
+            },
+            error: () => this.isLoading = false,
           });
       } catch (error) {
         console.error('Erro no login:', error);

@@ -13,6 +13,7 @@ import {
   heroCog6Tooth,
   heroUserGroup,
 } from '@ng-icons/heroicons/outline';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -34,6 +35,7 @@ import {
   host: { class: 'block' },
 })
 export class HeaderComponent {
+  #authService = inject(AuthService);
   userName = input<string>('Usuário');
   notificationCount = input<number>(0);
   #router = inject(Router);
@@ -87,8 +89,10 @@ export class HeaderComponent {
   }
 
   onLogout(): void {
-    // Implementar lógica de logout
-    console.log('Logout realizado');
-    // this.authService.logout();
+    this.#authService.logout().subscribe({
+      next: () => {
+        this.#router.navigate(['/login']);
+      },
+    });
   }
 }
