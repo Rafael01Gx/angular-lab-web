@@ -1,7 +1,9 @@
 export interface ITipoAnalise {
-  id: number;
+  id?: string;
   tipo: string;
   classe: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IClasseItem {
