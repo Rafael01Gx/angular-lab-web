@@ -26,13 +26,9 @@ export class AnalysisTypeService {
       withCredentials: true,
     });
   }
-  delete(id: string): Observable<ITipoAnalise> {
-    return this.#http.patch<ITipoAnalise>(
-      `${this.#apiUrl}/${id}`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
+  delete(id: string): Observable<any> {
+    return this.#http.delete(`${this.#apiUrl}/${id}`, {
+      withCredentials: true,
+    });
   }
 }

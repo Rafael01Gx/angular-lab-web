@@ -1,65 +1,86 @@
-<header class="fixed top-0 left-0 right-0 z-50 w-full bg-gradient-to-r from-slate-50/95 to-blue-50/95 backdrop-blur-md border-b border-slate-200/60 shadow-md">
-      <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        
-        <!-- Logo -->
-        <div class="flex items-center space-x-3 min-w-0 flex-shrink-0">
-          <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-            <ng-icon name="heroBeaker" size="20" class="text-white"></ng-icon>
-          </div>
-          <div class="hidden sm:block">
-            <h1 class="text-lg font-bold bg-gradient-to-r from-slate-700 to-blue-600 bg-clip-text text-transparent">
-              LabManager
-            </h1>
-          </div>
-        </div>
-
-        <!-- Current Route -->
-        <div class="flex items-center space-x-2 min-w-0 flex-1 justify-center px-4">
-          <div class="flex items-center space-x-2 bg-white/60 rounded-xl px-4 py-2 shadow-sm border border-slate-200/40">
-            <ng-icon [name]="getCurrentRouteIcon()" size="18" class="text-slate-600 flex-shrink-0"></ng-icon>
-            <span class="text-sm font-medium text-slate-700 truncate">
-              {{ getCurrentRouteName() }}
-            </span>
-          </div>
-        </div>
-
-        <!-- User Tools -->
-        <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-          <!-- User Name (hidden on small screens) -->
-          <div class="hidden md:flex items-center space-x-2">
-            <span class="text-sm font-medium text-slate-700 truncate max-w-32">
-              {{ userName() }}
-            </span>
-          </div>
-
-          <!-- Notifications -->
-          <button 
-            class="relative p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
-            (click)="onNotificationClick()"
-            [attr.aria-label]="'Notificações' + (notificationCount() > 0 ? ' (' + notificationCount() + ' não lidas)' : '')">
-            <ng-icon name="heroBell" size="20"></ng-icon>
-            <span 
-              *ngIf="notificationCount() > 0" 
-              class="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-red-400 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-lg animate-pulse">
-              {{ notificationCount() > 99 ? '99+' : notificationCount() }}
-            </span>
-          </button>
-
-          <!-- User Profile -->
-          <button 
-            class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
-            (click)="onProfileClick()"
-            aria-label="Perfil do usuário">
-            <ng-icon name="heroUser" size="20"></ng-icon>
-          </button>
-
-          <!-- Logout -->
-          <button 
-            class="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-            (click)="onLogout()"
-            aria-label="Sair do sistema">
-            <ng-icon name="heroArrowRightOnRectangle" size="20"></ng-icon>
-          </button>
-        </div>
+<header
+  class="fixed dark:bg-gray-800 top-0 left-0 right-0 z-50 w-full bg-blue-50 backdrop-blur-md border-b border-slate-200/60 shadow-md"
+>
+  <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+    <!-- Logo -->
+    <div class="flex items-center space-x-3 min-w-0 flex-shrink-0">
+      <div
+        class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg"
+      >
+        <ng-icon name="heroBeaker" size="20" class="text-white"></ng-icon>
       </div>
-    </header>
+      <div class="hidden sm:block">
+        <h1
+          class="text-lg font-bold bg-gradient-to-r from-slate-700 to-blue-600 bg-clip-text text-transparent"
+        >
+          LabManager
+        </h1>
+      </div>
+    </div>
+
+    <!-- Current Route -->
+    <div class="flex items-center space-x-2 min-w-0 flex-1 justify-center px-4">
+      <div
+        class="flex items-center space-x-2 bg-white/60 dark:bg-gray-800 dark:border-gray-400 rounded-xl px-4 py-2 shadow-sm border border-slate-200/40"
+      >
+        <ng-icon
+          [name]="getCurrentRouteIcon()"
+          size="18"
+          class="text-slate-600 flex-shrink-0"
+        ></ng-icon>
+        <span class="text-sm font-medium text-slate-700 dark:text-gray-400 truncate">
+          {{ getCurrentRouteName() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- User Tools -->
+    <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+      <!-- User Name (hidden on small screens) -->
+      <div class="hidden md:flex items-center space-x-2">
+        <span class="text-sm font-medium text-slate-700 dark:text-gray-400 truncate max-w-32">
+          {{ userName() }}
+        </span>
+      </div>
+
+      <!-- Notifications -->
+      <button
+        class="relative dark:text-gray-400 p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
+        (click)="onNotificationClick()"
+        [attr.aria-label]="
+          'Notificações' +
+          (notificationCount() > 0
+            ? ' (' + notificationCount() + ' não lidas)'
+            : '')
+        "
+      >
+        <ng-icon name="heroBell" size="20"></ng-icon>
+        @if(notificationCount() > 0){
+        <span
+          class="absolute  -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-red-400 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-lg animate-pulse"
+        >
+          {{ notificationCount() > 99 ? "99+" : notificationCount() }}
+        </span>
+        }
+      </button>
+
+      <!-- User Profile -->
+      <button
+        class="p-2 dark:text-gray-400 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
+        (click)="onProfileClick()"
+        aria-label="Perfil do usuário"
+      >
+        <ng-icon name="heroUser" size="20"></ng-icon>
+      </button>
+
+      <!-- Logout -->
+      <button
+        class="p-2 dark:text-gray-400 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+        (click)="onLogout()"
+        aria-label="Sair do sistema"
+      >
+        <ng-icon name="heroArrowRightOnRectangle" size="20"></ng-icon>
+      </button>
+    </div>
+  </div>
+</header>

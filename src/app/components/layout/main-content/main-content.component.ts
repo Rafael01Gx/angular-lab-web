@@ -1,4 +1,4 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
@@ -6,7 +6,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
   selector: 'app-main-content',
-  imports: [CommonModule, RouterOutlet, HeaderComponent, SidebarComponent],
+  imports: [ RouterOutlet, HeaderComponent, SidebarComponent],
   templateUrl: './main-content.component.html',
   styles: [
     `

@@ -1,5 +1,4 @@
 import { Component, inject, input, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
@@ -17,7 +16,7 @@ import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule, NgIconComponent],
+  imports: [ NgIconComponent],
   templateUrl: './header.component.html',
   viewProviders: [
     provideIcons({

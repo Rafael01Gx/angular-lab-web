@@ -1,9 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {
   FormControl,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -25,7 +23,7 @@ import { ConfirmationModalService } from '../../../services/confirmation-modal.s
 
 @Component({
   selector: 'app-tipo-analise',
-  imports: [CommonModule, ReactiveFormsModule, NgIconComponent],
+  imports: [ReactiveFormsModule, NgIconComponent],
   templateUrl: './tipo-analise.component.html',
   viewProviders: [
     provideIcons({
@@ -158,11 +156,14 @@ export class TipoAnaliseComponent implements OnInit {
     );
 
     if (confirmed) {
-      // Executar a exclusão
-      this.tiposAnalise = this.tiposAnalise.filter((t) => t.id !== item.id);
-      if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
-        this.paginaAtual = this.totalPaginas;
-      }
+      this.#analysisTypeService.delete(item.id as string).subscribe({
+        next: () => {
+          this.tiposAnalise = this.tiposAnalise.filter((t) => t.id !== item.id);
+          if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
+            this.paginaAtual = this.totalPaginas;
+          }
+        },
+      });
     }
   }
 }

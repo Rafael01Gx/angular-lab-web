@@ -1,5 +1,5 @@
-import { Component, Output, EventEmitter, HostListener, OnInit, inject, PLATFORM_ID, OutputEmitterRef, output } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, HostListener, OnInit, inject, PLATFORM_ID, OutputEmitterRef, output } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { 
@@ -28,7 +28,7 @@ import { IMenuItem } from '../../../interfaces/layout.interface';
 
 @Component({
   selector: 'app-sidebar',
-  imports:  [CommonModule, NgIconComponent],
+  imports:  [NgIconComponent],
   templateUrl: './sidebar.component.html',
   viewProviders:  [
     provideIcons({
@@ -55,6 +55,24 @@ import { IMenuItem } from '../../../interfaces/layout.interface';
   ],
   host: { class: 'block max-h-full'
   },
+  styles:[`
+    .custom-scrollbar::-webkit-scrollbar {
+  width: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #a7c7e7; 
+  border-radius: 3px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #93b5e1; 
+}
+    `]
 })
 export class SidebarComponent implements OnInit {
 
@@ -203,8 +221,8 @@ router = inject(Router);
     return `
       w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200
       ${isActive 
-        ? 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 shadow-md border border-blue-200/60' 
-        : 'text-slate-700 hover:bg-slate-100 hover:text-blue-600'
+        ? 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 shadow-md border border-blue-200/60 dark:from-neutral-300 dark:to-neutral-300 ' 
+        : 'text-slate-700 dark:text-gray-400 dark:hover:bg-blue-500/50 dark:hover:text-gray-200  hover:bg-slate-50 hover:text-blue-600'
       }
       group relative
     `;
@@ -215,8 +233,8 @@ router = inject(Router);
     return `
       w-full flex items-center p-2 rounded-lg transition-all duration-200
       ${isActive 
-        ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 shadow-sm border-l-2 border-blue-400' 
-        : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600'
+        ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 dark:from-neutral-200 dark:to-neutral-200 shadow-sm border-l-2 border-blue-400' 
+        : 'text-slate-600 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-blue-500/50  hover:bg-slate-50 hover:text-blue-600'
       }
     `;
   }

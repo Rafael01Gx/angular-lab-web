@@ -1,5 +1,5 @@
 <div
-  class="h-full w-full bg-gradient-to-b from-white to-slate-50/80 p-6 flex flex-col"
+  class="h-full w-full bg-gradient-to-b from-blue-50 to-slate-50/80 p-2 rounded-sm flex flex-col"
 >
   <!-- Formulário de Cadastro -->
   <div
@@ -46,9 +46,9 @@
           class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
         >
           <option value="">Selecione uma classe</option>
-          @for(classe of classe_itens; track classe_itens){
-          <option [value]="classe.value">
-            {{ classe.label }}
+          @for(item of classe_itens; track item.label){
+          <option [value]="item.value">
+            {{ item.label }}
           </option>
           }
         </select>
@@ -64,14 +64,15 @@
           {{ editingItem ? "Atualizar" : "Salvar" }}
         </button>
 
+        @if(editingItem){
         <button
-          *ngIf="editingItem"
           type="button"
           (click)="cancelarEdicao()"
           class="px-6 h-12 py-3 bg-slate-200 text-slate-700 rounded-sm font-medium hover:bg-slate-300 transition-colors duration-200"
         >
           Cancelar
         </button>
+        }
       </div>
     </form>
   </div>
@@ -93,10 +94,12 @@
           ></ng-icon>
           Análises Cadastradas
         </h2>
+        @if(tiposAnalise){
         <div class="text-sm text-slate-500">
           Total: {{ tiposAnalise.length }}
           {{ tiposAnalise.length === 1 ? "item" : "itens" }}
         </div>
+        }
       </div>
     </div>
 
@@ -133,7 +136,8 @@
           </tr>
         </thead>
         <tbody>
-          @for(item of itensPaginados; track item.id; let i = $index){
+          @if(tiposAnalise){ @for(item of itensPaginados; track item.id; let i =
+          $index){
           <tr
             class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-slate-100/50"
           >
@@ -167,10 +171,8 @@
               </button>
             </td>
           </tr>
-          }
-
-          <!-- Estado vazio -->
-          <tr *ngIf="tiposAnalise.length === 0">
+          }}@else {
+          <tr>
             <td colspan="5" class="py-12 text-center text-slate-500">
               <div class="flex flex-col items-center gap-3">
                 <div
@@ -189,15 +191,16 @@
               </div>
             </td>
           </tr>
+          }
+
+          <!-- Estado vazio -->
         </tbody>
       </table>
     </div>
 
     <!-- Paginação Fixa -->
-    <div
-      *ngIf="tiposAnalise.length > 0"
-      class="border-t border-slate-200/50 p-4 bg-white/50 backdrop-blur-sm"
-    >
+    @if(tiposAnalise){
+    <div class="border-t border-slate-200/50 p-4 bg-white/50 backdrop-blur-sm">
       <div class="flex items-center justify-between">
         <div class="text-sm text-slate-600">
           Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} a
@@ -228,5 +231,6 @@
         </div>
       </div>
     </div>
+    }
   </div>
 </div>
