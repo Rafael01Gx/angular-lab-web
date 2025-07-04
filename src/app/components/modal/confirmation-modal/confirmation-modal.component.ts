@@ -19,7 +19,7 @@ import {
   heroInformationCircle,
   heroExclamationCircle,
 } from '@ng-icons/heroicons/outline';
-import { ConfirmationModalConfig } from '../../../interfaces/confirmation-moda.interface';
+import { ConfirmationModalConfig } from '../../../interfaces/confirmation-modal.interface';
 
 @Component({
   selector: 'app-confirmation-modal',

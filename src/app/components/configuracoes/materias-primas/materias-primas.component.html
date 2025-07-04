@@ -8,23 +8,26 @@
       class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2"
     >
       <ng-icon name="heroPlus" class="text-emerald-500" size="20"></ng-icon>
-      {{ editingItem ? "Editar Análise" : "Nova Análise" }}
+      {{ editingItem ? "Editar Matéria-Prima" : "Nova Matéria-Prima" }}
     </h2>
 
     <form
-      [formGroup]="analiseForm"
+      [formGroup]="materiaPrimaForm"
       (ngSubmit)="salvarItem()"
       class="md:flex justify-between gap-4"
     >
       <div class="flex-1">
-        <label for="tipo" class="block text-sm font-medium text-slate-600">
-          Tipo de Análise
+        <label
+          for="nomeDescricao"
+          class="block text-sm font-medium text-slate-600 mb-1"
+        >
+          Matéria-Prima
         </label>
         <input
-          id="tipo"
+          id="nomeDescricao"
           type="text"
-          formControlName="tipo"
-          name="tipo"
+          formControlName="nomeDescricao"
+          name="nomeDescricao"
           required
           class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 placeholder-slate-400 text-slate-700 transition-all duration-200"
           placeholder="Digite o tipo de análise"
@@ -32,18 +35,21 @@
       </div>
 
       <div class="flex-1">
-        <label for="classe" class="block text-sm font-medium text-slate-600">
-          Classe
+        <label
+          for="classeTipo"
+          class="block text-sm font-medium text-slate-600 mb-1"
+        >
+          Classe/Tipo
         </label>
         <select
-          id="classe"
-          formControlName="classe"
-          name="classe"
+          id="classeTipo"
+          formControlName="classeTipo"
+          name="classeTipo"
           required
           class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
         >
           <option value="">Selecione uma classe</option>
-          @for(item of classe_itens; track item.label){
+          @for(item of classeTipo; track item.label){
           <option [value]="item.value">
             {{ item.label }}
           </option>
@@ -54,7 +60,7 @@
       <div class="flex justify-center items-end py-1 gap-3">
         <button
           type="submit"
-          [disabled]="!analiseForm.valid"
+          [disabled]="!materiaPrimaForm.valid"
           class="px-6 h-12 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md"
         >
           {{ editingItem ? "Atualizar" : "Salvar" }}
@@ -88,12 +94,20 @@
             class="text-indigo-500"
             size="20"
           ></ng-icon>
-          Análises Cadastradas
+          Matérias-Primas Cadastradas
         </h2>
-        @if(tiposAnalise){
+        <input
+          class="w-1/3 px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 placeholder-slate-400 text-slate-700 transition-all duration-200"
+          type="text"
+          name="filter"
+          #teste
+          (keyup)="filtrar(teste.value)"
+          placeholder="Filtro"
+        />
+        @if(materiasPrimasFiltro){
         <div class="text-sm text-slate-500">
-          Total: {{ tiposAnalise.length }}
-          {{ tiposAnalise.length === 1 ? "item" : "itens" }}
+          Total: {{ materiasPrimasFiltro.length }}
+          {{ materiasPrimasFiltro.length === 1 ? "item" : "itens" }}
         </div>
         }
       </div>
@@ -112,12 +126,12 @@
             <th
               class="text-left py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
             >
-              Tipo
+              Matéria-Prima
             </th>
             <th
               class="text-left py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
             >
-              Classe
+              Classe/Tipo
             </th>
             <th
               class="text-center py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
@@ -132,20 +146,20 @@
           </tr>
         </thead>
         <tbody>
-          @if(tiposAnalise){ @for(item of itensPaginados; track item.id; let i =
-          $index){
+          @if(materiasPrimasFiltro){ @for(item of itensPaginados; track item.id;
+          let i = $index){
           <tr
             class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-slate-100/50"
           >
-            <td class="py-4 px-6 text-slate-700 font-medium">#{{ i + 1 }}</td>
+            <td class="py-4 px-6 text-slate-700 font-medium">#{{ item.id }}</td>
             <td class="py-4 px-6 text-slate-600">
-              {{ item.tipo }}
+              {{ item.nomeDescricao }}
             </td>
             <td class="py-4 px-6">
               <span
                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200/50"
               >
-                {{ getClasseLabel(item.classe) }}
+                {{ getClasseLabel(item.classeTipo) }}
               </span>
             </td>
             <td class="py-4 px-6 text-center">
@@ -195,13 +209,15 @@
     </div>
 
     <!-- Paginação -->
-    @if(tiposAnalise){
+    @if(materiasPrimasFiltro){
     <div class="border-t border-slate-200/50 p-4 bg-white/50 backdrop-blur-sm">
       <div class="flex items-center justify-between">
         <div class="text-sm text-slate-600">
           Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} a
-          {{ Math.min(paginaAtual * itensPorPagina, tiposAnalise.length) }} de
-          {{ tiposAnalise.length }} resultados
+          {{
+            Math.min(paginaAtual * itensPorPagina, materiasPrimasFiltro.length)
+          }}
+          de {{ materiasPrimasFiltro.length }} resultados
         </div>
 
         <div class="flex items-center gap-2">

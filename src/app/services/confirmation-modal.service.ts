@@ -7,7 +7,7 @@ import {
   EnvironmentInjector,
 } from '@angular/core';
 import { ConfirmationModalComponent } from '../components/modal/confirmation-modal/confirmation-modal.component';
-import { ConfirmationModalConfig } from '../interfaces/confirmation-moda.interface';
+import { ConfirmationModalConfig } from '../interfaces/confirmation-modal.interface';
 
 @Injectable({
   providedIn: 'root',

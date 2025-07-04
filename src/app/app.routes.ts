@@ -32,6 +32,13 @@ export const routes: Routes = [
             './components/configuracoes/tipo-analise/tipo-analise.component'
           ).then((m) => m.TipoAnaliseComponent),
       },
+      {
+        path: 'settings/materials',
+        loadComponent: () =>
+          import(
+            './components/configuracoes/materias-primas/materias-primas.component'
+          ).then((m) => m.MateriasPrimasComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '/', pathMatch: 'full' },
