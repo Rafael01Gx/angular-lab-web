@@ -1,4 +1,4 @@
-import { Component, inject, input, Input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
@@ -13,10 +13,11 @@ import {
   heroUserGroup,
 } from '@ng-icons/heroicons/outline';
 import { AuthService } from '../../../services/auth.service';
+import { IUser } from '../../../interfaces/user.interface';
 
 @Component({
   selector: 'app-header',
-  imports: [ NgIconComponent],
+  imports: [NgIconComponent],
   templateUrl: './header.component.html',
   viewProviders: [
     provideIcons({
@@ -35,9 +36,10 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class HeaderComponent {
   #authService = inject(AuthService);
-  userName = input<string>('Usuário');
   notificationCount = input<number>(0);
   #router = inject(Router);
+  authService = inject(AuthService);
+  user = signal(this.#authService.currentUser());
 
   getCurrentRouteName(): string {
     const url = this.#router.url;
@@ -80,7 +82,7 @@ export class HeaderComponent {
 
   onNotificationClick(): void {
     // Implementar lógica de notificações
-    console.log('Notificações clicadas');
+    console.log(this.user());
   }
 
   onProfileClick(): void {

@@ -4,6 +4,10 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of, tap } from 'rxjs';
 
+interface IUserResponse {
+  user: IUser;
+  message: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -17,23 +21,23 @@ export class AuthService {
 
   constructor() {}
 
-  login(email: string, password: string): Observable<IUser> {
+  login(email: string, password: string): Observable<IUserResponse> {
     return this.#http
-      .post<IUser>(
+      .post<IUserResponse>(
         `${this.#apiUrl}/login`,
         { email, password },
         { withCredentials: true }
       )
       .pipe(
-        tap((user) => {
-          this.setUser(user);
+        tap((res) => {
+          this.setUser(res.user);
         })
       );
   }
 
   logout(): Observable<any> {
     return this.#http
-      .post(`${this.#apiUrl}/logout`, {},{ withCredentials: true })
+      .post(`${this.#apiUrl}/logout`, {}, { withCredentials: true })
       .pipe(
         tap(() => {
           this.clearUser();
@@ -41,13 +45,13 @@ export class AuthService {
       );
   }
 
-  checkAuthStatus(): Observable<IUser | null> {
+  checkAuthStatus(): Observable<IUserResponse | null> {
     return this.#http
-      .get<IUser>(`${this.#apiUrl}/profile`, {
+      .get<IUserResponse>(`${this.#apiUrl}/profile`, {
         withCredentials: true,
       })
       .pipe(
-        tap((user) => this.setUser(user)),
+        tap((res) => this.setUser(res.user)),
         catchError(() => {
           this.clearUser();
           return of(null);

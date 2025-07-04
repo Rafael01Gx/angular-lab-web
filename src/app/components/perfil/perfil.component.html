@@ -1,0 +1,382 @@
+<div
+  class="flex-1 bg-gradient-to-b from-blue-50 to-slate-50/80  overflow-y-auto "
+>
+  <div class="w-full h-full mx-auto">
+    <div class="flex flex-col w-ful h-full">
+      <form
+        [formGroup]="profileForm"
+        (ngSubmit)="onSubmit()"
+        class="space-y-1 flex-1 flex flex-col"
+      >
+        <div
+          class="bg-white/70 backdrop-blur-sm rounded-md shadow-xl border border-purple-100 p-4"
+        >
+          <div class="flex items-center space-x-3 mb-4">
+            <ng-icon
+              name="heroShieldExclamation"
+              class="text-purple-500 text-xl"
+            ></ng-icon>
+            <h2 class="text-xl font-semibold text-gray-800">
+              Informações do Sistema
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700"
+                >Status de Autorização</label
+              >
+              <div
+                class="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl"
+              >
+                <div
+                  [class]="
+                    currentUser()?.authorization
+                      ? 'w-3 h-3 bg-green-400 rounded-full'
+                      : 'w-3 h-3 bg-red-400 rounded-full'
+                  "
+                ></div>
+                <span
+                  [class]="
+                    currentUser()?.authorization
+                      ? 'text-green-700 font-medium'
+                      : 'text-red-700 font-medium'
+                  "
+                >
+                  {{
+                    currentUser()?.authorization
+                      ? "Autorizado"
+                      : "Não Autorizado"
+                  }}
+                </span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700"
+                >Função no Sistema</label
+              >
+              <div
+                class="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl"
+              >
+                <ng-icon name="heroBriefcase" class="text-purple-400"></ng-icon>
+                <span class="text-gray-700 font-medium">{{
+                  currentUser()?.role || "Não definido"
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-1 space-x-1">
+          <div
+            class="bg-white/70 backdrop-blur-sm rounded-sm shadow-xl border border-purple-100 p-8 flex-1"
+          >
+            <div class="flex items-center space-x-3 mb-6">
+              <ng-icon
+                name="heroUser"
+                class="text-purple-500 text-xl"
+              ></ng-icon>
+              <h2 class="text-xl font-semibold text-gray-800">
+                Informações Pessoais
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700"
+                  >Nome Completo</label
+                >
+                <div class="relative">
+                  <input
+                    type="text"
+                    formControlName="name"
+                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    placeholder="Digite seu nome completo"
+                  />
+                  <ng-icon
+                    name="heroUser"
+                    class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                  ></ng-icon>
+                </div>
+                <div
+                  *ngIf="
+                    profileForm.get('name')?.touched &&
+                    profileForm.get('name')?.errors
+                  "
+                  class="text-red-500 text-sm"
+                >
+                  <span *ngIf="profileForm.get('name')?.errors?.['required']"
+                    >Nome é obrigatório</span
+                  >
+                  <span *ngIf="profileForm.get('name')?.errors?.['minlength']"
+                    >Nome deve ter pelo menos 2 caracteres</span
+                  >
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700"
+                  >E-mail</label
+                >
+                <div class="relative">
+                  <input
+                    type="email"
+                    formControlName="email"
+                    readonly
+                    class="w-full px-4 py-3 pl-12 border border-gray-200 rounded-xl bg-gray-50 text-gray-600 cursor-not-allowed"
+                    placeholder="seu@email.com"
+                  />
+                  <ng-icon
+                    name="heroEnvelope"
+                    class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  ></ng-icon>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Telefone</label>
+                <div class="relative">
+                  <input
+                    type="tel"
+                    formControlName="phone"
+                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    placeholder="(11) 99999-9999"
+                    (input)="formatPhone($event)"
+                    maxlength="15"
+                  />
+                  <ng-icon name="heroPhone" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"></ng-icon>
+                </div>
+                <div *ngIf="profileForm.get('phone')?.touched && profileForm.get('phone')?.errors" class="text-red-500 text-sm">
+                  <span *ngIf="profileForm.get('phone')?.errors?.['pattern']">Formato inválido. Use: (xx) xxxx-xxxx ou (xx) x xxxx-xxxx</span>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700"
+                  >Área</label
+                >
+                <div class="relative">
+                  <input
+                    type="text"
+                    formControlName="area"
+                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    placeholder="Sua área de atuação"
+                  />
+                  <ng-icon
+                    name="heroMapPin"
+                    class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                  ></ng-icon>
+                </div>
+              </div>
+
+              <div class="space-y-2 md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700"
+                  >Função</label
+                >
+                <div class="relative">
+                  <input
+                    type="text"
+                    formControlName="funcao"
+                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    placeholder="Sua função/cargo"
+                  />
+                  <ng-icon
+                    name="heroBriefcase"
+                    class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                  ></ng-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white/70 backdrop-blur-sm rounded-md shadow-xl border border-purple-100 p-6 flex-1"
+          >
+            <div class="flex items-center space-x-3 mb-6">
+              <ng-icon
+                name="heroLockClosed"
+                class="text-purple-500 text-xl"
+              ></ng-icon>
+              <h2 class="text-xl font-semibold text-gray-800">Segurança</h2>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="changePassword"
+                  (change)="togglePasswordChange($event)"
+                  class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                />
+                <label
+                  for="changePassword"
+                  class="text-sm font-medium text-gray-700"
+                >
+                  Alterar senha
+                </label>
+              </div>
+
+              <div
+                *ngIf="showPasswordFields()"
+                class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4"
+              >
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Senha Atual</label
+                  >
+                  <div class="relative">
+                    <input
+                      [type]="showOldPassword() ? 'text' : 'password'"
+                      formControlName="oldPassword"
+                      class="w-full px-4 py-3 pl-12 pr-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                      placeholder="Digite sua senha atual"
+                    />
+                    <ng-icon
+                      name="heroLockClosed"
+                      class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                    ></ng-icon>
+                    <button
+                      type="button"
+                      (click)="toggleOldPasswordVisibility()"
+                      class="absolute right-4 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-600"
+                    >
+                      <ng-icon
+                        [name]="showOldPassword() ? 'heroEyeSlash' : 'heroEye'"
+                      ></ng-icon>
+                    </button>
+                  </div>
+                  <div
+                    *ngIf="
+                      profileForm.get('oldPassword')?.touched &&
+                      profileForm.get('oldPassword')?.errors
+                    "
+                    class="text-red-500 text-sm"
+                  >
+                    <span
+                      *ngIf="profileForm.get('oldPassword')?.errors?.['required']"
+                      >Senha atual é obrigatória</span
+                    >
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Nova Senha</label
+                  >
+                  <div class="relative">
+                    <input
+                      [type]="showNewPassword() ? 'text' : 'password'"
+                      formControlName="password"
+                      class="w-full px-4 py-3 pl-12 pr-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                      placeholder="Digite sua nova senha"
+                    />
+                    <ng-icon
+                      name="heroLockClosed"
+                      class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                    ></ng-icon>
+                    <button
+                      type="button"
+                      (click)="toggleNewPasswordVisibility()"
+                      class="absolute right-4 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-600"
+                    >
+                      <ng-icon
+                        [name]="showNewPassword() ? 'heroEyeSlash' : 'heroEye'"
+                      ></ng-icon>
+                    </button>
+                  </div>
+                  <div
+                    *ngIf="
+                      profileForm.get('password')?.touched &&
+                      profileForm.get('password')?.errors
+                    "
+                    class="text-red-500 text-sm"
+                  >
+                    <span
+                      *ngIf="profileForm.get('password')?.errors?.['required']"
+                      >Nova senha é obrigatória</span
+                    >
+                    <span
+                      *ngIf="profileForm.get('password')?.errors?.['strongPassword']"
+                    >
+                      Senha deve ter: 8+ caracteres, 1 maiúscula, 1 minúscula, 1
+                      número e 1 símbolo
+                    </span>
+                  </div>
+                </div>
+
+                <div class="space-y-2 md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700"
+                    >Confirmar Nova Senha</label
+                  >
+                  <div class="relative">
+                    <input
+                      [type]="showConfirmPassword() ? 'text' : 'password'"
+                      formControlName="confirmPassword"
+                      class="w-full px-4 py-3 pl-12 pr-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                      placeholder="Confirme sua nova senha"
+                    />
+                    <ng-icon
+                      name="heroLockClosed"
+                      class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                    ></ng-icon>
+                    <button
+                      type="button"
+                      (click)="toggleConfirmPasswordVisibility()"
+                      class="absolute right-4 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-600"
+                    >
+                      <ng-icon
+                        [name]="
+                          showConfirmPassword() ? 'heroEyeSlash' : 'heroEye'
+                        "
+                      ></ng-icon>
+                    </button>
+                  </div>
+                  <div
+                    *ngIf="
+                      profileForm.get('confirmPassword')?.touched &&
+                      profileForm.get('confirmPassword')?.errors
+                    "
+                    class="text-red-500 text-sm"
+                  >
+                    <span
+                      *ngIf="profileForm.get('confirmPassword')?.errors?.['required']"
+                      >Confirmação de senha é obrigatória</span
+                    >
+                    <span
+                      *ngIf="profileForm.get('confirmPassword')?.errors?.['passwordMismatch']"
+                      >As senhas não coincidem</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex justify-end  mt-auto mb-2 space-x-4 bg-white/70 backdrop-blur-sm rounded-md p-2 shadow-xl border border-purple-100"
+        >
+          <button
+            type="button"
+            class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="profileForm.invalid || isLoading()"
+            class="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center space-x-2"
+          >
+            <ng-icon
+              *ngIf="isLoading()"
+              name="heroCheck"
+              class="animate-spin"
+            ></ng-icon>
+            <span>{{ isLoading() ? "Salvando..." : "Salvar Alterações" }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

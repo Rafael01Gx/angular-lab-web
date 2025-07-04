@@ -1,37 +1,33 @@
- <div class="min-h-screen dark:from-zinc-200 dark:via-zinc-200 dark:to-zinc-200 bg-gradient-to-br from-slate-50 via-blue-200/30 to-purple-50/20">
-      
-      <!-- Header -->
-      <app-header 
-        [userName]="currentUser.name"
-        [notificationCount]="notificationCount">
-      </app-header>
+<div
+  class="min-h-screen dark:from-zinc-200 dark:via-zinc-200 dark:to-zinc-200 bg-gradient-to-br from-slate-50 via-blue-200/30 to-purple-50/20"
+>
+  <!-- Header -->
+  <app-header
+    [notificationCount]="notificationCount"
+  >
+  </app-header>
 
-      <!-- Main Content Area -->
-      <div class="pt-16 flex size-full">
-        
-        <!-- Sidebar -->
-        <app-sidebar 
-          (sidebarToggled)="onSidebarToggle($event)">
-        </app-sidebar>
+  <!-- Main Content Area -->
+  <div class="pt-16 flex size-full">
+    <!-- Sidebar -->
+    <app-sidebar (sidebarToggled)="onSidebarToggle($event)"> </app-sidebar>
 
-        <!-- Main Content Container -->
-        <main 
-          class="flex-1 overflow-hidden  transition-all duration-300 ease-in-out relative">
-          
-          <!-- Content Wrapper with Scroll -->
-         
-           
-              
-              <!-- Router Outlet Container -->
-              <div class="bg-blue-50/20 dark:bg-zinc-200 backdrop-blur-sm p-4 shadow-xl border border-slate-200/60 h-[calc(100vh-4rem)] overflow-hidden">
-                <div class="h-full w-full bg-blue-50/20 backdrop-blur-md dark:bg-zinc-200 ">
-                  <router-outlet></router-outlet>
-                </div>
-              </div>
-              
-           
-          
-        </main>
+    <!-- Main Content Container -->
+    <main
+      class="flex-1 overflow-hidden transition-all duration-300 ease-in-out relative"
+    >
+      <!-- Content Wrapper with Scroll -->
 
+      <!-- Router Outlet Container -->
+      <div
+        class="bg-blue-50/20 dark:bg-zinc-200 backdrop-blur-sm p-4 shadow-xl border border-slate-200/60 h-[calc(100vh-4rem)] overflow-hidden"
+      >
+        <div
+          class="h-full w-full bg-blue-50/20 backdrop-blur-md dark:bg-zinc-200"
+        >
+          <router-outlet></router-outlet>
+        </div>
       </div>
-    </div>
+    </main>
+  </div>
+</div>

@@ -11,3 +11,12 @@ export interface IUser {
   authorization?: boolean;
   role?: Role;
 }
+
+export interface UpdateUserData {
+  name: string;
+  phone?: string;
+  area?: string;
+  funcao?: string;
+  oldPassword?: string;
+  password?: string;
+}

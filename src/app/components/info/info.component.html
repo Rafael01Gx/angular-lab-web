@@ -1,0 +1,172 @@
+<!-- lab-info.component.html -->
+<div class="flex bg-gradient-to-b from-blue-50 to-slate-50/80 p-4 md:p-8 w-full h-full overflow-y-auto">
+  <div class="flex-1 mx-auto">
+    
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mb-8">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-800">Informações sobre Ensaios Laboratoriais</h1>
+      </div>
+      <p class="text-slate-600">Especificações técnicas e requisitos para análises laboratoriais</p>
+    </div>
+
+    <!-- Important Notes Card -->
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+        </div>
+        <h2 class="text-lg font-semibold text-amber-800">Importante</h2>
+      </div>
+      
+      <div class="space-y-3">
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+          <p class="text-amber-800 leading-relaxed">
+            As massas indicadas na tabela consideram que o material enviado já está classificado nas faixas granulométricas adequadas.
+          </p>
+        </div>
+        
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+          <p class="text-amber-800 leading-relaxed">
+            Os ensaios serão realizados somente quando houver massa suficiente, sendo que todos os ensaios (metalúrgicos, químicos e físicos) serão conduzidos em duplicata, ou seja, será necessário o dobro da massa exigida para cada ensaio, com margem adicional.
+          </p>
+        </div>
+        
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+          <p class="text-amber-800 leading-relaxed">
+            Se o material enviado for bruto, deve-se considerar uma margem de segurança para a preparação, conforme o tipo de ensaio solicitado. A massa será aquela gerada após as distribuições granulométricas dos ensaios requeridos, em duplicata (ou seja, o dobro da massa por ensaio).
+          </p>
+        </div>
+        
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+          <p class="text-amber-800 leading-relaxed">
+            Na ausência de referências, considera-se a massa mínima de 5 kg para materiais finos e 30 kg para materiais brutos, ciente de que essa quantidade pode afetar a representatividade dos ensaios.
+          </p>
+        </div>
+        
+        <div class="flex gap-3">
+          <div class="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+          <p class="text-amber-800 leading-relaxed">
+            <span class="font-medium">*</span>Em função da limitação dos equipamentos de quarteamento, a quantidade máxima é definida pelo volume de 100 litros por amostra.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <h3 class="text-lg font-semibold text-slate-800">Especificações por Tipo de Ensaio</h3>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-800 text-white">
+            <tr>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Ensaio</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Massa Necessária</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Tamanho de Malha (mm)</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Quantidade por Malha</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold">Norma Associada</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">RDI (Índice de Degradação por Redução)</td>
+              <td class="px-6 py-4 text-slate-600">500 a 1.000 g</td>
+              <td class="px-6 py-4 text-slate-600">10 a 16 mm</td>
+              <td class="px-6 py-4 text-slate-600">Pelo menos 500 g na faixa de 10 a 16 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR ISO 4696-1</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Redutibilidade</td>
+              <td class="px-6 py-4 text-slate-600">500 a 1.000 g</td>
+              <td class="px-6 py-4 text-slate-600">9,5 a 19,5 mm</td>
+              <td class="px-6 py-4 text-slate-600">Pelo menos 500 g na faixa de 9,5 a 19,5 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR ISO 7215</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Granulometria</td>
+              <td class="px-6 py-4 text-slate-600">5 kg (Bruto)* / 1 kg (finos)*</td>
+              <td class="px-6 py-4 text-slate-600">90,0 mm ... 0,0045 mm</td>
+              <td class="px-6 py-4 text-slate-600">Pelo menos 500 g para finos e 5kg para brutos*</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR ISO 4701</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Tamboramento (Tumble Index)</td>
+              <td class="px-6 py-4 text-slate-600">15 kg</td>
+              <td class="px-6 py-4 text-slate-600">10 a 40 mm</td>
+              <td class="px-6 py-4 text-slate-600">Pelo menos 15 kg na faixa de 10 a 40 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR ISO 3271</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Densidade</td>
+              <td class="px-6 py-4 text-slate-600">0,500 L a 30 L</td>
+              <td class="px-6 py-4 text-slate-600">-</td>
+              <td class="px-6 py-4 text-slate-600">O volume do densímetro a ser utilizado varia conforme o diâmetro em milímetros do material analisado</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR 13133</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">PPC (Perda por Calcinação)</td>
+              <td class="px-6 py-4 text-slate-600">1 a 10 g</td>
+              <td class="px-6 py-4 text-slate-600">≤ 0,15 mm</td>
+              <td class="px-6 py-4 text-slate-600">Todo o material deve passar pela malha de 0,15 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR 244</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Crepitação</td>
+              <td class="px-6 py-4 text-slate-600">5000 g (material seco)</td>
+              <td class="px-6 py-4 text-slate-600">10 a 19 mm</td>
+              <td class="px-6 py-4 text-slate-600">Pelo menos 5000 g na faixa de 10 a 19 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR 8601</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Reatividade (Reatividade da Cal)</td>
+              <td class="px-6 py-4 text-slate-600">200 a 500 g</td>
+              <td class="px-6 py-4 text-slate-600">≤ 1 mm (pulverizado)</td>
+              <td class="px-6 py-4 text-slate-600">Todo o material deve passar pela malha de 1 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR 12929</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Análises Imediatas (combustíveis sólidos)</td>
+              <td class="px-6 py-4 text-slate-600">1 a 5 g (para carbono, voláteis, cinzas, umidade)</td>
+              <td class="px-6 py-4 text-slate-600">≤ 0,25 mm (pulverizado)</td>
+              <td class="px-6 py-4 text-slate-600">Todo o material deve passar pela malha de 0,25 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR 16598, 16599, 16601</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Umidade</td>
+              <td class="px-6 py-4 text-slate-600">1000 a 5.000 g</td>
+              <td class="px-6 py-4 text-slate-600">Granulometria original da amostra</td>
+              <td class="px-6 py-4 text-slate-600">Representatividade da amostra sem separação por malhas</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">ABNT NBR 9937</td>
+            </tr>
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">Preparo para Ensaio Químico</td>
+              <td class="px-6 py-4 text-slate-600">350 a 900 g</td>
+              <td class="px-6 py-4 text-slate-600">≤ 0,075 mm (200 mesh)</td>
+              <td class="px-6 py-4 text-slate-600">Todo o material deve passar pela malha de 0,075 mm</td>
+              <td class="px-6 py-4 text-blue-600 font-medium">LBF 008</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+ 
+    <div class="mt-8 text-center text-slate-500 text-sm">
+      <p>Para mais informações sobre os ensaios laboratoriais, consulte as normas técnicas associadas.</p>
+    </div>
+  </div>
+</div>

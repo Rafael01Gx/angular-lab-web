@@ -6,7 +6,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
   selector: 'app-main-content',
-  imports: [ RouterOutlet, HeaderComponent, SidebarComponent],
+  imports: [RouterOutlet, HeaderComponent, SidebarComponent],
   templateUrl: './main-content.component.html',
   styles: [
     `
@@ -42,11 +42,7 @@ export class MainContentComponent {
   sidebarExpanded = signal(true);
   notificationCount = 3;
   platformID = inject(PLATFORM_ID);
-  currentUser = {
-    name: 'Dr. João Silva',
-    email: 'joao.silva@lab.com',
-    role: 'Analista Senior',
-  };
+
 
   constructor() {}
 

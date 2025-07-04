@@ -13,12 +13,17 @@ export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    //canActivate: [authGuard],
+    canActivate: [authGuard],
     children: [
       {
-        path: 'settings',
-        redirectTo: 'settings/analysis-type',
+        path: '',
         pathMatch: 'full',
+        loadComponent:()=> import('./components/info/info.component').then((m)=> m.InfoComponent)
+      },
+      {
+        path: 'profile',
+        pathMatch: 'full',
+        loadComponent:()=> import('./components/perfil/perfil.component').then((m)=> m.PerfilComponent)
       },
       {
         path: 'settings/analysis-type',

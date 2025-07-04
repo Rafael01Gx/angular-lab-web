@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  PLATFORM_ID,
+  signal,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
@@ -35,31 +41,23 @@ import { Router } from '@angular/router';
     <div
       class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex"
     >
-      <!-- Left Side - Login Form -->
       <div class="flex-1 flex items-center justify-center p-8 lg:p-12">
         <div class="w-full max-w-md">
-          <!-- Logo/Brand -->
           <div class="text-center mb-8">
             <div
-              class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl mb-4 shadow-lg"
+              class="inline-flex items-center justify-center w-16 h-16  rounded-md mb-4 shadow-md"
             >
-              <ng-icon
-                name="heroSparkles"
-                size="24"
-                class="text-white"
-              ></ng-icon>
+              <img src="img/logo.png" alt="" srcset="" />
             </div>
             <h1
-              class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
+              class="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent"
             >
               Bem-vindo
             </h1>
             <p class="text-slate-500 mt-2">Faça login para continuar</p>
           </div>
 
-          <!-- Login Form -->
           <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-6">
-            <!-- Email Field -->
             <div class="space-y-2">
               <label
                 for="email"
@@ -94,7 +92,6 @@ import { Router } from '@angular/router';
               </div>
             </div>
 
-            <!-- Password Field -->
             <div class="space-y-2">
               <label
                 for="password"
@@ -139,7 +136,6 @@ import { Router } from '@angular/router';
               </div>
             </div>
 
-            <!-- Remember Me & Forgot Password -->
             <div class="flex items-center justify-between">
               <label class="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -158,11 +154,10 @@ import { Router } from '@angular/router';
               </a>
             </div>
 
-            <!-- Login Button -->
             <button
               type="submit"
               [disabled]="!loginForm.valid || isLoading"
-              class="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl
+              class="w-full py-3 px-4 bg-gradient-to-r from-red-500 to-orange-600 text-white rounded-xl
                      font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
                      transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
                      disabled:transform-none disabled:shadow-md flex items-center justify-center gap-2"
@@ -184,14 +179,10 @@ import { Router } from '@angular/router';
         </div>
       </div>
 
-      <!-- Right Side - Image/Brand Section -->
       <div class="hidden lg:flex flex-3 relative overflow-hidden">
-        <!-- Background Gradient -->
         <div
-          class="absolute inset-0 bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-400"
+          class="absolute inset-0 bg-gradient-to-br from-orange-400 via-orange-500 to-red-400"
         ></div>
-
-        <!-- Content -->
       </div>
     </div>
   `,
@@ -202,7 +193,6 @@ export class LoginComponent implements OnInit {
   #router = inject(Router);
   #platformId = inject(PLATFORM_ID);
 
-
   loginData = {
     email: '',
     password: '',
@@ -211,12 +201,10 @@ export class LoginComponent implements OnInit {
   showPassword = false;
   rememberMe = false;
   isLoading = false;
+  spinnerLoad = signal(true);
 
-  // Grid items for background animation
 
-  ngOnInit(): void {
-    // Component initialization
-  }
+  ngOnInit(): void {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -233,10 +221,10 @@ export class LoginComponent implements OnInit {
           .login(this.loginData.email, this.loginData.password)
           .subscribe({
             next: () => {
-              this.isLoading = false
+              this.isLoading = false;
               this.#router.navigate(['/']);
             },
-            error: () => this.isLoading = false,
+            error: () => (this.isLoading = false),
           });
       } catch (error) {
         console.error('Erro no login:', error);
