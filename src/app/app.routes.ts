@@ -18,12 +18,30 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        loadComponent:()=> import('./components/info/info.component').then((m)=> m.InfoComponent)
+        loadComponent: () =>
+          import('./components/info/info.component').then(
+            (m) => m.InfoComponent
+          ),
       },
       {
         path: 'profile',
         pathMatch: 'full',
-        loadComponent:()=> import('./components/perfil/perfil.component').then((m)=> m.PerfilComponent)
+        loadComponent: () =>
+          import('./components/perfil/perfil.component').then(
+            (m) => m.PerfilComponent
+          ),
+      },
+            {
+        path: 'settings',
+        redirectTo:'settings/parameters',
+        pathMatch: 'full',
+      },
+      {
+        path: 'settings/parameters',
+        loadComponent: () =>
+          import(
+            './components/configuracoes/parametros/parametros.component'
+          ).then((m) => m.ParametrosComponent),
       },
       {
         path: 'settings/analysis-type',

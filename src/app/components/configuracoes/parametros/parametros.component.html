@@ -16,46 +16,63 @@
       (ngSubmit)="salvarItem()"
       class="md:flex justify-between gap-4"
     >
-      <div class="flex-1">
+          <div class="flex-1">
         <label
-          for="nomeDescricao"
+          for="tipoAnaliseId"
           class="block text-sm font-medium text-slate-600 mb-1"
         >
-          Matéria-Prima
+          Análise
+        </label>
+        <select
+          id="tipoAnaliseId"
+          formControlName="tipoAnaliseId"
+          name="tipoAnaliseId"
+          required
+          class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
+        >
+          <option value="">Selecione uma Análise</option>
+          @for(item of tipoAnalise; track item.tipo){
+          <option [value]="item.id">
+            {{ item.tipo }}
+          </option>
+          }
+        </select>
+      </div>
+
+      <div class="flex-1">
+        <label
+          for="descricao"
+          class="block text-sm font-medium text-slate-600 mb-1"
+        >
+          Descricao
         </label>
         <input
-          id="nomeDescricao"
+          id="descricao"
           type="text"
-          formControlName="nomeDescricao"
-          name="nomeDescricao"
+          formControlName="descricao"
+          name="descricao"
           required
           class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 placeholder-slate-400 text-slate-700 transition-all duration-200"
           placeholder="Digite o tipo de análise"
         />
       </div>
-
       <div class="flex-1">
         <label
-          for="classeTipo"
+          for="unidadeMedida"
           class="block text-sm font-medium text-slate-600 mb-1"
         >
-          Classe/Tipo
+          Unidade
         </label>
-        <select
-          id="classeTipo"
-          formControlName="classeTipo"
-          name="classeTipo"
-          required
-          class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
-        >
-          <option value="">Selecione uma classe</option>
-          @for(item of classeTipo; track item.label){
-          <option [value]="item.value">
-            {{ item.label }}
-          </option>
-          }
-        </select>
+        <input
+          id="unidadeMedida"
+          type="text"
+          formControlName="unidadeMedida"
+          name="unidadeMedida"
+          class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 placeholder-slate-400 text-slate-700 transition-all duration-200"
+          placeholder="Digite o tipo de análise"
+        />
       </div>
+
 
       <div class="flex justify-center items-end py-1 gap-3">
         <button
@@ -104,10 +121,10 @@
           (keyup)="filtrar(teste.value)"
           placeholder="Filtro"
         />
-        @if(materiasPrimasFiltro){
+        @if(parametrosFiltro){
         <div class="text-sm text-slate-500">
-          Total: {{ materiasPrimasFiltro.length }}
-          {{ materiasPrimasFiltro.length === 1 ? "item" : "itens" }}
+          Total: {{ parametrosFiltro.length }}
+          {{ parametrosFiltro.length === 1 ? "item" : "itens" }}
         </div>
         }
       </div>
@@ -126,12 +143,17 @@
             <th
               class="text-left py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
             >
-              Matéria-Prima
+              Descrição
             </th>
             <th
               class="text-left py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
             >
-              Classe/Tipo
+              Unidade
+            </th>
+            <th
+              class="text-left py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
+            >
+              Análise
             </th>
             <th
               class="text-center py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
@@ -146,20 +168,27 @@
           </tr>
         </thead>
         <tbody>
-          @if(materiasPrimasFiltro){ @for(item of itensPaginados; track item.id;
-          let i = $index){
+          @if(parametrosFiltro.length > 0){ @for(item of itensPaginados; track item.id; let
+          i = $index){
           <tr
             class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-slate-100/50"
           >
             <td class="py-4 px-6 text-slate-700 font-medium">#{{ item.id }}</td>
-            <td class="py-4 px-6 text-slate-600">
-              {{ item.nomeDescricao }}
+            <td class="py-4 px-6 text-gray-700 font-medium">
+              {{ item.descricao }}
+            </td>
+            <td class="py-4 px-6">
+              <span
+                class="inline-flex items-center px-3 py-1  text-xs font-medium text-gray-700 "
+              >
+                {{ item.unidadeMedida }}
+              </span>
             </td>
             <td class="py-4 px-6">
               <span
                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200/50"
               >
-                {{ getClasseLabel(item.classeTipo) }}
+                {{item.tipoAnalise?.tipo }}
               </span>
             </td>
             <td class="py-4 px-6 text-center">
@@ -194,9 +223,9 @@
                     class="text-slate-400"
                   ></ng-icon>
                 </div>
-                <p class="text-lg font-medium">Nenhuma análise cadastrada</p>
+                <p class="text-lg font-medium">Nenhuma parâmetro cadastrada</p>
                 <p class="text-sm">
-                  Adicione o primeiro tipo de análise usando o formulário acima
+                  Adicione o primeiro parâmetro usando o formulário acima
                 </p>
               </div>
             </td>
@@ -209,15 +238,13 @@
     </div>
 
     <!-- Paginação -->
-    @if(materiasPrimasFiltro){
+    @if(parametrosFiltro){
     <div class="border-t border-slate-200/50 p-4 bg-white/50 backdrop-blur-sm">
       <div class="flex items-center justify-between">
         <div class="text-sm text-slate-600">
           Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} a
-          {{
-            Math.min(paginaAtual * itensPorPagina, materiasPrimasFiltro.length)
-          }}
-          de {{ materiasPrimasFiltro.length }} resultados
+          {{ Math.min(paginaAtual * itensPorPagina, parametrosFiltro.length) }}
+          de {{ parametrosFiltro.length }} resultados
         </div>
 
         <div class="flex items-center gap-2">

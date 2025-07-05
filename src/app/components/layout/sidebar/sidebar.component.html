@@ -62,8 +62,8 @@
           }
         </button>
 
-        @if(item.children && item.expanded && isExpanded){
-        <div class="ml-4 pb-1 space-y-1 overflow-hidden transition-all duration-300">
+        @if(item.children && item.expanded){
+        <div class="pb-1 space-y-1 overflow-hidden transition-all duration-300" [class.ml-2]="!isExpanded"  [class.ml-4]="isExpanded"  >
           @for(subItem of item.children; track subItem){
           <button
             (click)="navigateToRoute(subItem.route!)"
@@ -89,7 +89,7 @@
       class="p-4 border-t border-slate-200/60 flex-shrink-0">
       @if(isExpanded){
       <div class="text-xs text-slate-500 text-center">
-        LabManager v1.0
+        Lab v1.0
       </div>
       } @if(!isExpanded){
       <div

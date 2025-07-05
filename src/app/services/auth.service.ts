@@ -1,13 +1,9 @@
-import { IUser } from './../interfaces/user.interface';
+import { IUser, IUserResponse } from './../interfaces/user.interface';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of, tap } from 'rxjs';
 
-interface IUserResponse {
-  user: IUser;
-  message: string;
-}
 @Injectable({
   providedIn: 'root',
 })
@@ -34,7 +30,7 @@ export class AuthService {
         })
       );
   }
-
+  
   logout(): Observable<any> {
     return this.#http
       .post(`${this.#apiUrl}/logout`, {}, { withCredentials: true })

@@ -25,10 +25,16 @@ import {
 import { IUser, UpdateUserData } from '../../interfaces/user.interface';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-perfil',
-  imports: [CommonModule, ReactiveFormsModule, NgIconComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NgIconComponent,
+    NgxMaskDirective,
+  ],
   viewProviders: [
     provideIcons({
       heroUser,
@@ -57,7 +63,6 @@ export class PerfilComponent implements OnInit {
   #platformId = inject(PLATFORM_ID);
   currentUser = signal<IUser | null>(null);
   profileForm!: FormGroup;
-
   isLoading = signal(false);
   showPasswordFields = signal(false);
   showOldPassword = signal(false);
@@ -77,10 +82,7 @@ export class PerfilComponent implements OnInit {
         [Validators.required, Validators.minLength(2)],
       ],
       email: [{ value: this.currentUser()?.email || '', disabled: true }],
-      phone: [
-        this.currentUser()?.phone || '',
-        [Validators.pattern(/^\(\d{2}\)\s(\d{4,5}-\d{4}|\d{1}\s\d{4}-\d{4})$/)],
-      ],
+      phone: [this.currentUser()?.phone || ''],
       area: [this.currentUser()?.area || ''],
       funcao: [this.currentUser()?.funcao || ''],
       oldPassword: [''],
@@ -130,27 +132,6 @@ export class PerfilComponent implements OnInit {
     this.showConfirmPassword.set(!this.showConfirmPassword());
   }
 
-  formatPhone(event: any) {
-    let value = event.target.value.replace(/\D/g, '');
-
-    if (value.length > 11) {
-      value = value.slice(0, 11);
-    }
-
-    if (value.length <= 2) {
-      value = value;
-    } else if (value.length <= 6) {
-      value = value.replace(/(\d{2})(\d{0,4})/, '($1) $2');
-    } else if (value.length <= 10) {
-      value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
-    } else {
-      value = value.replace(/(\d{2})(\d{1})(\d{4})(\d{0,4})/, '($1) $2 $3-$4');
-    }
-
-    event.target.value = value;
-    this.profileForm.get('phone')?.setValue(value);
-  }
-
   strongPasswordValidator(control: AbstractControl) {
     const password = control.value;
     if (!password) return null;
@@ -194,18 +175,22 @@ export class PerfilComponent implements OnInit {
           updateData.password = formData.password;
         }
 
-        await this.#userService.update(updateData);
-
-        if (this.showPasswordFields()) {
-          this.showPasswordFields.set(false);
-          this.profileForm.get('oldPassword')?.setValue('');
-          this.profileForm.get('password')?.setValue('');
-          this.profileForm.get('confirmPassword')?.setValue('');
-        }
+        this.#userService.update(updateData).subscribe({
+          complete: () => {
+            this.isLoading.set(false);
+            if (this.showPasswordFields()) {
+              this.showPasswordFields.set(false);
+              this.profileForm.get('oldPassword')?.setValue('');
+              this.profileForm.get('password')?.setValue('');
+              this.profileForm.get('confirmPassword')?.setValue('');
+            }
+          },
+          error: (err) => {
+            console.log(err), this.isLoading.set(false);
+          },
+        });
       } catch (error) {
         console.error('Erro ao atualizar perfil:', error);
-      } finally {
-        this.isLoading.set(false);
       }
     }
   }

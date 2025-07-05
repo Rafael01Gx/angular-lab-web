@@ -77,7 +77,7 @@ export class MateriasPrimasComponent {
     return this.materiasPrimasFiltro.slice(inicio, fim);
   }
 
-  // Utilitário Math para template
+  // Utilitário
   Math = Math;
 
   ngOnInit(): void {
@@ -170,7 +170,7 @@ export class MateriasPrimasComponent {
       try {
         this.#materiaPrimaService.delete(item.id!).subscribe({
           next: () => {
-            this.materiasPrimas = this.materiasPrimas.filter(
+            this.materiasPrimasFiltro = this.materiasPrimas.filter(
               (t) => t.id !== item.id
             );
             if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {

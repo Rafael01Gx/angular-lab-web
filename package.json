@@ -24,6 +24,7 @@
     "@ng-icons/heroicons": "^32.0.0",
     "@tailwindcss/postcss": "^4.1.7",
     "express": "^4.18.2",
+    "ngx-mask": "^19.0.7",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.7",

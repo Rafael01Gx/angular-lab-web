@@ -13,10 +13,15 @@ export interface IUser {
 }
 
 export interface UpdateUserData {
+  id?: string;
   name: string;
   phone?: string;
   area?: string;
   funcao?: string;
   oldPassword?: string;
   password?: string;
+}
+export interface IUserResponse {
+  user: IUser;
+  message: string;
 }
