@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { ITipoAnalise } from '../interfaces/settings.interface';
+import { ITipoAnalise } from '../interfaces/analysis-type.interface';
 import { IMateriaPrima } from '../interfaces/materia-prima.interface';
 
 @Injectable({

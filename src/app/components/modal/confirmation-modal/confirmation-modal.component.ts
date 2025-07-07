@@ -19,7 +19,7 @@ import {
   heroInformationCircle,
   heroExclamationCircle,
 } from '@ng-icons/heroicons/outline';
-import { ConfirmationModalConfig } from '../../../interfaces/confirmation-modal.interface';
+import { ConfirmationModalConfig } from '../../../interfaces/modals.interface';
 
 @Component({
   selector: 'app-confirmation-modal',
@@ -167,19 +167,19 @@ export class ConfirmationModalComponent implements OnInit, OnDestroy {
   closed: OutputEmitterRef<void> = output<void>();
 
   ngOnInit(): void {
-    // Prevent body scroll when modal is open
     if (this.isVisible) {
-      document.body.style.overflow = 'hidden';
+    //  document.body.style.overflow = 'hidden';
     }
   }
 
-  ngOnDestroy(): void {
-    // Restore body scroll
-    document.body.style.overflow = '';
-  }
+private isDestroyed = false;
+
+ngOnDestroy(): void {
+  this.isDestroyed = true;
+  document.body.style.overflow = '';
+}
 
   onBackdropClick(event: Event): void {
-    // Close modal when clicking on backdrop
     this.onCancel();
   }
 

@@ -1,5 +1,5 @@
 export interface ITipoAnalise {
-  id?: string;
+  id?: number;
   tipo: string;
   classe: string;
   createdAt?: Date;

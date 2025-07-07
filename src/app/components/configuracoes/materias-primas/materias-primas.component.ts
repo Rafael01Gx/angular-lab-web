@@ -14,7 +14,7 @@ import {
   heroPlus,
   heroMagnifyingGlass,
 } from '@ng-icons/heroicons/outline';
-import { IClasseItem } from '../../../interfaces/settings.interface';
+import { IClasseItem } from '../../../interfaces/analysis-type.interface';
 
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 import { MateriaPrimaService } from '../../../services/materia-prima.service';
@@ -46,8 +46,8 @@ export class MateriasPrimasComponent {
   ];
 
   #materiaPrimaService = inject(MateriaPrimaService);
-  materiasPrimas!: IMateriaPrima[];
-  materiasPrimasFiltro!: IMateriaPrima[];
+  materiasPrimas: IMateriaPrima[]=[]
+  materiasPrimasFiltro: IMateriaPrima[]=[]
   editingItem: IMateriaPrima | null = null;
   editItemIndex: number | null = null;
   confirmationModal = inject(ConfirmationModalService);
@@ -81,12 +81,19 @@ export class MateriasPrimasComponent {
   Math = Math;
 
   ngOnInit(): void {
-    this.#materiaPrimaService.findAll().subscribe({
-      next: (res) => {
-        this.materiasPrimas = res;
-        this.materiasPrimasFiltro = this.materiasPrimas;
-      },
-    });
+    this.loadingData()
+  }
+  loadingData() {
+    try {
+      this.#materiaPrimaService.findAll().subscribe({
+        next: (res) => {
+          this.materiasPrimas = res;
+          this.materiasPrimasFiltro = this.materiasPrimas;
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   salvarItem(): void {
@@ -170,9 +177,7 @@ export class MateriasPrimasComponent {
       try {
         this.#materiaPrimaService.delete(item.id!).subscribe({
           next: () => {
-            this.materiasPrimasFiltro = this.materiasPrimas.filter(
-              (t) => t.id !== item.id
-            );
+         this.loadingData()
             if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
               this.paginaAtual = this.totalPaginas;
             }

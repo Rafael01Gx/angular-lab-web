@@ -1,13 +1,12 @@
 import {
   Injectable,
   ComponentRef,
-  ViewContainerRef,
   ApplicationRef,
   createComponent,
   EnvironmentInjector,
 } from '@angular/core';
 import { ConfirmationModalComponent } from '../components/modal/confirmation-modal/confirmation-modal.component';
-import { ConfirmationModalConfig } from '../interfaces/confirmation-modal.interface';
+import { ConfirmationModalConfig } from '../interfaces/modals.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -52,13 +51,16 @@ export class ConfirmationModalService {
     });
   }
 
+
   private close(): void {
-    if (this.modalRef) {
-      this.appRef.detachView(this.modalRef.hostView);
-      this.modalRef.destroy();
-      this.modalRef = null;
-    }
+setTimeout(() => {
+  if (this.modalRef?.hostView) {
+    this.appRef.detachView(this.modalRef.hostView);
+    this.modalRef.destroy();
+    this.modalRef = null;
   }
+}, 500);
+}
 
 
   confirmDelete(itemName?: string, customMessage?: string): Promise<boolean> {

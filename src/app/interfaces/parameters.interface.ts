@@ -1,9 +1,11 @@
-import { ITipoAnalise } from './settings.interface';
+import { ITipoAnalise } from './analysis-type.interface';
 
 export interface IParameters {
   id?: number;
-  unidadeMedida: string;
   descricao: string;
+  unidadeMedida: string;
+  unidadeResultado: string;
+  casasDecimais: number;
   tipoAnalise?: ITipoAnalise;
   tipoAnaliseId?: number;
 }

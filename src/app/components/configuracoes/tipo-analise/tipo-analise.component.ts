@@ -17,7 +17,7 @@ import {
 import {
   IClasseItem,
   ITipoAnalise,
-} from '../../../interfaces/settings.interface';
+} from '../../../interfaces/analysis-type.interface';
 import { AnalysisTypeService } from '../../../services/analysis-type.service';
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 
@@ -38,7 +38,7 @@ import { ConfirmationModalService } from '../../../services/confirmation-modal.s
 })
 export class TipoAnaliseComponent implements OnInit {
   #analysisTypeService = inject(AnalysisTypeService);
-  tiposAnalise!: ITipoAnalise[];
+  tiposAnalise: ITipoAnalise[]=[]
   editingItem: ITipoAnalise | null = null;
   editItemIndex: number | null = null;
   confirmationModal = inject(ConfirmationModalService);
@@ -80,11 +80,18 @@ export class TipoAnaliseComponent implements OnInit {
   Math = Math;
 
   ngOnInit(): void {
-    this.#analysisTypeService.findAll().subscribe({
+this.loadingData()
+  }
+  loadingData(){
+    try {
+          this.#analysisTypeService.findAll().subscribe({
       next: (res) => {
         this.tiposAnalise = res;
       },
     });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   salvarItem(): void {
@@ -156,9 +163,9 @@ export class TipoAnaliseComponent implements OnInit {
     );
 
     if (confirmed) {
-      this.#analysisTypeService.delete(item.id as string).subscribe({
+      this.#analysisTypeService.delete(item.id!).subscribe({
         next: () => {
-          this.tiposAnalise = this.tiposAnalise.filter((t) => t.id !== item.id);
+         this.loadingData()
           if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
             this.paginaAtual = this.totalPaginas;
           }

@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { ITipoAnalise } from '../interfaces/settings.interface';
+import { ITipoAnalise } from '../interfaces/analysis-type.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -21,12 +21,12 @@ export class AnalysisTypeService {
       withCredentials: true,
     });
   }
-  update(id: string, body: ITipoAnalise): Observable<ITipoAnalise> {
+  update(id: number, body: ITipoAnalise): Observable<ITipoAnalise> {
     return this.#http.patch<ITipoAnalise>(`${this.#apiUrl}/${id}`, body, {
       withCredentials: true,
     });
   }
-  delete(id: string): Observable<any> {
+  delete(id: number): Observable<any> {
     return this.#http.delete(`${this.#apiUrl}/${id}`, {
       withCredentials: true,
     });

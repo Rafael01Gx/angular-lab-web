@@ -1,3 +1,5 @@
+import { IAnalysisSettings } from "./analysis-settings.interface";
+
 export interface ConfirmationModalConfig {
   title?: string;
   message?: string;
@@ -7,4 +9,9 @@ export interface ConfirmationModalConfig {
   icon?: string;
   itemName?: string;
   showItemName?: boolean;
+}
+
+export interface AnalysisSettingsModal {
+data?: IAnalysisSettings;
+isEditMode: boolean;
 }

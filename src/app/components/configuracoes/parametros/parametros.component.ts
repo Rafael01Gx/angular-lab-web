@@ -17,7 +17,7 @@ import {
 import {
   IClasseItem,
   ITipoAnalise,
-} from '../../../interfaces/settings.interface';
+} from '../../../interfaces/analysis-type.interface';
 import { ParametersService } from '../../../services/parameters.service';
 import { AnalysisTypeService } from '../../../services/analysis-type.service';
 import { IParameters } from '../../../interfaces/parameters.interface';
@@ -41,8 +41,8 @@ import { ConfirmationModalService } from '../../../services/confirmation-modal.s
 export class ParametrosComponent {
   #parametrosService = inject(ParametersService);
   #analysisTypeService = inject(AnalysisTypeService);
-  parametros!: IParameters[];
-  parametrosFiltro!: IParameters[];
+  parametros: IParameters[]=[]
+  parametrosFiltro: IParameters[]=[]
   editingItem: IParameters | null = null;
   editItemIndex: number | null = null;
   confirmationModal = inject(ConfirmationModalService);
@@ -56,6 +56,8 @@ export class ParametrosComponent {
       Validators.minLength(2),
     ]),
     unidadeMedida: new FormControl<string>(''),
+    unidadeResultado: new FormControl<string>(''),
+    casasDecimais: new FormControl<number>(0),
   });
 
   // Paginação
@@ -77,19 +79,30 @@ export class ParametrosComponent {
   Math = Math;
 
   ngOnInit(): void {
-    this.#parametrosService.findAll().subscribe({
-      next: (res) => {
-        this.parametros = res;
-        this.parametrosFiltro = this.parametros;
-      },
-    });
-    this.#analysisTypeService.findAll().subscribe({
-      next: (res) => {
-        this.tipoAnalise = res;
-      },
-    });
+    this.loadingData();
+    try {
+      this.#analysisTypeService.findAll().subscribe({
+        next: (res) => {
+          this.tipoAnalise = res;
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
+  loadingData() {
+    try {
+      this.#parametrosService.findAll().subscribe({
+        next: (res) => {
+          this.parametros = res;
+          this.parametrosFiltro = this.parametros;
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
   salvarItem(): void {
     if (
       !this.materiaPrimaForm.value.tipoAnaliseId ||
@@ -99,10 +112,10 @@ export class ParametrosComponent {
     }
     const _params = {
       unidadeMedida: this.materiaPrimaForm.value.unidadeMedida,
+      unidadeResultado: this.materiaPrimaForm.value.unidadeResultado,
       descricao: this.materiaPrimaForm.value.descricao,
-      tipoAnaliseId: parseInt(
-        this.materiaPrimaForm.value.tipoAnaliseId as string
-      ),
+      tipoAnaliseId: this.materiaPrimaForm.value.tipoAnaliseId,
+      casasDecimais: this.materiaPrimaForm.value.casasDecimais,
     };
 
     if (this.editingItem && this.editingItem.id) {
@@ -116,14 +129,11 @@ export class ParametrosComponent {
           },
         });
     } else {
-      this.#parametrosService
-        .create(_params as IParameters)
-        .subscribe({
-          next: (res) => {
-            this.parametros.push(res),
-              (this.parametrosFiltro = this.parametros);
-          },
-        });
+      this.#parametrosService.create(_params as IParameters).subscribe({
+        next: (res) => {
+          this.parametros.push(res), (this.parametrosFiltro = this.parametros);
+        },
+      });
     }
 
     this.materiaPrimaForm.reset();
@@ -141,17 +151,14 @@ export class ParametrosComponent {
       tipoAnaliseId: item.id ? item.id : null,
       descricao: item.descricao,
       unidadeMedida: item.unidadeMedida,
+      unidadeResultado: item.unidadeResultado,
+      casasDecimais: item.casasDecimais,
     });
   }
 
   cancelarEdicao(): void {
     this.editingItem = null;
     this.materiaPrimaForm.reset();
-  }
-
-  getClasseLabel(value: string): string {
-    const classe = this.tipoAnalise.find((item) => item.id === value);
-    return classe ? classe.tipo : value;
   }
 
   paginaAnterior(): void {
@@ -176,7 +183,7 @@ export class ParametrosComponent {
       try {
         this.#parametrosService.delete(item.id!).subscribe({
           next: () => {
-            this.parametrosFiltro = this.parametros.filter((t) => t.id !== item.id);
+            this.loadingData()
             if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
               this.paginaAtual = this.totalPaginas;
             }

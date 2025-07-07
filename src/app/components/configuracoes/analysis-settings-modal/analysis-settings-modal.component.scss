@@ -1,0 +1,182 @@
+.animate-move-up {
+  animation: moveUp 0.3s ease-in-out;
+}
+
+.animate-move-down {
+  animation: moveDown 0.3s ease-in-out;
+}
+
+// Keyframes for animations
+@keyframes moveUp {
+  0% { 
+    transform: translateY(0);
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  50% { 
+    transform: translateY(-10px);
+    background-color: rgba(59, 130, 246, 0.2);
+  }
+  100% { 
+    transform: translateY(0);
+    background-color: transparent;
+  }
+}
+
+@keyframes moveDown {
+  0% { 
+    transform: translateY(0);
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  50% { 
+    transform: translateY(10px);
+    background-color: rgba(59, 130, 246, 0.2);
+  }
+  100% { 
+    transform: translateY(0);
+    background-color: transparent;
+  }
+}
+
+// Modal entrance animation
+.modal-enter {
+  animation: modalEnter 0.3s ease-out;
+}
+
+@keyframes modalEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+// Table hover effects
+.table-row {
+  transition: all 0.2s ease;
+}
+
+.table-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+// Form field focus effects
+.form-field {
+  transition: all 0.2s ease;
+}
+
+.form-field:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+}
+
+// Button hover effects
+.btn-primary {
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+// Icon button effects
+.icon-button {
+  transition: all 0.2s ease;
+}
+
+.icon-button:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+// Loading state
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+// Validation error shake animation
+.validation-error {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+// Success state
+.success-state {
+  animation: success 0.6s ease-in-out;
+}
+
+@keyframes success {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+// Mobile responsive adjustments
+@media (max-width: 768px) {
+  .modal-container {
+    margin: 1rem;
+    max-height: 95vh;
+  }
+  
+  .modal-content {
+    padding: 1rem;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+// Dark mode support (if needed)
+@media (prefers-color-scheme: dark) {
+  .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .modal-container {
+    background-color: #1f2937;
+    color: #f9fafb;
+  }
+  
+  .modal-header {
+    background: linear-gradient(135deg, #374151, #4b5563);
+  }
+  
+  .form-field {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
+  
+  .table-row:hover {
+    background-color: #374151;
+  }
+}

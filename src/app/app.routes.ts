@@ -37,6 +37,13 @@ export const routes: Routes = [
         pathMatch: 'full',
       },
       {
+        path: 'settings/analysis',
+        loadComponent: () =>
+          import(
+            './components/configuracoes/analise-config/analise-config.component'
+          ).then((m) => m.AnaliseConfigComponent),
+      },
+      {
         path: 'settings/parameters',
         loadComponent: () =>
           import(
