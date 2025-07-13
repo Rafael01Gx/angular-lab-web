@@ -18,10 +18,13 @@ import {
   heroChevronRight,
   heroChevronDoubleLeft,
   heroChevronDoubleRight,
+  heroArrowDown,
+  heroArrowUp,
 } from '@ng-icons/heroicons/outline';
-import { Role } from '../../../enums/roles.enum';
+import { mapUserRole, Role } from '../../../enums/roles.enum';
 import { ToastrService } from '../../layout/toastr/toastr.service';
 import { UserService } from '../../../services/user.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-user-authorization',
@@ -41,18 +44,22 @@ import { UserService } from '../../../services/user.service';
       heroChevronRight,
       heroChevronDoubleLeft,
       heroChevronDoubleRight,
+      heroArrowUp,
+      heroArrowDown,
     }),
   ],
   templateUrl: './user-authorization.component.html',
 })
 export class UserAuthorizationComponent implements OnInit {
+  mapRoles = mapUserRole;
   #toastr = inject(ToastrService);
   #userService = inject(UserService);
+  #authService = inject(AuthService);
   users: IUser[] = [];
   filteredUsers: IUser[] = [];
   paginatedUsers: IUser[] = [];
   selectedUser: IUser | null = null;
-
+  expanded = true;
   searchTerm: string = '';
   authorizationFilter: string = '';
   roleFilter: string = '';
@@ -62,25 +69,26 @@ export class UserAuthorizationComponent implements OnInit {
   totalPages: number = 0;
 
   roles = [
-    { value: Role.USUARIO, label: Role.USUARIO },
-    { value: Role.OPERADOR, label: Role.OPERADOR },
-    { value: Role.ADMIN, label: Role.ADMIN },
+    { value: 'USUARIO', label: 'Usuário' },
+    { value: 'OPERADOR', label: 'Operador' },
+    { value: 'ADMIN', label: 'Administrador' },
   ];
 
   ngOnInit(): void {
     this.loadUsers();
   }
-
- async loadUsers() {
+  async loadUsers() {
     try {
-     await this.#userService.findAll().then((res) => {
+      await this.#userService.findAll().then((res) => {
         if (res) {
+          res.map((res) => {
+            return { ...res, role: this.mapRoles(res.role as string) };
+          });
           this.users = res;
-          console.log(res.map(res=> res.role))
         }
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
     this.filteredUsers = [...this.users];
     this.updatePagination();
@@ -117,20 +125,24 @@ export class UserAuthorizationComponent implements OnInit {
     this.updatePagination();
   }
 
-  toggleAuthorization(user: IUser): void {
-    user.authorization = !user.authorization;
-   
-    this.#toastr.error('Inclusao', user.email);
-  }
+  updateUser(user: IUser): void {
+    if (!user.id || !this.#authService.currentUser) return;
 
-  updateUserRole(user: IUser): void {}
-
-  openUserDetails(user: IUser): void {
-    this.selectedUser = user;
-  }
-
-  closeUserDetails(): void {
-    this.selectedUser = null;
+    if (user.id == this.#authService.currentUser()?.id) {
+      this.#toastr.info(
+        'Você não pode alterar suas próprias permissões de acesso.'
+      );
+      return;
+    }
+    this.#userService
+      .updateStatus(user.id, user)
+      .then(() => {
+        this.#toastr.success(`Usuário ${user.name}, atualizado com sucesso!`);
+      })
+      .catch((err) => {
+        this.#toastr.error(err.error.message);
+        console.log(err);
+      });
   }
 
   getAuthorizedCount(): number {

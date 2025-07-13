@@ -8,13 +8,16 @@
   </div>
 
   <!-- Filtros -->
-  <div class="mb-4 p-4 bg-gray-50 rounded-lg flex-shrink-0">
+  <div class="p-4 bg-gray-50 rounded-lg flex-shrink-0">
     <div class="flex items-center gap-2 mb-3">
       <ng-icon name="heroFunnel" class="text-lg text-gray-600"></ng-icon>
       <h3 class="text-lg font-semibold text-gray-700">Filtros</h3>
+        <ng-icon (click)="expanded = !expanded" name="heroArrowUp" [class.rotate-180]="!expanded" class="shadow-sm ml-auto rounded-full hover:scale-105 text-lg text-gray-600 transition duration-500 ease-in-out"></ng-icon>
+
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div [class]="!expanded ? 'opacity-0 h-0 ' : ''"  class="transition-all duration-200 ease-in-out">
+      <div [class.hidden]="!expanded " class="mb-4  grid grid-cols-1 md:grid-cols-4 gap-4">
       <div class="relative">
         <ng-icon
           name="heroMagnifyingGlass"
@@ -59,8 +62,8 @@
         Limpar Filtros
       </button>
     </div>
-  </div>
-
+    
+  
   <!-- Estatísticas -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 flex-shrink-0">
     <div class="bg-blue-50 p-4 rounded-lg">
@@ -101,7 +104,8 @@
       </div>
     </div>
   </div>
-
+</div>
+</div>
   <!-- Tabela de Usuários -->
   <div class="flex-1 flex flex-col min-h-0">
     <div
@@ -160,47 +164,35 @@
               <td class="p-3 border-b">
                 <select
                   [(ngModel)]="user.role"
-                  (change)="updateUserRole(user)"
                   class="px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
-               
                   @for(role of roles;track role){
                   <option [value]="role.value">
                     {{ role.label }}
                   </option>
                   }
                 </select>
-                {{user.role}}
               </td>
               <td class="p-3 border-b text-center">
-                <div class="flex justify-center">
-                  @if(user.authorization){
-                  <span
-                    class="inline-flex items-center gap-1 px-2 py-1 bg-gradient-blue text-blue-800 w-full rounded-full text-sm"
-                  >
-                    <ng-icon name="heroCheckCircle" class="text-sm"></ng-icon>
-                    Autorizado </span
-                  >}@else {
-                  <span
-                    class="inline-flex items-center gap-1 px-2 py-1 bg-gradient-red text-red-700 w-full rounded-full text-sm"
-                  >
-                    <ng-icon name="heroXCircle" class="text-sm"></ng-icon>
-                    Não Autorizado </span
-                  >}
-                </div>
+                <label class="inline-flex items-center me-5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="user.authorization"
+                    class="sr-only peer"
+                    [checked]="user.authorization"
+                  />
+                  <div
+                    class="relative w-11 h-6 bg-red-200 rounded-full peer dark:bg-red-400 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500 dark:peer-checked:bg-green-500"
+                  ></div>
+                </label>
               </td>
               <td class="p-3 border-b text-center">
                 <div class="flex justify-center gap-2">
                   <button
-                    (click)="toggleAuthorization(user)"
-                    [class]="
-                      user.authorization
-                        ? 'button-gradient-orange'
-                        : 'button-gradient-blue'
-                    "
-                    class="px-3 w-full h-full py-1 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors"
+                    (click)="updateUser(user)"
+                    class="button-gradient-blue px-3 w-full h-full py-1 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors"
                   >
-                    {{ user.authorization ? "Desautorizar" : "Autorizar" }}
+                   Atualizar
                   </button>
                 </div>
               </td>

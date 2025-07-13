@@ -35,16 +35,16 @@ export class ToastrService {
     this.#toastSubject.next(this.#toasts);
   }
 
-  success(title: string = 'Sucesso', message: string) {
+  success(message: string, title: string = 'Sucesso') {
     return this.show(title, message, 'success');
   }
-  error(title: string = 'Erro', message: string) {
+  error(message: string, title: string = 'Erro') {
     return this.show(title, message, 'error');
   }
-  info(title: string = 'Informação', message: string) {
+  info(message: string, title: string = 'Informação') {
     return this.show(title, message, 'info');
   }
-  warning(title: string = 'Aviso', message: string) {
+  warning(message: string, title: string = 'Aviso') {
     return this.show(title, message, 'warning');
   }
 }

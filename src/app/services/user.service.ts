@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { firstValueFrom, map, Observable } from 'rxjs';
+import { Role } from '../enums/roles.enum';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -32,10 +33,18 @@ export class UserService {
       );
   }
 
-  
   async findAll(): Promise<IUser[]> {
     return firstValueFrom(
       this.#http.get<IUser[]>(`${this.#apiUrl}`, { withCredentials: true })
     );
   }
+  async updateStatus(id: string, user: IUser): Promise<IUserResponse> {
+    return firstValueFrom(
+      this.#http.patch<IUserResponse>(`${this.#apiUrl}/status/${id}`, user, {
+        withCredentials: true,
+      })
+    );
+  }
+
+  
 }
