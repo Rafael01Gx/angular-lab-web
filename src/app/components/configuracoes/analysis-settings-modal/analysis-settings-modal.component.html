@@ -14,7 +14,7 @@
       </h2>
       <button
         (click)="close()"
-        class="p-2 rounded-full   text-black dark:text-white hover:scale-120 hover:text-red-500 transition-colors"
+        class="p-2 rounded-full text-black dark:text-white hover:scale-120 hover:text-red-500 transition-colors"
       >
         <ng-icon name="heroXMark" class="text-xl"></ng-icon>
       </button>
@@ -22,12 +22,10 @@
 
     <!-- Content -->
     <div class="p-6 flex-1 flex flex-col overflow-hidden">
-      <!-- Main Form -->
       <form
         [formGroup]="analysisSettingsForm"
         class="flex flex-col space-y-2 flex-shrink-0"
       >
-        <!-- Nome/Descrição -->
         <div class="flex justify-center space-x-2 p-4 items-center">
           <div class="flex-1">
             <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -45,7 +43,6 @@
             />
           </div>
 
-          <!-- Tipo de Análise -->
           <div class="flex-1">
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               Tipo de Análise <span class="text-red-500">*</span>
@@ -68,9 +65,7 @@
             </select>
           </div>
 
-          <!-- Parameter Form -->
           <div class="flex flex-2 items-end space-x-2">
-            <!-- Descrição -->
             <div class="flex-4">
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 Parãmetros <span class="text-red-500">*</span>
@@ -99,12 +94,10 @@
         </div>
       </form>
 
-      <!-- Parameters Table Container - Ocupa o restante do espaço -->
       <div class="flex-1 flex flex-col min-h-0">
         <div
           class="bg-white border border-gray-200 rounded-md flex-1 flex flex-col overflow-hidden"
         >
-          <!-- Header da tabela - fixo -->
           <div class="bg-gray-50 border-b border-gray-200 flex-shrink-0">
             <div class="min-w-full">
               <div class="flex">
@@ -142,7 +135,6 @@
             </div>
           </div>
           @if (parameters.length > 0) {
-          <!-- Corpo da tabela - com scroll -->
           <div class="flex-1 overflow-auto">
             <div class="min-w-full">
               @for (param of parameters; track $index) {
@@ -225,7 +217,7 @@
     <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-4 flex-shrink-0">
       <button
         (click)="close()"
-        class="px-6 py-3 border hover:bg-gradient-to-r hover:from-gray-500/90 hover:to-gray-700/90 hover:text-white border-gray-300 text-gray-700 rounded-md  transition-colors flex items-center gap-2"
+        class="px-6 py-3 border hover:bg-gradient-to-r hover:from-gray-500/90 hover:to-gray-700/90 hover:text-white border-gray-300 text-gray-700 rounded-md transition-colors flex items-center gap-2"
       >
         <ng-icon name="heroXMark" class="text-sm"></ng-icon>
         Cancelar

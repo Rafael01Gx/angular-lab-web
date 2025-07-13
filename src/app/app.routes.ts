@@ -32,6 +32,19 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'orders',
+        redirectTo:'orders/create',
+        pathMatch: 'full',
+      },
+      {
+        path: 'orders/create',
+        pathMatch: 'full',
+         loadComponent: () =>
+          import('./components/orders/orders-create/orders-create.component').then(
+            (m) => m.OrdersCreateComponent
+          ),
+      },
+      {
         path: 'access-management',
         redirectTo: 'access-management/access-create',
         pathMatch: 'full',
