@@ -6,7 +6,8 @@
 body {
   @apply overflow-hidden;
 }
-html,body{
+html,
+body {
   width: 100lvw;
   height: 100lvh;
 }
@@ -20,12 +21,12 @@ html,body{
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #a7c7e7; 
+  background: #a7c7e7;
   border-radius: 6px;
 }
 
 :hover::-webkit-scrollbar-thumb {
-  background: #93b5e1; 
+  background: #93b5e1;
 }
 
 @theme {
@@ -93,4 +94,17 @@ html,body{
   --gradient-button-save-to: var(--color-purple-600);
   --gradient-background-main-from: var(--color-white);
   --gradient-background-main-to: var(--color-slate-50);
+}
+
+.button-gradient-orange {
+  @apply bg-gradient-to-r from-red-400 to-orange-500 text-white font-semibold rounded-md hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-200 transform hover:scale-105 shadow-lg;
+}
+.button-gradient-blue {
+  @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-md hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 shadow-lg;
+}
+.bg-gradient-blue {
+  @apply bg-gradient-to-r from-blue-50 to-purple-50;
+}
+.bg-gradient-red {
+  @apply bg-gradient-to-r from-red-50 to-orange-50;
 }

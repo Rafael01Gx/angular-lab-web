@@ -1,9 +1,13 @@
 import { inject, Injectable } from '@angular/core';
-import { IUserResponse, UpdateUserData } from '../interfaces/user.interface';
+import {
+  IUser,
+  IUserResponse,
+  UpdateUserData,
+} from '../interfaces/user.interface';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import { map, Observable } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -12,14 +16,12 @@ export class UserService {
   #authService = inject(AuthService);
 
   update(user: UpdateUserData): Observable<IUserResponse> {
-    console.log(user)
+    console.log(user);
     const id = this.#authService.currentUser()?.id;
     return this.#http
-      .patch<IUserResponse>(
-        `${this.#apiUrl}/${id}`,
-         user ,
-        { withCredentials: true }
-      )
+      .patch<IUserResponse>(`${this.#apiUrl}/${id}`, user, {
+        withCredentials: true,
+      })
       .pipe(
         map((res) => {
           if (res.user) {
@@ -28,5 +30,12 @@ export class UserService {
           return res;
         })
       );
+  }
+
+  
+  async findAll(): Promise<IUser[]> {
+    return firstValueFrom(
+      this.#http.get<IUser[]>(`${this.#apiUrl}`, { withCredentials: true })
+    );
   }
 }

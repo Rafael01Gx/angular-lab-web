@@ -9,12 +9,12 @@
     <div
       class="dark:bg-gray-800 bg-blue-50 backdrop-blur-md border-b border-slate-200/60 shadow-md text-white p-4 flex items-center justify-between flex-shrink-0"
     >
-      <h2 class="text-2xl text-gray-700 dark:text-gray-400 font-bold">
+      <h2 class="text-2xl text-gray-600 dark:text-gray-400 font-bold">
         {{ isEditMode ? "Editar" : "Criar" }} Configuração de Análise
       </h2>
       <button
         (click)="close()"
-        class="p-2 rounded-full hover:bg-white/20 transition-colors"
+        class="p-2 rounded-full   text-black dark:text-white hover:scale-120 hover:text-red-500 transition-colors"
       >
         <ng-icon name="heroXMark" class="text-xl"></ng-icon>
       </button>
@@ -23,7 +23,10 @@
     <!-- Content -->
     <div class="p-6 flex-1 flex flex-col overflow-hidden">
       <!-- Main Form -->
-      <form [formGroup]="analysisSettingsForm" class="flex flex-col space-y-2 flex-shrink-0">
+      <form
+        [formGroup]="analysisSettingsForm"
+        class="flex flex-col space-y-2 flex-shrink-0"
+      >
         <!-- Nome/Descrição -->
         <div class="flex justify-center space-x-2 p-4 items-center">
           <div class="flex-1">
@@ -48,7 +51,7 @@
               Tipo de Análise <span class="text-red-500">*</span>
             </label>
             <select
-            (change)="filtrarParametro()"
+              (change)="filtrarParametro()"
               formControlName="tipoAnaliseId"
               class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               [class.border-red-500]="
@@ -73,13 +76,11 @@
                 Parãmetros <span class="text-red-500">*</span>
               </label>
               <div>
-                <app-multi-select 
+                <app-multi-select
                   [data]="paramFilter"
                   [config]="config"
-                  
                   (itemsChange)="onSelect($event)"
                   [disabled]="!analysisSettingsForm.valid"
-                  
                 ></app-multi-select>
               </div>
             </div>
@@ -89,7 +90,7 @@
                 type="button"
                 (click)="addParameter()"
                 [disabled]="!analysisSettingsForm.valid"
-                class="px-6 min-h-[50px] py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                class="px-6 ml-auto min-h-[50px] py-3 rounded-md disabled:cursor-not-allowed transition-colors flex items-center gap-2 bg-gradient-to-r from-indigo-500/80 to-purple-600/80 text-white rounded-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 <ng-icon name="heroPlus" class="text-sm"></ng-icon>
               </button>
@@ -100,34 +101,47 @@
 
       <!-- Parameters Table Container - Ocupa o restante do espaço -->
       <div class="flex-1 flex flex-col min-h-0">
-        @if (parameters.length > 0) {
-        <div class="bg-white border border-gray-200 rounded-md flex-1 flex flex-col overflow-hidden">
+        <div
+          class="bg-white border border-gray-200 rounded-md flex-1 flex flex-col overflow-hidden"
+        >
           <!-- Header da tabela - fixo -->
           <div class="bg-gray-50 border-b border-gray-200 flex-shrink-0">
             <div class="min-w-full">
               <div class="flex">
-                <div class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                <div
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16"
+                >
                   #
                 </div>
-                <div class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-1">
+                <div
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-1"
+                >
                   Descrição
                 </div>
-                <div class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                <div
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                >
                   Unidade
                 </div>
-                <div class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                <div
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                >
                   Decimais
                 </div>
-                <div class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                <div
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                >
                   Ordem
                 </div>
-                <div class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+                <div
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20"
+                >
                   Ações
                 </div>
               </div>
             </div>
           </div>
-          
+          @if (parameters.length > 0) {
           <!-- Corpo da tabela - com scroll -->
           <div class="flex-1 overflow-auto">
             <div class="min-w-full">
@@ -136,19 +150,29 @@
                 class="flex hover:bg-gray-50 transition-colors border-b border-gray-200 last:border-b-0"
                 [class]="getRowAnimation($index)"
               >
-                <div class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-16">
+                <div
+                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-16"
+                >
                   {{ $index + 1 }}
                 </div>
-                <div class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex-1">
+                <div
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex-1"
+                >
                   {{ param.descricao }}
                 </div>
-                <div class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24">
+                <div
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24"
+                >
                   {{ param.unidadeMedida }}
                 </div>
-                <div class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24">
+                <div
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24"
+                >
                   {{ param.casasDecimais }}
                 </div>
-                <div class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24">
+                <div
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24"
+                >
                   <div class="flex space-x-2">
                     <button
                       (click)="moveParameter($index, 'up')"
@@ -166,7 +190,9 @@
                     </button>
                   </div>
                 </div>
-                <div class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-20">
+                <div
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-20"
+                >
                   <button
                     (click)="removeParameter($index)"
                     class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -178,17 +204,20 @@
               }
             </div>
           </div>
+
+          }@else{
+          <div
+            class="text-center py-12 text-gray-500 flex-1 flex flex-col justify-center"
+          >
+            <ng-icon
+              name="heroMagnifyingGlass"
+              class="text-4xl mx-auto mb-4 text-gray-400"
+            ></ng-icon>
+            <p class="text-lg font-medium">Nenhum parâmetro adicionado</p>
+            <p class="text-sm">Adicione parâmetros usando o formulário acima</p>
+          </div>
+          }
         </div>
-        } @else {
-        <div class="text-center py-12 text-gray-500 flex-1 flex flex-col justify-center">
-          <ng-icon
-            name="heroMagnifyingGlass"
-            class="text-4xl mx-auto mb-4 text-gray-400"
-          ></ng-icon>
-          <p class="text-lg font-medium">Nenhum parâmetro adicionado</p>
-          <p class="text-sm">Adicione parâmetros usando o formulário acima</p>
-        </div>
-        }
       </div>
     </div>
 
@@ -196,15 +225,14 @@
     <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-4 flex-shrink-0">
       <button
         (click)="close()"
-        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors flex items-center gap-2"
+        class="px-6 py-3 border hover:bg-gradient-to-r hover:from-gray-500/90 hover:to-gray-700/90 hover:text-white border-gray-300 text-gray-700 rounded-md  transition-colors flex items-center gap-2"
       >
         <ng-icon name="heroXMark" class="text-sm"></ng-icon>
         Cancelar
       </button>
       <button
         (click)="onSave()"
-       
-        class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+        class="px-6 py-3 bg-gradient-to-r from-violet-500/80 to-blue-600/80 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
       >
         <ng-icon name="heroCheck" class="text-sm"></ng-icon>
         {{ isEditMode ? "Atualizar" : "Salvar" }}

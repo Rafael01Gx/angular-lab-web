@@ -1,0 +1,252 @@
+<div class="flex size-full bg-white">
+  <div class="flex flex-col flex-1 min-h-0">
+    <div class="p-4">
+      <div class="flex items-center gap-3">
+        <ng-icon name="heroUser" class="text-2xl text-gray-700"></ng-icon>
+        <h2 class="text-xl font-semibold text-slate-700">
+          Cadastrar Novo Usuário
+        </h2>
+      </div>
+    </div>
+
+    <form
+      class="flex flex-col flex-1 min-h-0 p-4 overflow-y-auto"
+      [formGroup]="userForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <div class="flex gap-8 flex-wrap flex-1">
+        <!-- Left -->
+        <div class="flex-1 flex flex-col space-y-6">
+          <div
+            class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2"
+          >
+            <div
+              class="w-1 h-6 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full"
+            ></div>
+            Dados Pessoais
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <ng-icon
+                name="heroUser"
+                class="inline mr-2 text-blue-600"
+              ></ng-icon>
+              Nome Completo *
+            </label>
+            <input
+              type="text"
+              formControlName="name"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 text-gray-700 placeholder:text-gray-400"
+              placeholder="Digite o nome completo"
+              [class.border-red-400]="
+                userForm.get('name')?.invalid && userForm.get('name')?.touched
+              "
+              [class.focus:ring-red-200]="
+                userForm.get('name')?.invalid && userForm.get('name')?.touched
+              "
+            />
+            @if(userForm.get('name')?.invalid && userForm.get('name')?.touched){
+            <div class="text-red-500 text-sm mt-1 flex items-center gap-1">
+              <ng-icon name="heroXCircle" class="text-sm"></ng-icon>
+              Nome é obrigatório
+            </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <ng-icon
+                name="heroEnvelope"
+                class="inline mr-2 text-blue-600"
+              ></ng-icon>
+              Email *
+            </label>
+            <input
+              type="email"
+              formControlName="email"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 text-gray-700 placeholder:text-gray-400"
+              placeholder="Digite o email"
+              [class.border-red-400]="
+                userForm.get('email')?.invalid && userForm.get('email')?.touched
+              "
+              [class.focus:ring-red-200]="
+                userForm.get('email')?.invalid && userForm.get('email')?.touched
+              "
+            />
+            @if( userForm.get('email')?.invalid &&
+            userForm.get('email')?.touched) {
+            <div class="text-red-500 text-sm mt-1 flex items-center gap-1">
+              <ng-icon name="heroXCircle" class="text-sm"></ng-icon>
+              @if(userForm.get('email')?.errors?.['required']){
+              <div>Email é obrigatório</div>
+              } @if(userForm.get('email')?.errors?.['email']) {
+              <div>Email inválido</div>
+              }
+            </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <ng-icon
+                name="heroPhone"
+                class="inline mr-2 text-blue-600"
+              ></ng-icon>
+              Telefone
+            </label>
+            <input
+              type="tel"
+              formControlName="phone"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 text-gray-700 placeholder:text-gray-400"
+              placeholder="(11) 99999-9999"
+              mask="(00) 0 0000-0000"
+            />
+          </div>
+        </div>
+
+        <!-- Right -->
+        <div class="flex-1 flex flex-col space-y-6">
+          <div
+            class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2"
+          >
+            <div
+              class="w-1 h-6 bg-gradient-to-b from-purple-600 to-pink-600 rounded-full"
+            ></div>
+            Dados Profissionais
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <ng-icon
+                name="heroBriefcase"
+                class="inline mr-2 text-purple-600"
+              ></ng-icon>
+              Área
+            </label>
+            <input
+              type="text"
+              formControlName="area"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 text-gray-700 placeholder:text-gray-400"
+              placeholder="Ex: GAPSI, GERED ..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <ng-icon
+                name="heroBriefcase"
+                class="inline mr-2 text-purple-600"
+              ></ng-icon>
+              Função
+            </label>
+            <input
+              type="text"
+              formControlName="funcao"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 text-gray-700 placeholder:text-gray-400"
+              placeholder="Ex: Analista, Gerente, Coordenador"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <ng-icon
+                name="heroUserGroup"
+                class="inline mr-2 text-purple-600"
+              ></ng-icon>
+              Nível de Acesso *
+            </label>
+            <select
+              formControlName="role"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200 text-gray-700 bg-white"
+              [class.border-red-400]="
+                userForm.get('role')?.invalid && userForm.get('role')?.touched
+              "
+              [class.focus:ring-red-200]="
+                userForm.get('role')?.invalid && userForm.get('role')?.touched
+              "
+            >
+              <option value="">Selecione o nível de acesso</option>
+              <option *ngFor="let role of roles" [value]="role.value">
+                {{ role.label }}
+              </option>
+            </select>
+            @if(userForm.get('role')?.invalid && userForm.get('role')?.touched){
+            <div class="text-red-500 text-sm mt-1 flex items-center gap-1">
+              <ng-icon name="heroXCircle" class="text-sm"></ng-icon>
+              Nível de acesso é obrigatório
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col sm:flex-row gap-8 mt-6 justify-center"
+        [class.mt-8]
+      >
+        <!-- Info -->
+        <div
+          class="bg-gradient-blue p-6 rounded-xl border border-blue-200 flex-1"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <ng-icon
+              name="heroInformationCircle"
+              class="text-2xl text-blue-600"
+            ></ng-icon>
+            <h3 class="text-lg font-semibold text-blue-800">
+              Informações Importantes
+            </h3>
+          </div>
+          <ul class="space-y-2 text-sm text-blue-700">
+            <li class="flex items-center gap-2">
+              <ng-icon name="heroCheckCircle" class="text-green-600"></ng-icon>
+              Senha será gerada automaticamente
+            </li>
+            <li class="flex items-center gap-2">
+              <ng-icon name="heroCheckCircle" class="text-green-600"></ng-icon>
+              Usuário precisará ser autorizado
+            </li>
+            <li class="flex items-center gap-2">
+              <ng-icon name="heroCheckCircle" class="text-green-600"></ng-icon>
+              Dados poderão ser editados posteriormente
+            </li>
+          </ul>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex-1 flex-row space-y-6 content-around p-6">
+          <div class="flex-1 w-full flex justify-end items-center">
+            <button
+              type="submit"
+              [disabled]="userForm.invalid || isloading"
+              class="px-6 w-1/2 py-2 button-gradient-blue"
+            >
+            @if(!isloading){
+              <ng-icon name="heroUserPlus" class="mr-2"></ng-icon>             
+              Cadastrar}@else {
+               <div class="flex self-center justify-self-center ">
+                <div class="animate-spin mr-2">
+                  <ng-icon name="heroSlash"></ng-icon>
+                </div>
+                Enviando
+              </div>
+
+              }
+            </button>
+          </div>
+          <div class="flex-1 w-full flex justify-end items-center">
+            <button
+              type="button"
+              (click)="resetForm()"
+              class="px-6 py-2 w-1/2 button-gradient-orange"
+            >
+              <ng-icon name="heroArrowPath" class="mr-2"></ng-icon>
+              Limpar
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

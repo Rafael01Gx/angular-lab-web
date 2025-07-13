@@ -2,7 +2,7 @@ import { IUser, IUserResponse } from './../interfaces/user.interface';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +30,7 @@ export class AuthService {
         })
       );
   }
-  
+
   logout(): Observable<any> {
     return this.#http
       .post(`${this.#apiUrl}/logout`, {}, { withCredentials: true })
@@ -53,6 +53,14 @@ export class AuthService {
           return of(null);
         })
       );
+  }
+
+  async create(user: IUser): Promise<IUserResponse> {
+    return firstValueFrom(
+      this.#http.post<IUserResponse>(`${this.#apiUrl}/register`, user, {
+        withCredentials: true,
+      })
+    );
   }
 
   setUser(user: IUser) {

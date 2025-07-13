@@ -139,9 +139,7 @@ router = inject(Router);
       icon: 'heroUserGroup',
       expanded: false,
       children: [
-        { id: 'access-authorize', label: 'Autorizar Acesso', icon: 'heroCheckCircle', route: '/access-management/authorize' },
-        { id: 'access-level', label: 'Alterar Nível de Usuário', icon: 'heroUsers', route: '/access-management/user-level' },
-        { id: 'access-delete', label: 'Excluir Usuário', icon: 'heroTrash', route: '/access-management/delete-user' },
+        { id: 'access-authorize', label: 'Gerenciar Acesso', icon: 'heroCheckCircle', route: '/access-management/authorize' },
         { id: 'access-create', label: 'Cadastrar Novo Usuário', icon: 'heroUserPlus', route: '/access-management/create-user' }
       ]
     },

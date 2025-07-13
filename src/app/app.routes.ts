@@ -31,9 +31,28 @@ export const routes: Routes = [
             (m) => m.PerfilComponent
           ),
       },
-            {
+      {
+        path: 'access-management',
+        redirectTo: 'access-management/access-create',
+        pathMatch: 'full',
+      },
+      {
+        path: 'access-management/create-user',
+        loadComponent: () =>
+          import(
+            './components/gerenciar-acesso/user-registration/user-registration.component'
+          ).then((m) => m.UserRegistrationComponent),
+      },
+      {
+        path: 'access-management/authorize',
+        loadComponent: () =>
+          import(
+            './components/gerenciar-acesso/user-authorization/user-authorization.component'
+          ).then((m) => m.UserAuthorizationComponent),
+      },
+      {
         path: 'settings',
-        redirectTo:'settings/parameters',
+        redirectTo: 'settings/parameters',
         pathMatch: 'full',
       },
       {
