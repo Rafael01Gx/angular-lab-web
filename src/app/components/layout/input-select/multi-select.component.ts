@@ -6,6 +6,8 @@ import {
   OnInit,
   OnChanges,
   SimpleChanges,
+  input,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +29,7 @@ export interface MultiSelectConfig {
   imports: [CommonModule, FormsModule],
   template: `
     <div class="relative w-full">
-      <!-- Trigger Button -->
+      <!-- Trigger -->
       <button
         type="button"
         class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-left shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
@@ -57,13 +59,10 @@ export interface MultiSelectConfig {
         </div>
       </button>
 
-      <!-- Selected Items Pills -->
+      <!-- Selected Items -->
       @if(showSelected && selectedItems.length > 0){
-      <div
-        class="flex -mb-10 gap-2 mt-2 truncate"
-      >
+      <div class="flex -mb-10 gap-2 mt-2 truncate">
         @for(item of selectedItems; track item){<span
-          
           class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200"
         >
           {{ getItemDisplayText(item) }}
@@ -85,8 +84,8 @@ export interface MultiSelectConfig {
                 d="M6 18L18 6M6 6l12 12"
               ></path>
             </svg>
-          </button>
-        </span>}
+          </button> </span
+        >}
       </div>
       }
 
@@ -199,10 +198,23 @@ export class MultiSelectComponent implements OnInit, OnChanges {
   @Output() selectionChange = new EventEmitter<(number | string)[]>();
   @Output() itemsChange = new EventEmitter<any>();
 
+  clearSelect = input<boolean>(false);
+
   isOpen = false;
   searchTerm = '';
   filteredItems: MultiSelectItem[] = [];
   selectedItems: MultiSelectItem[] = [];
+
+  constructor(){
+     effect(() => {
+      if (this.clearSelect()) {
+        this.selectedIds=[]
+        this.selectedItems = [];
+        this.filteredItems = [];
+         this.searchTerm = '';
+      }
+    });
+  }
 
   ngOnInit() {
     this.initializeComponent();
