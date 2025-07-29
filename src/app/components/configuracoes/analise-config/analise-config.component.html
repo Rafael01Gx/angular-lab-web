@@ -27,10 +27,10 @@
             (keyup)="filtrar(teste.value)"
             placeholder="Filtro"
           />
-          @if(analysisSettingsFlt){
+          @if(analysisSettingsFlt()){
           <div class="text-sm text-slate-500">
-            Total: {{ analysisSettingsFlt.length }}
-            {{ analysisSettingsFlt.length === 1 ? "item" : "itens" }}
+            Total: {{ analysisSettingsFlt().length }}
+            {{ analysisSettingsFlt().length === 1 ? "item" : "itens" }}
           </div>
           }
         </div>
@@ -89,7 +89,7 @@
           </tr>
         </thead>
         <tbody>
-          @if(analysisSettingsFlt.length > 0){ @for(item of itensPaginados;
+          @if(analysisSettingsFlt().length > 0){ @for(item of itensPaginados;
           track item.id; let i = $index){
           <tr
             class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-gray-200/80"
@@ -163,15 +163,15 @@
     </div>
 
     <!-- Paginação -->
-    @if(analysisSettingsFlt){
+    @if(analysisSettingsFlt()){
     <div class="border-t border-slate-200/50 p-4 bg-white/50 backdrop-blur-sm">
       <div class="flex items-center justify-between">
         <div class="text-sm text-slate-600">
           Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} a
           {{
-            Math.min(paginaAtual * itensPorPagina, analysisSettingsFlt.length)
+            Math.min(paginaAtual * itensPorPagina, analysisSettingsFlt().length)
           }}
-          de {{ analysisSettingsFlt.length }} resultados
+          de {{ analysisSettingsFlt().length }} resultados
         </div>
 
         <div class="flex items-center gap-2">

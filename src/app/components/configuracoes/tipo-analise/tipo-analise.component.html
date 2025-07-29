@@ -8,7 +8,7 @@
       class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2"
     >
       <ng-icon name="heroPlus" class="text-emerald-500" size="20"></ng-icon>
-      {{ editingItem ? "Editar Análise" : "Nova Análise" }}
+      {{ editingItem() ? "Editar Análise" : "Nova Análise" }}
     </h2>
 
     <form
@@ -57,10 +57,10 @@
           [disabled]="!analiseForm.valid"
           class="px-6 h-12 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md"
         >
-          {{ editingItem ? "Atualizar" : "Salvar" }}
+          {{ editingItem() ? "Atualizar" : "Salvar" }}
         </button>
 
-        @if(editingItem){
+        @if(editingItem()){
         <button
           type="button"
           (click)="cancelarEdicao()"
@@ -90,10 +90,10 @@
           ></ng-icon>
           Análises Cadastradas
         </h2>
-        @if(tiposAnalise){
+        @if(tiposAnalise()){
         <div class="text-sm text-slate-500">
-          Total: {{ tiposAnalise.length }}
-          {{ tiposAnalise.length === 1 ? "item" : "itens" }}
+          Total: {{ tiposAnalise().length }}
+          {{ tiposAnalise().length === 1 ? "item" : "itens" }}
         </div>
         }
       </div>
@@ -132,7 +132,7 @@
           </tr>
         </thead>
         <tbody>
-          @if(tiposAnalise){ @for(item of itensPaginados; track item.id; let i =
+          @if(tiposAnalise()){ @for(item of itensPaginados; track item.id; let i =
           $index){
           <tr
             class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-gray-200/80"
@@ -195,13 +195,13 @@
     </div>
 
     <!-- Paginação -->
-    @if(tiposAnalise){
+    @if(tiposAnalise()){
     <div class="border-t border-slate-200/50 p-4 bg-white/50 backdrop-blur-sm">
       <div class="flex items-center justify-between">
         <div class="text-sm text-slate-600">
           Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} a
-          {{ Math.min(paginaAtual * itensPorPagina, tiposAnalise.length) }} de
-          {{ tiposAnalise.length }} resultados
+          {{ Math.min(paginaAtual * itensPorPagina, tiposAnalise().length) }} de
+          {{ tiposAnalise().length }} resultados
         </div>
 
         <div class="flex items-center gap-2">

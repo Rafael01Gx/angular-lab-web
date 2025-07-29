@@ -8,7 +8,7 @@
       class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2"
     >
       <ng-icon name="heroPlus" class="text-emerald-500" size="20"></ng-icon>
-      {{ editingItem ? "Editar Parâmetro" : "Novo Parâmetro" }}
+      {{ editingItem() ? "Editar Parâmetro" : "Novo Parâmetro" }}
     </h2>
 
     <form
@@ -31,7 +31,7 @@
           class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
         >
           <option value="">Selecione uma Análise</option>
-          @for(item of tipoAnalise; track item.tipo){
+          @for(item of tipoAnalise(); track item.tipo){
           <option [value]="item.id">
             {{ item.tipo }}
           </option>
@@ -114,10 +114,10 @@
           [disabled]="!materiaPrimaForm.valid"
           class="px-6 h-12 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md"
         >
-          {{ editingItem ? "Atualizar" : "Salvar" }}
+          {{ editingItem() ? "Atualizar" : "Salvar" }}
         </button>
 
-        @if(editingItem){
+        @if(editingItem()){
         <button
           type="button"
           (click)="cancelarEdicao()"
@@ -155,10 +155,10 @@
           (keyup)="filtrar(teste.value)"
           placeholder="Filtro"
         />
-        @if(parametrosFiltro){
+        @if(parametrosFiltro()){
         <div class="text-sm text-slate-500">
-          Total: {{ parametrosFiltro.length }}
-          {{ parametrosFiltro.length === 1 ? "item" : "itens" }}
+          Total: {{ parametrosFiltro().length }}
+          {{ parametrosFiltro().length === 1 ? "item" : "itens" }}
         </div>
         }
       </div>
@@ -217,7 +217,7 @@
           </tr>
         </thead>
         <tbody>
-          @if(parametrosFiltro.length > 0){ @for(item of itensPaginados; track item.id; let
+          @if(parametrosFiltro().length > 0){ @for(item of itensPaginados; track item.id; let
           i = $index){
           <tr
             class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-gray-200/80 "
@@ -308,13 +308,13 @@
     </div>
 
     <!-- Paginação -->
-    @if(parametrosFiltro){
+    @if(parametrosFiltro()){
     <div class="border-t border-slate-200/50 p-4 bg-white/50 backdrop-blur-sm">
       <div class="flex items-center justify-between">
         <div class="text-sm text-slate-600">
           Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} a
-          {{ Math.min(paginaAtual * itensPorPagina, parametrosFiltro.length) }}
-          de {{ parametrosFiltro.length }} resultados
+          {{ Math.min(paginaAtual * itensPorPagina, parametrosFiltro().length) }}
+          de {{ parametrosFiltro().length }} resultados
         </div>
 
         <div class="flex items-center gap-2">

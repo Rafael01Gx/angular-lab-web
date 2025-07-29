@@ -72,7 +72,7 @@
               </label>
               <div>
                 <app-multi-select
-                  [data]="paramFilter"
+                  [data]="paramFilter()"
                   [config]="config"
                   (itemsChange)="onSelect($event)"
                   [disabled]="!analysisSettingsForm.valid"
@@ -134,10 +134,10 @@
               </div>
             </div>
           </div>
-          @if (parameters.length > 0) {
+          @if (parameters().length > 0) {
           <div class="flex-1 overflow-auto">
             <div class="min-w-full">
-              @for (param of parameters; track $index) {
+              @for (param of parameters(); track $index) {
               <div
                 class="flex hover:bg-gray-50 transition-colors border-b border-gray-200 last:border-b-0"
                 [class]="getRowAnimation($index)"
@@ -175,7 +175,7 @@
                     </button>
                     <button
                       (click)="moveParameter($index, 'down')"
-                      [disabled]="$index === parameters.length - 1"
+                      [disabled]="$index === parameters().length - 1"
                       class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
                     >
                       <ng-icon name="heroChevronDown" class="text-sm"></ng-icon>

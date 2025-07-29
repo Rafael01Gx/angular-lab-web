@@ -4,17 +4,14 @@ import {
   inject,
   signal,
   computed,
-  DestroyRef,
   output,
   OutputEmitterRef,
   Input,
-  OnDestroy,
-  AfterViewInit,
+  AfterViewInit, TransferState, makeStateKey, PLATFORM_ID,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, isPlatformServer} from '@angular/common';
 import {
   ReactiveFormsModule,
-  FormBuilder,
   FormGroup,
   Validators,
   FormControl,
@@ -39,6 +36,10 @@ import {
   MultiSelectConfig,
 } from '../../layout/input-select/multi-select.component';
 import { AnalysisSettingsService } from '../../../services/analysis-settings.service';
+import {catchError, finalize, of} from 'rxjs';
+
+const TIPOS_ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appSettingsTypeAnalysis');
+const PARAMETROS_KEY = makeStateKey<IParameters[]>('appSettingsTypeParam');
 
 @Component({
   selector: 'app-analysis-settings-modal',
@@ -67,6 +68,8 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   #analysisTypeService = inject(AnalysisTypeService);
   #analysisSettingsService = inject(AnalysisSettingsService);
   #parametersService = inject(ParametersService);
+  #transferState = inject(TransferState);
+  #platformId = inject(PLATFORM_ID);
 
   dataSaved: OutputEmitterRef<IAnalysisSettings> = output<IAnalysisSettings>();
   cancelled: OutputEmitterRef<void> = output<void>();
@@ -75,13 +78,12 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   @Input('data') data: IAnalysisSettings | null = null;
   @Input() isVisible: boolean = false;
 
-  allparameters: IParameters[] = [];
-  parameters: IParameters[] = [];
-  selectedParams: IParameters[] = [];
+  allparameters= signal<IParameters[]|[] >([]);
+  parameters= signal<IParameters[]|[] >([]);
+  selectedParams= signal<IParameters[]|[] >([]);
   tiposAnalise = signal<ITipoAnalise[]>([]);
-
   animatedRows = signal<{ [key: number]: string }>({});
-  paramFilter: IParameters[] = [];
+  paramFilter= signal<IParameters[]|[] >([]);
 
   canSave = computed(
     () => this.analysisSettingsForm.valid && this.parameters.length > 0
@@ -105,8 +107,27 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   });
 
   ngOnInit() {
-    this.loadTiposAnalise();
-    this.loadParametros();
+    const keyParametros= this.#transferState.get(PARAMETROS_KEY,null)
+    const keyTipoAnalise= this.#transferState.get(TIPOS_ANALISE_KEY,null)
+    if(isPlatformServer(this.#platformId)){
+      this.loadTiposAnalise();
+      this.loadParametros();
+      return;
+    }else {
+      if (keyParametros) {
+        this.allparameters.set(keyParametros);
+        this.#transferState.remove(PARAMETROS_KEY);
+      } else {
+        this.loadParametros();
+      }
+      if (keyTipoAnalise) {
+        this.tiposAnalise.set(keyTipoAnalise);
+        this.#transferState.remove(TIPOS_ANALISE_KEY);
+      } else {
+        this.loadTiposAnalise();
+      }
+    }
+
   }
 
   ngAfterViewInit(): void {
@@ -115,8 +136,8 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
         nomeDescricao: this.data.nomeDescricao,
         tipoAnaliseId: this.data.tipoAnaliseId!,
       });
-      this.parameters = this.data.parametros;
-      this.selectedParams = this.data.parametros;
+      this.parameters.set(this.data.parametros);
+      this.selectedParams.set(this.data.parametros);
     }
   }
 
@@ -127,32 +148,40 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   close(result?: any) {
     this.cancelled.emit();
     this.analysisSettingsForm.reset();
-    this.parameters = [];
+    this.parameters.set([]);
   }
 
   loadTiposAnalise() {
-    try {
-      this.#analysisTypeService.findAll().subscribe({
-        next: (res) => {
-          this.tiposAnalise.set(res);
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    this.#analysisTypeService.findAll().pipe(
+      catchError(error => {
+        console.error('Erro ao carregar tipos de análise:', error);
+        return of([]);
+      }),
+
+    ).subscribe({
+      next: (res) => {
+        this.tiposAnalise.set(res);
+        if(isPlatformServer(this.#platformId)){
+          this.#transferState.set(TIPOS_ANALISE_KEY,res);
+        }
+      },
+    });
   }
 
   loadParametros() {
-    try {
-      this.#parametersService.findAll().subscribe({
-        next: (res) => {
-          this.allparameters = res;
-          this.filtrarParametro()
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    this.#parametersService.findAll().pipe(
+      catchError((error) => { console.log('Erro ao carregar parâmetros:', error)
+        return of([])
+      })
+    ).subscribe({
+      next: (res) => {
+        this.allparameters.set(res);
+        this.filtrarParametro()
+        if(isPlatformServer(this.#platformId)){
+          this.#transferState.set(PARAMETROS_KEY,res);
+        }
+      },
+    });
   }
 
   private loadModalData() {
@@ -162,25 +191,23 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
         nomeDescricao: data.nomeDescricao,
         tipoAnaliseId: data.tipoAnaliseId,
       });
-      this.parameters = [...data.parametros];
+      this.parameters.set([...data.parametros]);
     }
   }
 
   addParameter() {
-    this.parameters = [
-      ...this.parameters,
-      ...this.selectedParams.filter(
-        (arr2) => !this.parameters.some((arr1) => arr1.id === arr2.id)
+    this.parameters.update((v)=> [...v,...v.filter(
+        (arr2) => !v.some((arr1) => arr1.id === arr2.id)
       ),
-    ];
+    ])
   }
 
   removeParameter(index: number) {
-    this.parameters = this.parameters.filter((_, i) => i !== index);
+    this.parameters.update((v)=> v.filter((_, i) => i !== index))
   }
 
   moveParameter(index: number, direction: 'up' | 'down') {
-    const currentParams = [...this.parameters];
+    const currentParams = [...this.parameters()];
 
     if (direction === 'up' && index > 0) {
       this.setRowAnimation(index, 'animate-move-up');
@@ -198,7 +225,7 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
       ];
     }
 
-    this.parameters = currentParams;
+    this.parameters.set(currentParams);
 
     // Clear animations
     setTimeout(() => {
@@ -221,12 +248,12 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
     if (
       this.analysisSettingsForm.value.nomeDescricao &&
       this.analysisSettingsForm.value.tipoAnaliseId &&
-      this.parameters
+      this.parameters()
     ) {
       const _analysisSettings: IAnalysisSettings = {
         nomeDescricao: this.analysisSettingsForm.value.nomeDescricao,
         tipoAnaliseId: this.analysisSettingsForm.value.tipoAnaliseId,
-        parametros: this.parameters,
+        parametros: this.parameters(),
       };
       try {
         if (this.data?.id && this.isEditMode) {
@@ -260,11 +287,11 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
 
   filtrarParametro() {
     const tipoAnaliseId = Number(this.analysisSettingsForm.value.tipoAnaliseId);
-    this.paramFilter = this.allparameters.filter(
+    this.paramFilter.update(()=> this.allparameters().filter(
       (p) => p.tipoAnalise?.id == tipoAnaliseId
-    );
+    ))
   }
   onSelect(event: IParameters[]) {
-    return (this.selectedParams = event);
+    return (this.selectedParams.set(event));
   }
 }

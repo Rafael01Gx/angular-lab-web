@@ -62,15 +62,15 @@
         Limpar Filtros
       </button>
     </div>
-    
-  
+
+
   <!-- Estatísticas -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 flex-shrink-0">
     <div class="bg-blue-50 p-4 rounded-lg">
       <div class="flex items-center justify-between gap-2">
         <ng-icon name="heroUsers" class="text-blue-600"></ng-icon>
         <span class="text-sm font-medium text-blue-700">Total de Usuários</span>
-        <span class="text-2xl font-bold text-blue-700">{{ users.length }}</span>
+        <span class="text-2xl font-bold text-blue-700">{{ users().length }}</span>
       </div>
     </div>
 
@@ -99,7 +99,7 @@
         <ng-icon name="heroUserGroup" class="text-purple-600"></ng-icon>
         <span class="text-sm font-medium text-purple-700">Filtrados</span>
         <span class="text-2xl font-bold text-purple-700">{{
-          filteredUsers.length
+          filteredUsers().length
         }}</span>
       </div>
     </div>
@@ -142,7 +142,7 @@
             </tr>
           </thead>
           <tbody>
-            @for(user of paginatedUsers; track user){
+            @for(user of paginatedUsers(); track user){
             <tr
               class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-gray-200/80 truncate"
             >
@@ -201,7 +201,7 @@
           </tbody>
         </table>
 
-        @if(filteredUsers.length === 0){
+        @if(filteredUsers().length === 0){
         <div class="text-center py-8 text-gray-500">
           <ng-icon name="heroUsers" class="text-4xl mb-2"></ng-icon>
           <p>Nenhum usuário encontrado com os filtros aplicados.</p>
@@ -214,13 +214,13 @@
     <div class="mt-4 flex justify-between items-center flex-shrink-0">
       <div class="text-sm text-gray-700">
         Mostrando {{ getStartIndex() + 1 }} a {{ getEndIndex() }} de
-        {{ filteredUsers.length }} usuários
+        {{ filteredUsers().length }} usuários
       </div>
 
       <div class="flex items-center gap-2">
         <!-- Seletor -->
         <select
-          pageSize
+          #pageSize
           (change)="onPageSizeChange()"
           class="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >

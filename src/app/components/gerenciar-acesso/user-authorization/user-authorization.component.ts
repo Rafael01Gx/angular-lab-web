@@ -1,7 +1,7 @@
 import { FormsModule } from '@angular/forms';
 
 import { IUser } from '../../../interfaces/user.interface';
-import { Component, inject, OnInit } from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
@@ -25,6 +25,7 @@ import { mapUserRole, Role } from '../../../enums/roles.enum';
 import { ToastrService } from '../../layout/toastr/toastr.service';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
+import {of} from 'rxjs';
 
 @Component({
   selector: 'app-user-authorization',
@@ -55,14 +56,15 @@ export class UserAuthorizationComponent implements OnInit {
   #toastr = inject(ToastrService);
   #userService = inject(UserService);
   #authService = inject(AuthService);
-  users: IUser[] = [];
-  filteredUsers: IUser[] = [];
-  paginatedUsers: IUser[] = [];
-  selectedUser: IUser | null = null;
-  expanded = true;
-  searchTerm: string = '';
-  authorizationFilter: string = '';
-  roleFilter: string = '';
+
+  users= signal<IUser[]>([]);
+  filteredUsers= signal<IUser[]>([]);
+  paginatedUsers= signal<IUser[]>([]);
+  selectedUser= signal<IUser | null>(null);
+  roleFilter:string=''
+  searchTerm:string=''
+  authorizationFilter:string=''
+  expanded:boolean=true;
 
   currentPage: number = 1;
   pageSize: number = 10;
@@ -77,25 +79,24 @@ export class UserAuthorizationComponent implements OnInit {
   ngOnInit(): void {
     this.loadUsers();
   }
+
   async loadUsers() {
-    try {
+
       await this.#userService.findAll().then((res) => {
         if (res) {
           res.map((res) => {
             return { ...res, role: this.mapRoles(res.role as string) };
           });
-          this.users = res;
+          this.users.set(res);
         }
-      });
-    } catch (error) {
-      console.log(error);
-    }
-    this.filteredUsers = [...this.users];
+      }).catch((err) => {console.log(err)})
+
+    this.filteredUsers.set([...this.users()]);
     this.updatePagination();
   }
 
   applyFilters(): void {
-    this.filteredUsers = this.users.filter((user) => {
+    const filters = this.users().filter((user) => {
       const matchesSearch =
         this.searchTerm === '' ||
         user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -111,22 +112,22 @@ export class UserAuthorizationComponent implements OnInit {
 
       return matchesSearch && matchesAuth && matchesRole;
     });
-
+    this.filteredUsers.set(filters);
     this.currentPage = 1;
     this.updatePagination();
   }
 
   clearFilters(): void {
-    this.searchTerm = '';
-    this.authorizationFilter = '';
-    this.roleFilter = '';
-    this.filteredUsers = [...this.users];
+    this.searchTerm='';
+    this.authorizationFilter='';
+    this.roleFilter='';
+    this.filteredUsers.set([...this.users()]);
     this.currentPage = 1;
     this.updatePagination();
   }
 
   updateUser(user: IUser): void {
-    if (!user.id || !this.#authService.currentUser) return;
+    if (!user.id || !this.#authService.currentUser()) return;
 
     if (user.id == this.#authService.currentUser()?.id) {
       this.#toastr.info(
@@ -146,16 +147,16 @@ export class UserAuthorizationComponent implements OnInit {
   }
 
   getAuthorizedCount(): number {
-    return this.users.filter((user) => user.authorization).length;
+    return this.users().filter((user) => user.authorization).length;
   }
 
   getUnauthorizedCount(): number {
-    return this.users.filter((user) => !user.authorization).length;
+    return this.users().filter((user) => !user.authorization).length;
   }
 
   // Métodos de paginação
   updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredUsers.length / this.pageSize);
+    this.totalPages = Math.ceil(this.filteredUsers().length / this.pageSize);
     if (this.currentPage > this.totalPages) {
       this.currentPage = 1;
     }
@@ -165,7 +166,7 @@ export class UserAuthorizationComponent implements OnInit {
   updatePaginatedUsers(): void {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedUsers = this.filteredUsers.slice(startIndex, endIndex);
+    this.paginatedUsers.update(()=> this.filteredUsers().slice(startIndex, endIndex))
   }
 
   goToFirstPage(): void {
@@ -204,7 +205,7 @@ export class UserAuthorizationComponent implements OnInit {
   getEndIndex(): number {
     return Math.min(
       this.getStartIndex() + this.pageSize,
-      this.filteredUsers.length
+      this.filteredUsers().length
     );
   }
 }

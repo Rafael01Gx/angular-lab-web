@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import {Component, inject, makeStateKey, OnInit, PLATFORM_ID, signal, TransferState} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -19,6 +19,11 @@ import { IClasseItem } from '../../../interfaces/analysis-type.interface';
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 import { MateriaPrimaService } from '../../../services/materia-prima.service';
 import { IMateriaPrima } from '../../../interfaces/materia-prima.interface';
+import {catchError, of} from 'rxjs';
+import {isPlatformBrowser, isPlatformServer} from '@angular/common';
+
+const MATERIA_PRIMA_KEY = makeStateKey<IMateriaPrima[]>('appMateriasPrimas');
+
 @Component({
   selector: 'app-materias-primas',
   imports: [ReactiveFormsModule, NgIconComponent],
@@ -34,7 +39,17 @@ import { IMateriaPrima } from '../../../interfaces/materia-prima.interface';
     }),
   ],
 })
-export class MateriasPrimasComponent {
+export class MateriasPrimasComponent implements OnInit {
+  #materiaPrimaService = inject(MateriaPrimaService);
+  #transferState = inject(TransferState);
+  #platformId = inject(PLATFORM_ID);
+  confirmationModal = inject(ConfirmationModalService);
+
+  materiasPrimas= signal<IMateriaPrima[]|[]>([])
+  materiasPrimasFiltro= signal<IMateriaPrima[]|[]>([])
+  editingItem= signal<IMateriaPrima | null>(null);
+  editItemIndex= signal<number | null>(null);
+
   classeTipo: IClasseItem[] = [
     { value: 'Combustível', label: 'Combustível' },
     { value: 'Fundente', label: 'Fundente' },
@@ -45,12 +60,6 @@ export class MateriasPrimasComponent {
     { value: 'Variável', label: 'Variável' },
   ];
 
-  #materiaPrimaService = inject(MateriaPrimaService);
-  materiasPrimas: IMateriaPrima[]=[]
-  materiasPrimasFiltro: IMateriaPrima[]=[]
-  editingItem: IMateriaPrima | null = null;
-  editItemIndex: number | null = null;
-  confirmationModal = inject(ConfirmationModalService);
   materiaPrimaForm = new FormGroup({
     nomeDescricao: new FormControl<string>('', [
       Validators.required,
@@ -74,26 +83,38 @@ export class MateriasPrimasComponent {
   get itensPaginados(): IMateriaPrima[] {
     const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
     const fim = inicio + this.itensPorPagina;
-    return this.materiasPrimasFiltro.slice(inicio, fim);
+    return this.materiasPrimasFiltro().slice(inicio, fim);
   }
 
   // Utilitário
   Math = Math;
 
   ngOnInit(): void {
+    const keyData = this.#transferState.get(MATERIA_PRIMA_KEY,null)
+    if(isPlatformBrowser(this.#platformId) && keyData){
+      this.materiasPrimas.set(keyData);
+      this.materiasPrimasFiltro.set(keyData);
+      this.#transferState.remove(MATERIA_PRIMA_KEY)
+      return;
+    }
     this.loadingData()
   }
+
   loadingData() {
-    try {
-      this.#materiaPrimaService.findAll().subscribe({
+      this.#materiaPrimaService.findAll().pipe(
+        catchError((error) => {
+          console.error('Erro ao carregar materias primas:', error);
+          return of([]);
+        })
+      ).subscribe({
         next: (res) => {
-          this.materiasPrimas = res;
-          this.materiasPrimasFiltro = this.materiasPrimas;
+          this.materiasPrimas.set(res);
+          this.materiasPrimasFiltro.set(this.materiasPrimas());
+          if(isPlatformServer(this.#platformId)){
+            this.#transferState.set(MATERIA_PRIMA_KEY,res);
+          }
         },
       });
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   salvarItem(): void {
@@ -104,16 +125,16 @@ export class MateriasPrimasComponent {
       return;
     }
 
-    if (this.editingItem && this.editingItem.id) {
+    if (this.editingItem() && this.editingItem()?.id) {
       this.#materiaPrimaService
         .update(
-          this.editingItem.id,
+          this.editingItem()?.id!,
           this.materiaPrimaForm.value as IMateriaPrima
         )
         .subscribe({
           next: (res) => {
-            if (this.editItemIndex !== -1) {
-              this.materiasPrimas[this.editItemIndex!] = res;
+            if (this.editItemIndex() !== -1) {
+              this.materiasPrimas()[this.editItemIndex()!] = res;
             }
           },
         });
@@ -122,8 +143,8 @@ export class MateriasPrimasComponent {
         .create(this.materiaPrimaForm.value as IMateriaPrima)
         .subscribe({
           next: (res) => {
-            this.materiasPrimas.push(res),
-              (this.materiasPrimasFiltro = this.materiasPrimas);
+            this.materiasPrimas.update((items)=> [...items, res]);
+              (this.materiasPrimasFiltro.set(this.materiasPrimas()));
           },
         });
     }
@@ -137,8 +158,8 @@ export class MateriasPrimasComponent {
   }
 
   editarItem(item: IMateriaPrima, index: number): void {
-    this.editingItem = item;
-    this.editItemIndex = index;
+    this.editingItem.set(item);
+    this.editItemIndex.set(index);
     this.materiaPrimaForm.setValue({
       nomeDescricao: item.nomeDescricao,
       classeTipo: item.classeTipo,
@@ -146,7 +167,7 @@ export class MateriasPrimasComponent {
   }
 
   cancelarEdicao(): void {
-    this.editingItem = null;
+    this.editingItem.set(null);
     this.materiaPrimaForm.reset();
   }
 
@@ -193,7 +214,7 @@ export class MateriasPrimasComponent {
   }
 
   filtrar(params: string) {
-    const filtro = this.materiasPrimas.filter((materia) => {
+    const filtro = this.materiasPrimas().filter((materia) => {
       const idStr = materia.id?.toString() ?? '';
       const nome = materia.nomeDescricao.toLowerCase();
       const classe = materia.classeTipo.toLowerCase();
@@ -204,6 +225,6 @@ export class MateriasPrimasComponent {
         classe.includes(params)
       );
     });
-    this.materiasPrimasFiltro = filtro;
+    this.materiasPrimasFiltro.set(filtro);
   }
 }

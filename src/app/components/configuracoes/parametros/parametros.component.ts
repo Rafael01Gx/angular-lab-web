@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
+import {Component, inject, makeStateKey, OnInit, PLATFORM_ID, signal, TransferState} from '@angular/core';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import {NgIconComponent, provideIcons} from '@ng-icons/core';
 import {
   heroPencil,
   heroTrash,
@@ -15,13 +15,17 @@ import {
   heroMagnifyingGlass,
 } from '@ng-icons/heroicons/outline';
 import {
-  IClasseItem,
   ITipoAnalise,
 } from '../../../interfaces/analysis-type.interface';
-import { ParametersService } from '../../../services/parameters.service';
-import { AnalysisTypeService } from '../../../services/analysis-type.service';
-import { IParameters } from '../../../interfaces/parameters.interface';
-import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
+import {ParametersService} from '../../../services/parameters.service';
+import {AnalysisTypeService} from '../../../services/analysis-type.service';
+import {IParameters} from '../../../interfaces/parameters.interface';
+import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
+import {isPlatformServer} from '@angular/common';
+import {catchError, of} from 'rxjs';
+
+const PARAMETROS_KEY = makeStateKey<IParameters[]>('appParametros');
+const ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appParamTipoAnalise');
 
 @Component({
   selector: 'app-parametros',
@@ -38,16 +42,18 @@ import { ConfirmationModalService } from '../../../services/confirmation-modal.s
     }),
   ],
 })
-export class ParametrosComponent {
+export class ParametrosComponent implements OnInit {
+  #platformId = inject(PLATFORM_ID)
+  #transferState = inject(TransferState)
   #parametrosService = inject(ParametersService);
   #analysisTypeService = inject(AnalysisTypeService);
-  parametros: IParameters[]=[]
-  parametrosFiltro: IParameters[]=[]
-  editingItem: IParameters | null = null;
-  editItemIndex: number | null = null;
   confirmationModal = inject(ConfirmationModalService);
 
-  tipoAnalise: ITipoAnalise[] = [];
+  parametros = signal<IParameters[] | []>([])
+  parametrosFiltro = signal<IParameters[] | []>([])
+  editingItem = signal<IParameters | null>(null);
+  editItemIndex = signal<number | null>(null);
+  tipoAnalise = signal<ITipoAnalise[] | []>([]);
 
   materiaPrimaForm = new FormGroup({
     tipoAnaliseId: new FormControl<string | number>('', [Validators.required]),
@@ -59,6 +65,30 @@ export class ParametrosComponent {
     unidadeResultado: new FormControl<string>(''),
     casasDecimais: new FormControl<number>(0),
   });
+
+  ngOnInit(): void {
+    const keyParametros = this.#transferState.get(PARAMETROS_KEY, null);
+    const keyTipoAnalise = this.#transferState.get(ANALISE_KEY, null);
+    if (isPlatformServer(this.#platformId)) {
+      this.loadingAnalysis();
+      this.loadingParams();
+      return;
+    } else {
+      if (keyParametros) {
+        this.parametros.set(keyParametros);
+        this.parametrosFiltro.set(keyParametros);
+        this.#transferState.remove(PARAMETROS_KEY);
+      } else {
+        this.loadingParams();
+      }
+      if (keyTipoAnalise) {
+        this.tipoAnalise.set(keyTipoAnalise);
+        this.#transferState.remove(ANALISE_KEY);
+      } else {
+        this.loadingAnalysis();
+      }
+    }
+  }
 
   // Paginação
   paginaAtual = 1;
@@ -72,37 +102,47 @@ export class ParametrosComponent {
   get itensPaginados(): IParameters[] {
     const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
     const fim = inicio + this.itensPorPagina;
-    return this.parametrosFiltro.slice(inicio, fim);
+    return this.parametrosFiltro().slice(inicio, fim);
   }
 
   // Utilitário
   Math = Math;
 
-  ngOnInit(): void {
-    this.loadingData();
-    try {
-      this.#analysisTypeService.findAll().subscribe({
-        next: (res) => {
-          this.tipoAnalise = res;
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
+
+  loadingParams() {
+    this.#parametrosService.findAll().pipe(
+      catchError((error) => {
+        console.log('Erro ao carregar parâmetros:', error)
+        return of([])
+      })
+    ).subscribe({
+      next: (res) => {
+        this.parametros.set(res);
+        this.parametrosFiltro.set(this.parametros());
+        if (isPlatformServer(this.#platformId)) {
+          this.#transferState.set(PARAMETROS_KEY, res);
+        }
+      },
+    });
   }
 
-  loadingData() {
-    try {
-      this.#parametrosService.findAll().subscribe({
-        next: (res) => {
-          this.parametros = res;
-          this.parametrosFiltro = this.parametros;
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
+  loadingAnalysis() {
+    this.#analysisTypeService.findAll().pipe(
+      catchError((error) => {
+        console.log('Erro ao carregar tipos de análise:', error)
+        return of([])
+      })
+    ).subscribe({
+      next: (res) => {
+        this.tipoAnalise.set(res);
+        if (isPlatformServer(this.#platformId)) {
+          this.#transferState.set(ANALISE_KEY, res)
+        }
+      },
+    });
+
   }
+
   salvarItem(): void {
     if (
       !this.materiaPrimaForm.value.tipoAnaliseId ||
@@ -118,20 +158,21 @@ export class ParametrosComponent {
       casasDecimais: this.materiaPrimaForm.value.casasDecimais,
     };
 
-    if (this.editingItem && this.editingItem.id) {
+    if (this.editingItem() && this.editingItem()?.id) {
       this.#parametrosService
-        .update(this.editingItem.id, _params as IParameters)
+        .update(this.editingItem()?.id!, _params as IParameters)
         .subscribe({
           next: (res) => {
-            if (this.editItemIndex !== -1) {
-              this.parametros[this.editItemIndex!] = res;
+            if (this.editItemIndex() !== -1) {
+              this.parametros()[this.editItemIndex()!] = res;
             }
           },
         });
     } else {
       this.#parametrosService.create(_params as IParameters).subscribe({
         next: (res) => {
-          this.parametros.push(res), (this.parametrosFiltro = this.parametros);
+          this.parametros.update((items) => [...items, res]);
+          this.parametrosFiltro.set(this.parametros());
         },
       });
     }
@@ -145,8 +186,8 @@ export class ParametrosComponent {
   }
 
   editarItem(item: IParameters, index: number): void {
-    this.editingItem = item;
-    this.editItemIndex = index;
+    this.editingItem.set(item);
+    this.editItemIndex.set(index);
     this.materiaPrimaForm.setValue({
       tipoAnaliseId: item.id ? item.id : null,
       descricao: item.descricao,
@@ -157,7 +198,7 @@ export class ParametrosComponent {
   }
 
   cancelarEdicao(): void {
-    this.editingItem = null;
+    this.editingItem.set(null);
     this.materiaPrimaForm.reset();
   }
 
@@ -183,7 +224,7 @@ export class ParametrosComponent {
       try {
         this.#parametrosService.delete(item.id!).subscribe({
           next: () => {
-            this.loadingData()
+            this.loadingParams()
             if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
               this.paginaAtual = this.totalPaginas;
             }
@@ -199,17 +240,18 @@ export class ParametrosComponent {
   }
 
   filtrar(params: string) {
-    const filtro = this.parametros.filter((param) => {
+    const filtro = this.parametros().filter((param) => {
+
       const idStr = param.id?.toString() ?? '';
-      const descricao = param.descricao.toLowerCase();
-      const medida = param.unidadeMedida.toLowerCase();
+      const descricao = param.descricao?.toLowerCase();
+      const analise = param.tipoAnalise?.tipo!.toLowerCase() || ''
 
       return (
         idStr.includes(params) ||
         descricao.includes(params) ||
-        medida.includes(params)
+        analise.includes(params)
       );
     });
-    this.parametrosFiltro = filtro;
+    this.parametrosFiltro.set(filtro);
   }
 }

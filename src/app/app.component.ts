@@ -6,7 +6,7 @@ import { ToastrComponent } from "./components/layout/toastr/toastr.component";
 @Component({
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet, ToastrComponent],
-  template: ` 
+  template: `
   <app-toastr />
   <router-outlet /> `,
 })

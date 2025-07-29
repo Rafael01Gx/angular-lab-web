@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {Component, inject, makeStateKey, OnInit, PLATFORM_ID, signal, TransferState} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -20,6 +20,10 @@ import {
 } from '../../../interfaces/analysis-type.interface';
 import { AnalysisTypeService } from '../../../services/analysis-type.service';
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
+import {isPlatformBrowser, isPlatformServer} from '@angular/common';
+import {catchError, finalize, of} from 'rxjs';
+
+const TIPOS_ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appTiposAnalise');
 
 @Component({
   selector: 'app-tipo-analise',
@@ -37,11 +41,16 @@ import { ConfirmationModalService } from '../../../services/confirmation-modal.s
   ],
 })
 export class TipoAnaliseComponent implements OnInit {
+  #platformId = inject(PLATFORM_ID)
+  #transferState = inject(TransferState)
   #analysisTypeService = inject(AnalysisTypeService);
-  tiposAnalise: ITipoAnalise[]=[]
-  editingItem: ITipoAnalise | null = null;
-  editItemIndex: number | null = null;
   confirmationModal = inject(ConfirmationModalService);
+
+  isLoading = signal(false);
+  tiposAnalise= signal<ITipoAnalise[]|[]>([])
+  editingItem= signal<ITipoAnalise| null>(null);
+  editItemIndex= signal<number | null>(null);
+
   analiseForm = new FormGroup({
     tipo: new FormControl<string>('', [
       Validators.required,
@@ -61,37 +70,57 @@ export class TipoAnaliseComponent implements OnInit {
     { value: 'Física/Química', label: 'Física/Química' },
   ];
 
+  ngOnInit(): void {
+    const keyData = this.#transferState.get(TIPOS_ANALISE_KEY,null)
+    if(isPlatformServer(this.#platformId)){
+      this.loadingData();
+      return;
+    }else if(isPlatformBrowser(this.#platformId) && keyData){
+      this.tiposAnalise.set(keyData);
+      this.#transferState.remove(TIPOS_ANALISE_KEY)
+      return;
+    }
+    this.loadingData();
+  }
+
+
   // Paginação
   paginaAtual = 1;
-  itensPorPagina = 5;
 
-  // Propriedades calculadas
+  itensPorPagina = 5;
+  // Propriedades
+
   get totalPaginas(): number {
-    return Math.ceil(this.tiposAnalise.length / this.itensPorPagina);
+    return Math.ceil(this.tiposAnalise().length / this.itensPorPagina);
   }
 
   get itensPaginados(): ITipoAnalise[] {
     const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
     const fim = inicio + this.itensPorPagina;
-    return this.tiposAnalise.slice(inicio, fim);
+    return this.tiposAnalise().slice(inicio, fim);
   }
+  // Utilitário
 
-  // Utilitário Math para template
   Math = Math;
-
-  ngOnInit(): void {
-this.loadingData()
-  }
   loadingData(){
-    try {
-          this.#analysisTypeService.findAll().subscribe({
+    this.isLoading.set(true);
+
+    this.#analysisTypeService.findAll().pipe(
+      catchError(error => {
+        console.error('Erro ao carregar tipos de análise:', error);
+        return of([]);
+      }),
+      finalize(() => {
+        this.isLoading.set(false)
+      })
+    ).subscribe({
       next: (res) => {
-        this.tiposAnalise = res;
+        this.tiposAnalise.set(res);
+        if(isPlatformServer(this.#platformId)){
+          this.#transferState.set(TIPOS_ANALISE_KEY,res);
+        }
       },
     });
-    } catch (error) {
-      console.log(error)
-    }
   }
 
   salvarItem(): void {
@@ -99,13 +128,13 @@ this.loadingData()
       return;
     }
 
-    if (this.editingItem && this.editingItem.id) {
+    if (this.editingItem() && this.editingItem()?.id) {
       this.#analysisTypeService
-        .update(this.editingItem.id, this.analiseForm.value as ITipoAnalise)
+        .update(this.editingItem()?.id!, this.analiseForm.value as ITipoAnalise)
         .subscribe({
           next: (res) => {
-            if (this.editItemIndex !== -1) {
-              this.tiposAnalise[this.editItemIndex!] = res;
+            if (this.editItemIndex() !== -1) {
+              this.tiposAnalise()[this.editItemIndex()!] = res;
             }
           },
         });
@@ -113,7 +142,7 @@ this.loadingData()
       this.#analysisTypeService
         .create(this.analiseForm.value as ITipoAnalise)
         .subscribe({
-          next: (res) => this.tiposAnalise.push(res),
+          next: (res) => this.tiposAnalise.update((items) => [...items, res]),
         });
     }
 
@@ -126,8 +155,8 @@ this.loadingData()
   }
 
   editarItem(item: ITipoAnalise, index: number): void {
-    this.editingItem = item;
-    this.editItemIndex = index;
+    this.editingItem.set(item);
+    this.editItemIndex.set(index);
     this.analiseForm.setValue({
       classe: item.classe,
       tipo: item.tipo,
@@ -135,7 +164,7 @@ this.loadingData()
   }
 
   cancelarEdicao(): void {
-    this.editingItem = null;
+    this.editingItem.set(null);
     this.analiseForm.reset();
   }
 

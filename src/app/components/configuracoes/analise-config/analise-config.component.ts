@@ -1,5 +1,4 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
-
+import {Component, inject, makeStateKey, OnInit, PLATFORM_ID, signal, TransferState} from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
   heroPencil,
@@ -14,6 +13,10 @@ import { ConfirmationModalService } from '../../../services/confirmation-modal.s
 import { AnalysisSettingsService } from '../../../services/analysis-settings.service';
 import { IAnalysisSettings } from '../../../interfaces/analysis-settings.interface';
 import { AnalysisModalService } from '../../../services/analysis-modal.service';
+import {catchError, of} from 'rxjs';
+import {isPlatformBrowser, isPlatformServer} from '@angular/common';
+
+const ANALISE_SETTINGS_KEY = makeStateKey<IAnalysisSettings[]>('appAnalise');
 
 @Component({
   selector: 'app-analise-config',
@@ -30,60 +33,72 @@ import { AnalysisModalService } from '../../../services/analysis-modal.service';
     }),
   ],
 })
-export class AnaliseConfigComponent {
+export class AnaliseConfigComponent implements OnInit{
   #analysisSettingsService = inject(AnalysisSettingsService);
   #analysisModalService = inject(AnalysisModalService);
+  #transferState = inject(TransferState);
+  #platformId = inject(PLATFORM_ID);
   confirmationModal = inject(ConfirmationModalService);
 
-  analysisSettings!: IAnalysisSettings[];
-  analysisSettingsFlt: IAnalysisSettings[]=[]
-  editingItem: IAnalysisSettings | null = null;
-  editItemIndex: number | null = null;
+  analysisSettings=signal<IAnalysisSettings[]>([])
+  analysisSettingsFlt=signal<IAnalysisSettings[]>([])
+  editingItem= signal<IAnalysisSettings | null>(null);
+  editItemIndex= signal<number | null>(null);
 
   paginaAtual = 1;
   itensPorPagina = 5;
 
   // Propriedades calculadas
   get totalPaginas(): number {
-    return Math.ceil(this.analysisSettingsFlt.length / this.itensPorPagina);
+    return Math.ceil(this.analysisSettingsFlt().length / this.itensPorPagina);
   }
 
   get itensPaginados(): IAnalysisSettings[] {
     const inicio = (this.paginaAtual - 1) * this.itensPorPagina;
     const fim = inicio + this.itensPorPagina;
-    return this.analysisSettingsFlt.slice(inicio, fim);
+    return this.analysisSettingsFlt().slice(inicio, fim);
   }
 
   // Utilitário HT
   Math = Math;
 
   ngOnInit(): void {
+    const keyData = this.#transferState.get(ANALISE_SETTINGS_KEY,null)
+    if(isPlatformBrowser(this.#platformId) && keyData){
+      this.analysisSettings.set(keyData);
+      this.analysisSettingsFlt.set(keyData);
+      this.#transferState.remove(ANALISE_SETTINGS_KEY)
+      return;
+    }
     this.loadingData();
   }
 
   loadingData() {
-    try {
-      this.#analysisSettingsService.findAll().subscribe({
+      this.#analysisSettingsService.findAll().pipe(
+        catchError((error) => {console.log('Erro ao obter análises:', error)
+        return of([])
+        })
+      ).subscribe({
         next: (res) => {
-          this.analysisSettings = res;
-          this.analysisSettingsFlt = this.analysisSettings;
+          this.analysisSettings.set(res);
+          this.analysisSettingsFlt.set(res);
+          if(isPlatformServer(this.#platformId)){
+            this.#transferState.set(ANALISE_SETTINGS_KEY,res);
+          }
         },
       });
-    } catch (error) {
-      console.log(error);
-    }
   }
   async editarItem(item: IAnalysisSettings, index: number): Promise<void> {
     const close = await this.#analysisModalService.openModal(true, item);
     if (close) {
       this.loadingData();
     }
-    this.editingItem = item;
-    this.editItemIndex = index;
+    this.editingItem.set(item);
+    this.editItemIndex.set(index);
   }
 
   cancelarEdicao(): void {
-    this.editingItem = null;
+    this.editingItem.set(null);
   }
 
   paginaAnterior(): void {
@@ -108,9 +123,9 @@ export class AnaliseConfigComponent {
       try {
         this.#analysisSettingsService.delete(item.id!).subscribe({
           next: () => {
-            this.analysisSettingsFlt = this.analysisSettings.filter(
+            this.analysisSettingsFlt.update(()=>this.analysisSettings().filter(
               (t) => t.id !== item.id
-            );
+            ));
             if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
               this.paginaAtual = this.totalPaginas;
             }
@@ -126,7 +141,7 @@ export class AnaliseConfigComponent {
   }
 
   filtrar(params: string) {
-    const filtro = this.analysisSettings.filter((param) => {
+    const filtro = this.analysisSettings().filter((param) => {
       const idStr = param.id?.toString() ?? '';
       const descricao = param.nomeDescricao.toLowerCase();
       const tipoAnalise = param.tipoAnalise?.tipo.toLowerCase();
@@ -137,7 +152,7 @@ export class AnaliseConfigComponent {
         tipoAnalise?.includes(params)
       );
     });
-    this.analysisSettingsFlt = filtro;
+    this.analysisSettingsFlt.set(filtro);
   }
 
   paramMap(params: IParameters[]) {
