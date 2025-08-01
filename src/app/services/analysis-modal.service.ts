@@ -1,4 +1,3 @@
-import { resolve } from 'node:path';
 import {
   ApplicationRef,
   ComponentRef,
@@ -8,7 +7,7 @@ import {
   Injectable,
 } from '@angular/core';
 import { AnalysisSettingsModalComponent } from '../components/configuracoes/analysis-settings-modal/analysis-settings-modal.component';
-import { AnalysisSettingsModal } from '../interfaces/modals.interface';
+import { AnalysisSettingsModal } from '../shared/interfaces/modals.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -24,15 +23,15 @@ export class AnalysisModalService {
         environmentInjector: this.#eInjector,
       });
 
-      this.#modalRef.instance.isEditMode = config.isEditMode;
-      this.#modalRef.instance.isVisible = true;
-      this.#modalRef.instance.data = config.data ? config.data : null;
+      this.#modalRef.instance.isEditMode.set(config.isEditMode);
+      this.#modalRef.instance.isVisible.set(true);
+      this.#modalRef.instance.data.set(config.data ? config.data : null);
 
       this.#modalRef.instance.cancelled.subscribe(() => {
         resolve(true);
         this.close();
       });
-      
+
       this.#modalRef.instance.dataSaved.subscribe(() => {
         resolve(true);
         this.close();

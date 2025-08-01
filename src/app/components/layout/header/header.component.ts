@@ -1,6 +1,6 @@
-import { Component, inject, input, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import {Component, inject, input, signal} from '@angular/core';
+import {Router} from '@angular/router';
+import {NgIconComponent, provideIcons} from '@ng-icons/core';
 import {
   heroBeaker,
   heroBell,
@@ -12,8 +12,7 @@ import {
   heroCog6Tooth,
   heroUserGroup,
 } from '@ng-icons/heroicons/outline';
-import { AuthService } from '../../../services/auth.service';
-import { IUser } from '../../../interfaces/user.interface';
+import {AuthService} from '../../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -32,7 +31,7 @@ import { IUser } from '../../../interfaces/user.interface';
       heroUserGroup,
     }),
   ],
-  host: { class: 'block' },
+  host: {class: 'block'},
 })
 export class HeaderComponent {
   #authService = inject(AuthService);

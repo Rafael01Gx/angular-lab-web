@@ -2,7 +2,7 @@ import {
   Component,
   inject,
   OnInit,
-  PLATFORM_ID
+  PLATFORM_ID, signal
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +19,8 @@ import {
 } from '@ng-icons/heroicons/outline';
 import { AuthService } from '../../services/auth.service';
 import {Router} from '@angular/router';
+import {catchError, throwError} from 'rxjs';
+import {HttpErrorResponse} from '@angular/common/http';
 
 
 @Component({
@@ -43,7 +45,7 @@ import {Router} from '@angular/router';
       >
         <div class="flex-1 flex items-center justify-center p-8 lg:p-12">
           <div class="w-full max-w-md">
-            <div class="text-center mb-8">
+            <div class="text-center mb-12">
               <div
                 class="inline-flex items-center justify-center w-16 h-16  rounded-md mb-4 shadow-md"
               >
@@ -56,8 +58,10 @@ import {Router} from '@angular/router';
               </h1>
               <p class="text-slate-500 mt-2">Faça login para continuar</p>
             </div>
-
-            <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-6">
+            @if(errMessage()){<div class="text-center -mt-6">
+              <span class="text-red-400 text-sm">{{errMessage()}}</span>
+            </div>}
+            <form (ngSubmit)="onLogin()" #loginForm="ngForm" class=" space-y-6">
               <div class="space-y-2">
                 <label
                   for="email"
@@ -193,6 +197,8 @@ export class LoginComponent implements OnInit {
   #router = inject(Router);
   #platformId = inject(PLATFORM_ID);
 
+  errMessage = signal<string|null>(null)
+
   loginData = {
     email: '',
     password: '',
@@ -216,20 +222,28 @@ export class LoginComponent implements OnInit {
     }
     this.isLoading = true;
     if (isPlatformBrowser(this.#platformId)) {
-      try {
+
         this.#authService
-          .login(this.loginData.email, this.loginData.password)
+          .login(this.loginData.email, this.loginData.password).pipe(
+            catchError((err:HttpErrorResponse)=>{
+              this.isLoading = false;
+              if(err.status == 401){
+                this.errMessage.set('E-mail ou senha incorretos.')
+                setTimeout(()=>{
+                  this.errMessage.set(null)
+                },5000)
+              }
+              return throwError(() => new Error(err.message))
+            })
+        )
           .subscribe({
             next: () => {
               this.isLoading = false;
               this.#router.navigate(['/']);
-            },
-            error: () => (this.isLoading = false),
+            }
           });
-      } catch (error) {
-        console.error('Erro no login:', error);
-        this.isLoading = false;
-      }
     }
+
+
   }
 }

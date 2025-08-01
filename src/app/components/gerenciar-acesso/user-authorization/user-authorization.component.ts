@@ -1,6 +1,6 @@
 import { FormsModule } from '@angular/forms';
 
-import { IUser } from '../../../interfaces/user.interface';
+import { IUser } from '../../../shared/interfaces/user.interface';
 import {Component, inject, OnInit, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
@@ -21,11 +21,10 @@ import {
   heroArrowDown,
   heroArrowUp,
 } from '@ng-icons/heroicons/outline';
-import { mapUserRole, Role } from '../../../enums/roles.enum';
+import { mapUserRole } from '../../../shared/enums/roles.enum';
 import { ToastrService } from '../../layout/toastr/toastr.service';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
-import {of} from 'rxjs';
 
 @Component({
   selector: 'app-user-authorization',

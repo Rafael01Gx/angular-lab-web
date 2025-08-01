@@ -22,7 +22,7 @@ import {
   heroXMark,
   heroPencil,
 } from '@ng-icons/heroicons/outline';
-import { IUser, UpdateUserData } from '../../interfaces/user.interface';
+import { IUser, UpdateUserData } from '../../shared/interfaces/user.interface';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { NgxMaskDirective } from 'ngx-mask';
@@ -186,7 +186,7 @@ export class PerfilComponent implements OnInit {
             }
           },
           error: (err) => {
-            console.log(err), this.isLoading.set(false);
+            this.isLoading.set(false);
           },
         });
       } catch (error) {

@@ -1,13 +1,13 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {NgIconComponent, provideIcons} from '@ng-icons/core';
 import {
   MultiSelectComponent,
   MultiSelectConfig,
 } from '../../layout/input-select/multi-select.component';
-import { AnalysisTypeService } from '../../../services/analysis-type.service';
-import { ITipoAnalise } from '../../../interfaces/analysis-type.interface';
-import { IAmostra } from '../../../interfaces/amostra.interface';
-import { FormsModule } from '@angular/forms';
+import {AnalysisTypeService} from '../../../services/analysis-type.service';
+import {ITipoAnalise} from '../../../shared/interfaces/analysis-type.interface';
+import {IAmostra} from '../../../shared/interfaces/amostra.interface';
+import {FormsModule} from '@angular/forms';
 import {
   heroArrowTurnRightDown,
   heroTrash,
@@ -79,6 +79,7 @@ export class OrdersCreateComponent implements OnInit {
   addEnsaios(event: ITipoAnalise[]) {
     return (this.selectedEnsaios = event);
   }
+
   addAmostras() {
     const amostra: Partial<IAmostra> = {
       nomeAmostra: this.identificacao(),
@@ -92,13 +93,14 @@ export class OrdersCreateComponent implements OnInit {
   rmAmostras(index: number) {
     return this.amostras.splice(index, 1);
   }
+
   clearForm() {
-    this.identificacao.update((v) => (v = ''));
-    this.data.update((v) => (v = ''));
+    this.identificacao.update((value) => (value = ''));
+    this.data.update((value) => (value = ''));
     this.selectedEnsaios = [];
-    this.clearSelect.update((v) => !v);
+    this.clearSelect.update((value) => !value);
     setTimeout(() => {
-      this.clearSelect.update((v) => !v);
+      this.clearSelect.update((value) => !value);
     }, 500);
   }
 }

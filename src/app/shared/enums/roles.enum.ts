@@ -12,4 +12,4 @@ export function mapUserRole(userRole: string): Role {
       case 'ADMIN': return Role.ADMIN;
       default: return Role.USUARIO;
     }
-  };
+  }

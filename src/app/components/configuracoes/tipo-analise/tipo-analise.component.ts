@@ -17,11 +17,11 @@ import {
 import {
   IClasseItem,
   ITipoAnalise,
-} from '../../../interfaces/analysis-type.interface';
+} from '../../../shared/interfaces/analysis-type.interface';
 import { AnalysisTypeService } from '../../../services/analysis-type.service';
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 import {isPlatformBrowser, isPlatformServer} from '@angular/common';
-import {catchError, finalize, of} from 'rxjs';
+import {ToastrService} from '../../layout/toastr/toastr.service';
 
 const TIPOS_ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appTiposAnalise');
 
@@ -44,6 +44,7 @@ export class TipoAnaliseComponent implements OnInit {
   #platformId = inject(PLATFORM_ID)
   #transferState = inject(TransferState)
   #analysisTypeService = inject(AnalysisTypeService);
+  #toastr = inject(ToastrService);
   confirmationModal = inject(ConfirmationModalService);
 
   isLoading = signal(false);
@@ -105,17 +106,10 @@ export class TipoAnaliseComponent implements OnInit {
   loadingData(){
     this.isLoading.set(true);
 
-    this.#analysisTypeService.findAll().pipe(
-      catchError(error => {
-        console.error('Erro ao carregar tipos de análise:', error);
-        return of([]);
-      }),
-      finalize(() => {
-        this.isLoading.set(false)
-      })
-    ).subscribe({
+    this.#analysisTypeService.findAll().subscribe({
       next: (res) => {
         this.tiposAnalise.set(res);
+        this.isLoading.set(false)
         if(isPlatformServer(this.#platformId)){
           this.#transferState.set(TIPOS_ANALISE_KEY,res);
         }
@@ -133,6 +127,7 @@ export class TipoAnaliseComponent implements OnInit {
         .update(this.editingItem()?.id!, this.analiseForm.value as ITipoAnalise)
         .subscribe({
           next: (res) => {
+            this.#toastr.success('Análise editada com sucesso!')
             if (this.editItemIndex() !== -1) {
               this.tiposAnalise()[this.editItemIndex()!] = res;
             }
@@ -142,7 +137,10 @@ export class TipoAnaliseComponent implements OnInit {
       this.#analysisTypeService
         .create(this.analiseForm.value as ITipoAnalise)
         .subscribe({
-          next: (res) => this.tiposAnalise.update((items) => [...items, res]),
+          next: (res) => {
+            this.#toastr.success('Análise salva com sucesso!')
+            this.tiposAnalise.update((items) => [...items, res])
+          },
         });
     }
 

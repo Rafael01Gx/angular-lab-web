@@ -16,13 +16,14 @@ import {
 } from '@ng-icons/heroicons/outline';
 import {
   ITipoAnalise,
-} from '../../../interfaces/analysis-type.interface';
+} from '../../../shared/interfaces/analysis-type.interface';
 import {ParametersService} from '../../../services/parameters.service';
 import {AnalysisTypeService} from '../../../services/analysis-type.service';
-import {IParameters} from '../../../interfaces/parameters.interface';
+import {IParameters} from '../../../shared/interfaces/parameters.interface';
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
 import {isPlatformServer} from '@angular/common';
 import {catchError, of} from 'rxjs';
+import {ToastrService} from '../../layout/toastr/toastr.service';
 
 const PARAMETROS_KEY = makeStateKey<IParameters[]>('appParametros');
 const ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appParamTipoAnalise');
@@ -48,6 +49,8 @@ export class ParametrosComponent implements OnInit {
   #parametrosService = inject(ParametersService);
   #analysisTypeService = inject(AnalysisTypeService);
   confirmationModal = inject(ConfirmationModalService);
+  #toastr = inject(ToastrService);
+
 
   parametros = signal<IParameters[] | []>([])
   parametrosFiltro = signal<IParameters[] | []>([])
@@ -163,6 +166,7 @@ export class ParametrosComponent implements OnInit {
         .update(this.editingItem()?.id!, _params as IParameters)
         .subscribe({
           next: (res) => {
+            this.#toastr.success('Tipo de análise editada com sucesso!')
             if (this.editItemIndex() !== -1) {
               this.parametros()[this.editItemIndex()!] = res;
             }
@@ -171,6 +175,7 @@ export class ParametrosComponent implements OnInit {
     } else {
       this.#parametrosService.create(_params as IParameters).subscribe({
         next: (res) => {
+          this.#toastr.success('Tipo de análise salva com sucesso!')
           this.parametros.update((items) => [...items, res]);
           this.parametrosFiltro.set(this.parametros());
         },

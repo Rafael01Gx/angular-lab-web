@@ -8,12 +8,11 @@ import {
   heroPlus,
   heroMagnifyingGlass,
 } from '@ng-icons/heroicons/outline';
-import { IParameters } from '../../../interfaces/parameters.interface';
+import { IParameters } from '../../../shared/interfaces/parameters.interface';
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 import { AnalysisSettingsService } from '../../../services/analysis-settings.service';
-import { IAnalysisSettings } from '../../../interfaces/analysis-settings.interface';
+import { IAnalysisSettings } from '../../../shared/interfaces/analysis-settings.interface';
 import { AnalysisModalService } from '../../../services/analysis-modal.service';
-import {catchError, of} from 'rxjs';
 import {isPlatformBrowser, isPlatformServer} from '@angular/common';
 
 const ANALISE_SETTINGS_KEY = makeStateKey<IAnalysisSettings[]>('appAnalise');
@@ -74,11 +73,7 @@ export class AnaliseConfigComponent implements OnInit{
   }
 
   loadingData() {
-      this.#analysisSettingsService.findAll().pipe(
-        catchError((error) => {console.log('Erro ao obter análises:', error)
-        return of([])
-        })
-      ).subscribe({
+      this.#analysisSettingsService.findAll().subscribe({
         next: (res) => {
           this.analysisSettings.set(res);
           this.analysisSettingsFlt.set(res);
@@ -118,9 +113,7 @@ export class AnaliseConfigComponent implements OnInit{
       `${item.nomeDescricao} - ${item.tipoAnalise?.tipo}`,
       'Esta Configuração será removida permanentemente.'
     );
-
     if (confirmed) {
-      try {
         this.#analysisSettingsService.delete(item.id!).subscribe({
           next: () => {
             this.analysisSettingsFlt.update(()=>this.analysisSettings().filter(
@@ -131,13 +124,7 @@ export class AnaliseConfigComponent implements OnInit{
             }
           },
         });
-      } catch (error) {
-        await this.confirmationModal.confirmInfo(
-          `${item.nomeDescricao} - ${item.tipoAnalise?.tipo}`,
-          'Ocorreu um erro ao remover esta Matéria-Prima.'
-        );
       }
-    }
   }
 
   filtrar(params: string) {

@@ -14,13 +14,14 @@ import {
   heroPlus,
   heroMagnifyingGlass,
 } from '@ng-icons/heroicons/outline';
-import { IClasseItem } from '../../../interfaces/analysis-type.interface';
+import { IClasseItem } from '../../../shared/interfaces/analysis-type.interface';
 
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 import { MateriaPrimaService } from '../../../services/materia-prima.service';
-import { IMateriaPrima } from '../../../interfaces/materia-prima.interface';
+import { IMateriaPrima } from '../../../shared/interfaces/materia-prima.interface';
 import {catchError, of} from 'rxjs';
 import {isPlatformBrowser, isPlatformServer} from '@angular/common';
+import {ToastrService} from '../../layout/toastr/toastr.service';
 
 const MATERIA_PRIMA_KEY = makeStateKey<IMateriaPrima[]>('appMateriasPrimas');
 
@@ -44,6 +45,7 @@ export class MateriasPrimasComponent implements OnInit {
   #transferState = inject(TransferState);
   #platformId = inject(PLATFORM_ID);
   confirmationModal = inject(ConfirmationModalService);
+  #toastr = inject(ToastrService);
 
   materiasPrimas= signal<IMateriaPrima[]|[]>([])
   materiasPrimasFiltro= signal<IMateriaPrima[]|[]>([])
@@ -133,6 +135,7 @@ export class MateriasPrimasComponent implements OnInit {
         )
         .subscribe({
           next: (res) => {
+            this.#toastr.success('Matéria Prima editada com sucesso!')
             if (this.editItemIndex() !== -1) {
               this.materiasPrimas()[this.editItemIndex()!] = res;
             }
@@ -143,6 +146,7 @@ export class MateriasPrimasComponent implements OnInit {
         .create(this.materiaPrimaForm.value as IMateriaPrima)
         .subscribe({
           next: (res) => {
+            this.#toastr.success('Matéria Prima salva com sucesso!')
             this.materiasPrimas.update((items)=> [...items, res]);
               (this.materiasPrimasFiltro.set(this.materiasPrimas()));
           },
@@ -198,6 +202,7 @@ export class MateriasPrimasComponent implements OnInit {
       try {
         this.#materiaPrimaService.delete(item.id!).subscribe({
           next: () => {
+
          this.loadingData()
             if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
               this.paginaAtual = this.totalPaginas;

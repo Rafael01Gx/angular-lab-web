@@ -6,7 +6,7 @@ import {
   EnvironmentInjector,
 } from '@angular/core';
 import { ConfirmationModalComponent } from '../components/modal/confirmation-modal/confirmation-modal.component';
-import { ConfirmationModalConfig } from '../interfaces/modals.interface';
+import { ConfirmationModalConfig } from '../shared/interfaces/modals.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -27,8 +27,8 @@ export class ConfirmationModalService {
       });
 
 
-      this.modalRef.instance.config = config;
-      this.modalRef.instance.isVisible = true;
+      this.modalRef.instance.config.set(config);
+      this.modalRef.instance.isVisible.set(true);
 
 
       this.modalRef.instance.confirmed.subscribe(() => {

@@ -6,8 +6,7 @@ import {
   computed,
   output,
   OutputEmitterRef,
-  Input,
-  AfterViewInit, TransferState, makeStateKey, PLATFORM_ID,
+  AfterViewInit, TransferState, makeStateKey, PLATFORM_ID, model,
 } from '@angular/core';
 import {CommonModule, isPlatformServer} from '@angular/common';
 import {
@@ -16,7 +15,7 @@ import {
   Validators,
   FormControl,
 } from '@angular/forms';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import {NgIconComponent, provideIcons} from '@ng-icons/core';
 import {
   heroXMark,
   heroCheck,
@@ -26,17 +25,17 @@ import {
   heroChevronDown,
   heroMagnifyingGlass,
 } from '@ng-icons/heroicons/outline';
-import { IAnalysisSettings } from '../../../interfaces/analysis-settings.interface';
-import { ITipoAnalise } from '../../../interfaces/analysis-type.interface';
-import { IParameters } from '../../../interfaces/parameters.interface';
-import { AnalysisTypeService } from '../../../services/analysis-type.service';
-import { ParametersService } from '../../../services/parameters.service';
+import {IAnalysisSettings} from '../../../shared/interfaces/analysis-settings.interface';
+import {ITipoAnalise} from '../../../shared/interfaces/analysis-type.interface';
+import {IParameters} from '../../../shared/interfaces/parameters.interface';
+import {AnalysisTypeService} from '../../../services/analysis-type.service';
+import {ParametersService} from '../../../services/parameters.service';
 import {
   MultiSelectComponent,
   MultiSelectConfig,
 } from '../../layout/input-select/multi-select.component';
-import { AnalysisSettingsService } from '../../../services/analysis-settings.service';
-import {catchError, finalize, of} from 'rxjs';
+import {AnalysisSettingsService} from '../../../services/analysis-settings.service';
+import {ToastrService} from '../../layout/toastr/toastr.service';
 
 const TIPOS_ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appSettingsTypeAnalysis');
 const PARAMETROS_KEY = makeStateKey<IParameters[]>('appSettingsTypeParam');
@@ -70,20 +69,22 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   #parametersService = inject(ParametersService);
   #transferState = inject(TransferState);
   #platformId = inject(PLATFORM_ID);
+  #toastr = inject(ToastrService);
 
   dataSaved: OutputEmitterRef<IAnalysisSettings> = output<IAnalysisSettings>();
   cancelled: OutputEmitterRef<void> = output<void>();
 
-  @Input('isEditMode') isEditMode: boolean = false;
-  @Input('data') data: IAnalysisSettings | null = null;
-  @Input() isVisible: boolean = false;
+  isEditMode = model<boolean>(false);
+  data = model<IAnalysisSettings | null>(null);
+  isVisible = model<boolean>(false);
+  isLoading = signal(false)
 
-  allparameters= signal<IParameters[]|[] >([]);
-  parameters= signal<IParameters[]|[] >([]);
-  selectedParams= signal<IParameters[]|[] >([]);
+  allparameters = signal<IParameters[] | []>([]);
+  parameters = signal<IParameters[] | []>([]);
+  selectedParams = signal<IParameters[] | []>([]);
   tiposAnalise = signal<ITipoAnalise[]>([]);
   animatedRows = signal<{ [key: number]: string }>({});
-  paramFilter= signal<IParameters[]|[] >([]);
+  paramFilter = signal<IParameters[] | []>([]);
 
   canSave = computed(
     () => this.analysisSettingsForm.valid && this.parameters.length > 0
@@ -107,13 +108,13 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   });
 
   ngOnInit() {
-    const keyParametros= this.#transferState.get(PARAMETROS_KEY,null)
-    const keyTipoAnalise= this.#transferState.get(TIPOS_ANALISE_KEY,null)
-    if(isPlatformServer(this.#platformId)){
+    const keyParametros = this.#transferState.get(PARAMETROS_KEY, null)
+    const keyTipoAnalise = this.#transferState.get(TIPOS_ANALISE_KEY, null)
+    if (isPlatformServer(this.#platformId)) {
       this.loadTiposAnalise();
       this.loadParametros();
       return;
-    }else {
+    } else {
       if (keyParametros) {
         this.allparameters.set(keyParametros);
         this.#transferState.remove(PARAMETROS_KEY);
@@ -131,13 +132,13 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.data && this.isEditMode) {
+    if (this.data && this.isEditMode()) {
       this.analysisSettingsForm.setValue({
-        nomeDescricao: this.data.nomeDescricao,
-        tipoAnaliseId: this.data.tipoAnaliseId!,
+        nomeDescricao: this.data()?.nomeDescricao!,
+        tipoAnaliseId: this.data()?.tipoAnaliseId!,
       });
-      this.parameters.set(this.data.parametros);
-      this.selectedParams.set(this.data.parametros);
+      this.parameters.set(this.data()?.parametros!);
+      this.selectedParams.set(this.data()?.parametros!);
     }
   }
 
@@ -152,33 +153,23 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
   }
 
   loadTiposAnalise() {
-    this.#analysisTypeService.findAll().pipe(
-      catchError(error => {
-        console.error('Erro ao carregar tipos de análise:', error);
-        return of([]);
-      }),
-
-    ).subscribe({
+    this.#analysisTypeService.findAll().subscribe({
       next: (res) => {
         this.tiposAnalise.set(res);
-        if(isPlatformServer(this.#platformId)){
-          this.#transferState.set(TIPOS_ANALISE_KEY,res);
+        if (isPlatformServer(this.#platformId)) {
+          this.#transferState.set(TIPOS_ANALISE_KEY, res);
         }
       },
     });
   }
 
   loadParametros() {
-    this.#parametersService.findAll().pipe(
-      catchError((error) => { console.log('Erro ao carregar parâmetros:', error)
-        return of([])
-      })
-    ).subscribe({
+    this.#parametersService.findAll().subscribe({
       next: (res) => {
         this.allparameters.set(res);
         this.filtrarParametro()
-        if(isPlatformServer(this.#platformId)){
-          this.#transferState.set(PARAMETROS_KEY,res);
+        if (isPlatformServer(this.#platformId)) {
+          this.#transferState.set(PARAMETROS_KEY, res);
         }
       },
     });
@@ -186,24 +177,24 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
 
   private loadModalData() {
     const data = this.data;
-    if (this.isEditMode && data) {
+    if (this.isEditMode() && data) {
       this.analysisSettingsForm.patchValue({
-        nomeDescricao: data.nomeDescricao,
-        tipoAnaliseId: data.tipoAnaliseId,
+        nomeDescricao: data()?.nomeDescricao,
+        tipoAnaliseId: data()?.tipoAnaliseId,
       });
-      this.parameters.set([...data.parametros]);
+      this.parameters.set([...data()?.parametros!]);
     }
   }
 
   addParameter() {
-    this.parameters.update((v)=> [...v,...v.filter(
-        (arr2) => !v.some((arr1) => arr1.id === arr2.id)
-      ),
+    this.parameters.update((params) => [...params, ...this.selectedParams().filter(
+      (arr2) => !params.some((arr1) => arr1.id === arr2.id)
+    )
     ])
   }
 
   removeParameter(index: number) {
-    this.parameters.update((v)=> v.filter((_, i) => i !== index))
+    this.parameters.update((v) => v.filter((_, i) => i !== index))
   }
 
   moveParameter(index: number, direction: 'up' | 'down') {
@@ -250,47 +241,43 @@ export class AnalysisSettingsModalComponent implements OnInit, AfterViewInit {
       this.analysisSettingsForm.value.tipoAnaliseId &&
       this.parameters()
     ) {
+      this.isLoading.set(true);
       const _analysisSettings: IAnalysisSettings = {
         nomeDescricao: this.analysisSettingsForm.value.nomeDescricao,
         tipoAnaliseId: this.analysisSettingsForm.value.tipoAnaliseId,
         parametros: this.parameters(),
       };
-      try {
-        if (this.data?.id && this.isEditMode) {
-          this.#analysisSettingsService
-            .update(this.data.id, _analysisSettings)
-            .subscribe({
-              next: () => {
-                this.dataSaved.emit(_analysisSettings);
-                this.close(_analysisSettings);
-              },
-              error: (err) => {
-                console.log(err);
-              },
-            });
-        } else {
-          this.#analysisSettingsService.create(_analysisSettings).subscribe({
-            next: () => {
-              this.dataSaved.emit(_analysisSettings);
-              this.close(_analysisSettings);
-            },
-            error: (err) => {
-              console.log(err);
-            },
-          });
-        }
-      } catch (error) {
-        console.log(error);
+      if (this.data()?.id && this.isEditMode()) {
+        this.#analysisSettingsService
+          .update(this.data()?.id!, _analysisSettings).subscribe({
+          next: () => {
+            this.isLoading.set(false)
+            this.#toastr.success('Análise atualizada com sucesso!')
+            this.dataSaved.emit(_analysisSettings);
+            this.close(_analysisSettings);
+          }
+        });
+      } else {
+        this.#analysisSettingsService.create(_analysisSettings).subscribe({
+          next: () => {
+            this.isLoading.set(false)
+            this.#toastr.success('Análise salva com sucesso!')
+            this.dataSaved.emit(_analysisSettings);
+            this.close(_analysisSettings);
+          }
+        });
       }
     }
+
   }
 
   filtrarParametro() {
     const tipoAnaliseId = Number(this.analysisSettingsForm.value.tipoAnaliseId);
-    this.paramFilter.update(()=> this.allparameters().filter(
+    this.paramFilter.update(() => this.allparameters().filter(
       (p) => p.tipoAnalise?.id == tipoAnaliseId
     ))
   }
+
   onSelect(event: IParameters[]) {
     return (this.selectedParams.set(event));
   }

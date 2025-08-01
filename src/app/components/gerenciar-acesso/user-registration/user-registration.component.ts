@@ -20,7 +20,7 @@ import {
   heroInformationCircle,
   heroArrowPath,
 } from '@ng-icons/heroicons/outline';
-import { IUser } from '../../../interfaces/user.interface';
+import { IUser } from '../../../shared/interfaces/user.interface';
 import { AuthService } from '../../../services/auth.service';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ToastrService } from '../../layout/toastr/toastr.service';

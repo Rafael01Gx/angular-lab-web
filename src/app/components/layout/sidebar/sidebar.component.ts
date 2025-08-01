@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit, inject, PLATFORM_ID, OutputEmitterRef,
 import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { 
+import {
   heroClipboardDocumentList,
   heroBeaker,
   heroCog6Tooth,
@@ -21,10 +21,11 @@ import {
   heroTrash,
   heroAdjustmentsHorizontal,
   heroTag,
-  heroCube
+  heroCube,
+  heroBriefcase
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
-import { IMenuItem } from '../../../interfaces/layout.interface';
+import { IMenuItem } from '../../../shared/interfaces/layout.interface';
 
 @Component({
   selector: 'app-sidebar',
@@ -50,7 +51,8 @@ import { IMenuItem } from '../../../interfaces/layout.interface';
       heroTrash,
       heroAdjustmentsHorizontal,
       heroTag,
-      heroCube
+      heroCube,
+      heroBriefcase
     })
   ],
   host: { class: 'block max-h-full'
@@ -65,12 +67,12 @@ import { IMenuItem } from '../../../interfaces/layout.interface';
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #a7c7e7; 
+  background: #a7c7e7;
   border-radius: 3px;
 }
 
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: #93b5e1; 
+  background: #93b5e1;
 }
     `]
 })
@@ -112,7 +114,7 @@ router = inject(Router);
     {
       id: 'analysis',
       label: 'Análises',
-      icon: 'heroBeaker',
+      icon: 'heroBriefcase',
       expanded: false,
       children: [
         { id: 'analysis-waiting-auth', label: 'Aguardando autorização', icon: 'heroExclamationTriangle', route: '/analysis/waiting-authorization' },
@@ -164,7 +166,7 @@ router = inject(Router);
       this.checkScreenSize();
     }
     this.currentRoute = this.router.url;
-    
+
     // Listen to route changes
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -183,7 +185,7 @@ router = inject(Router);
       if(isPlatformBrowser(this.platformID)){
     const wasMobile = this.isMobile;
     this.isMobile = window.innerWidth < 1024;
-    
+
     if (this.isMobile && !wasMobile) {
       this.isExpanded = false;
     } else if (!this.isMobile && wasMobile) {
@@ -206,7 +208,7 @@ router = inject(Router);
 
   navigateToRoute(route: string): void {
     this.router.navigate([route]);
-    
+
     // Close sidebar on mobile after navigation
     if (this.isMobile) {
       this.isExpanded = false;
@@ -218,8 +220,8 @@ router = inject(Router);
     const isActive = this.isRouteActive(item);
     return `
       w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200
-      ${isActive 
-        ? 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 shadow-md border border-blue-200/60 dark:from-neutral-300 dark:to-neutral-300 ' 
+      ${isActive
+        ? 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 shadow-md border border-blue-200/60 dark:from-neutral-300 dark:to-neutral-300 '
         : 'text-slate-700 dark:text-gray-400 dark:hover:bg-blue-500/50 dark:hover:text-gray-200  hover:bg-slate-50 hover:text-blue-600'
       }
       group relative
@@ -230,8 +232,8 @@ router = inject(Router);
     const isActive = this.currentRoute === subItem.route;
     return `
       w-full flex items-center p-2 rounded-lg transition-all duration-200
-      ${isActive 
-        ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 dark:from-neutral-200 dark:to-neutral-200 shadow-sm border-l-2 border-blue-400' 
+      ${isActive
+        ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 dark:from-neutral-200 dark:to-neutral-200 shadow-sm border-l-2 border-blue-400'
         : 'text-slate-600 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-blue-500/50  hover:bg-slate-50 hover:text-blue-600'
       }
     `;
@@ -241,11 +243,11 @@ router = inject(Router);
     if (item.route) {
       return this.currentRoute === item.route;
     }
-    
+
     if (item.children) {
       return item.children.some(child => this.currentRoute === child.route);
     }
-    
+
     return false;
   }
 }
