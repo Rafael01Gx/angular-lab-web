@@ -9,7 +9,7 @@ export interface UserPayload  {
   exp?: number;
   iss?: string;
   aud?: string;
-};
+}
 
 export interface IUserlogin {
   email: string;

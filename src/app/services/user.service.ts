@@ -8,14 +8,14 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import {firstValueFrom, map, Observable} from 'rxjs';
-import {HandleFetchErrorService} from './handle-fetch-error.service';
+
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   #apiUrl = `${environment.apiURL}/user`;
   #http = inject(HttpClient);
   #authService = inject(AuthService);
-  #handleFetchError = inject(HandleFetchErrorService);
+
 
   update(user: UpdateUserData): Observable<IUserResponse> {
     console.log(user);
