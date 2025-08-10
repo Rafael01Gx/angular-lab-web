@@ -1,8 +1,8 @@
-import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
-import { LoginComponent } from './pages/login/login.component';
-import { authGuard } from './core/guards/auth.guard';
-import { loginGuard } from './core/guards/login.guard';
+import {Routes} from '@angular/router';
+import {HomeComponent} from './pages/home/home.component';
+import {LoginComponent} from './pages/login/login.component';
+import {authGuard} from './core/guards/auth.guard';
+import {loginGuard} from './core/guards/login.guard';
 
 export const routes: Routes = [
   {
@@ -33,13 +33,13 @@ export const routes: Routes = [
       },
       {
         path: 'orders',
-        redirectTo:'orders/create',
+        redirectTo: 'orders/create',
         pathMatch: 'full',
       },
       {
         path: 'orders/create',
         pathMatch: 'full',
-         loadComponent: () =>
+        loadComponent: () =>
           import('./components/orders/orders-create/orders-create.component').then(
             (m) => m.OrdersCreateComponent
           ),
@@ -54,49 +54,25 @@ export const routes: Routes = [
         loadComponent: () =>
           import(
             './components/gerenciar-acesso/user-registration/user-registration.component'
-          ).then((m) => m.UserRegistrationComponent),
+            ).then((m) => m.UserRegistrationComponent),
       },
       {
         path: 'access-management/authorize',
         loadComponent: () =>
           import(
             './components/gerenciar-acesso/user-authorization/user-authorization.component'
-          ).then((m) => m.UserAuthorizationComponent),
+            ).then((m) => m.UserAuthorizationComponent),
+      },
+      {
+        path: 'external-labs',
+        loadChildren: () => import('./components/laboratorios-externos/laboratorios-externos.routes').then(m => m.LABORATORIOS_EXTERNOS_ROUTES),
       },
       {
         path: 'settings',
-        redirectTo: 'settings/parameters',
-        pathMatch: 'full',
+        loadChildren: () => import('./components/configuracoes/settings.routes').then(m => m.SETTINGS_ROUTES),
       },
-      {
-        path: 'settings/analysis',
-        loadComponent: () =>
-          import(
-            './components/configuracoes/analise-config/analise-config.component'
-          ).then((m) => m.AnaliseConfigComponent),
-      },
-      {
-        path: 'settings/parameters',
-        loadComponent: () =>
-          import(
-            './components/configuracoes/parametros/parametros.component'
-          ).then((m) => m.ParametrosComponent),
-      },
-      {
-        path: 'settings/analysis-type',
-        loadComponent: () =>
-          import(
-            './components/configuracoes/tipo-analise/tipo-analise.component'
-          ).then((m) => m.TipoAnaliseComponent),
-      },
-      {
-        path: 'settings/materials',
-        loadComponent: () =>
-          import(
-            './components/configuracoes/materias-primas/materias-primas.component'
-          ).then((m) => m.MateriasPrimasComponent),
-      },
+
     ],
   },
-  { path: '**', redirectTo: '/', pathMatch: 'full' },
+  {path: '**', redirectTo: '/', pathMatch: 'full'},
 ];

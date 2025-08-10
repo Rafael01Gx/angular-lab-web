@@ -1,0 +1,658 @@
+<div
+  class="h-full w-full bg-gradient-to-b from-blue-50 to-slate-50/80 dark:from-blue-50/70 dark:to-slate-50/50 p-0 rounded-sm flex flex-col"
+>
+  <div class="border-b border-gray-200 mb-2">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content" data-tabs-active-classes="text-purple-600 hover:text-purple-600 dark:text-purple-500 dark:hover:text-purple-500 border-purple-600 dark:border-purple-500" data-tabs-inactive-classes="dark:border-transparent text-gray-500 hover:text-gray-600 dark:text-gray-400 border-gray-100 hover:border-gray-300 dark:border-gray-700 dark:hover:text-gray-300" role="tablist">
+      <li class="flex-1" role="presentation">
+        <button (click)="tableSelect(0)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 0)" id="nova-remessa-styled-tab" data-tabs-target="#styled-nova-remessa" type="button" role="tab" aria-controls="nova-remessa" aria-selected="false">{{ editando ? "Editar" : "Cadastrar Nova" }} Remessa</button>
+      </li>
+      <li class="flex-1" role="presentation">
+        <button (click)="tableSelect(1)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 1)" id="dashboard-styled-tab" data-tabs-target="#styled-remessas-cadastradas" type="button" role="tab" aria-controls="remessas-cadastradas" aria-selected="false">Remessas Cadastradas</button>
+      </li>
+    </ul>
+  </div>
+  <div class="flex-1 flex min-h-0" id="default-styled-tab-content">
+    @switch (selectTable()){
+      @case (0){
+        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0" id="styled-nova-remessa" role="tabpanel" aria-labelledby="nova-remessa-tab">
+          <!-- -->
+          <div class="flex justify-between items-center mb-4 p-4">
+            <h2 class="text-lg font-semibold text-slate-700">
+              {{ editando ? "Editar" : "Cadastrar Nova" }} Remessa
+            </h2>
+            <button
+              (click)="fecharFormulario()"
+              class="text-gray-500 hover:text-gray-700"
+            >
+              <div class="flex items-center gap-2">
+                <span> Limpar</span>
+                <ng-icon name="heroPencilSquare"></ng-icon>
+              </div>
+            </button>
+          </div>
+          <div class="flex flex-col gap-4 min-h-0 flex-1">
+            <div class="flex gap-4">
+              <!-- Data da Remessa -->
+              <div class="flex-1">
+                <label
+                  for="data_remessa"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >Data da Remessa</label
+                >
+                <input
+                  type="date"
+                  name="dataInput"
+                  [(ngModel)]="novaRemessa.data"
+                  required
+                  class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
+                />
+
+                <p class="mt-1 text-xs text-gray-500">
+                  A data é definida automaticamente como a data atual
+                </p>
+              </div>
+              <!-- Destino (Laboratório) -->
+              <div class="flex-1">
+                <label
+                  for="destino"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >Laboratório Destino</label
+                >
+                <select
+                  id="destino"
+                  name="destino"
+                  [(ngModel)]="novaRemessa.destino"
+                  class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
+                >
+                  <option [value]="null" disabled>Selecione um laboratório</option>
+                  <option *ngFor="let lab of laboratorios" [value]="lab.id">
+                    {{ lab.nome }}
+                  </option>
+                </select>
+              </div>
+              <!-- Seleção de Amostras -->
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Selecionar Amostras</label
+                >
+                <div class="flex space-x-2">
+                  <select
+                    [(ngModel)]="amostraSelecionada"
+                    class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
+                  >
+                    <option [ngValue]="null" disabled>Escolha uma amostra</option>
+                    <option *ngFor="let amostra of amostras" [ngValue]="amostra">
+                      {{ amostra.amostra_name }}
+                    </option>
+                  </select>
+                  <button
+                    (click)="adicionarAmostraRemessa()"
+                    [disabled]="!amostraSelecionada"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-md flex items-center transition-colors duration-200"
+                    [ngClass]="{ 'opacity-50 cursor-not-allowed': !amostraSelecionada }"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lista de Amostras Selecionadas -->
+            <div
+              class="border border-gray-200 rounded-lg overflow-auto min-h-0 flex-1"
+            >
+              <table class="min-w-full divide-y divide-gray-200 table-fixed">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Amostra
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Sub-Identificação
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Período
+                  </th>
+                  <!-- Cabeçalhos dinâmicos para cada elemento -->
+                  <th
+                    *ngFor="let elemento of elementos"
+                    scope="col"
+                    class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+            {{ elemento.element_name }}
+            </th>
+            <th
+              scope="col"
+              class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Ações
+            </th>
+          </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let amostra of novaRemessa.amostras; let i = index">
+            <td
+              class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+            {{ amostra.amostra_name }}
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <input
+                type="text"
+                [(ngModel)]="amostra.sub_identificacao"
+                class="w-full p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Ex: Lote 01"
+              />
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <div class="flex items-center space-x-2">
+                <div>
+                  <input
+                    type="date"
+                    [(ngModel)]="amostra.periodo.inicio"
+                    class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <span class="text-gray-500">até</span>
+                <div>
+                  <input
+                    type="date"
+                    [(ngModel)]="amostra.periodo.fim"
+                    class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+            </td>
+            <!-- Células dinâmicas para cada elemento -->
+            <td
+              *ngFor="let elemento of elementos"
+              class="px-2 py-3 whitespace-nowrap text-center"
+            >
+              <div class="flex justify-center">
+                <input
+                  type="checkbox"
+                  [checked]="
+                amostra.elementos_analisados.includes(
+                  elemento.element_name
+                )
+              "
+                  (change)="toggleElementoAmostra(i, elemento.element_name)"
+                  class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+              </div>
+            </td>
+            <td
+              class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"
+            >
+              <button
+                (click)="removerAmostraRemessa(i)"
+                class="text-red-600 hover:text-red-900 transition-colors duration-200"
+                title="Remover amostra"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+            <div class="flex justify-end shrink-0 space-x-2 p-4">
+              <button
+                *ngIf="ultimaRemessa && !editando"
+                (click)="carregarUltimaRemessa()"
+                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Usar Última Remessa
+              </button>
+              <button
+                (click)="salvarRemessa()"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
+                [disabled]="!novaRemessa.destino || novaRemessa.amostras.length === 0"
+                [ngClass]="{
+            'opacity-50 cursor-not-allowed':
+              !novaRemessa.destino || novaRemessa.amostras.length === 0
+          }"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                {{ editando ? "Atualizar" : "Salvar" }} Remessa
+              </button>
+            </div>
+          </div>
+          <!-- -->
+        </div>
+      }
+      @case (1){
+        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0" id="styled-remessas-cadastradas" role="tabpanel" aria-labelledby="remessas-cadastradas-tab">
+          <!-- -->
+
+            <div class="p-4 border-b border-gray-200 shrink-0">
+              <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-slate-700">
+                  Remessas Cadastradas
+                </h2>
+                <div class="relative rounded-md shadow-sm">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    [(ngModel)]="searchTerm"
+                    (ngModelChange)="filtrarRemessas()"
+                    type="text"
+                    name="search"
+                    id="search"
+                    class="block w-full pl-10 p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Pesquisar remessa"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="flex-1 overflow-auto min-h-0">
+              <table class="w-full divide-y divide-gray-200 table-fixed">
+                <thead class="bg-slate-50/90 sticky top-0">
+                <tr>
+                  <th
+                    scope="col"
+                    class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    ID
+                  </th>
+                  <th
+                    scope="col"
+                    class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Data
+                  </th>
+                  <th
+                    scope="col"
+                    class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Laboratório
+                  </th>
+                  <th
+                    scope="col"
+                    class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Amostras
+                  </th>
+                  <th
+                    scope="col"
+                    class="w-1/6  px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Ações
+                  </th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                @for( remessa of remessasFiltradas; track remessa.id){<tr>
+                  <td
+                    class="px-6 py-4 truncate text-sm text-gray-500"
+                    [title]="remessa.id"
+                  >
+                {{ remessa.id.substring(0, 8) }}...
+                  </td>
+                  <td class="px-6 py-4 truncate text-sm text-gray-900">
+                {{ remessa.data | date : "dd/MM/yyyy" }}
+                </td>
+                <td class="px-6 py-4 truncate text-sm text-gray-900">
+                {{ getLaboratorioNome(remessa.destino) }}
+                </td>
+                <td class="px-6 py-4 truncate text-sm text-gray-900">
+                {{ remessa.amostras.length }} amostra(s)
+                    <span class="text-xs text-gray-500">
+                {{ listarAmostras(remessa) }}
+                </span>
+                    </td>
+                    <td
+                      class="px-6 py-4 truncate text-right text-sm font-medium"
+                    >
+                      <div class="flex justify-end space-x-2">
+                        <button
+                          (click)="visualizarRemessa(remessa)"
+                          class="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                          title="Visualizar detalhes"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          (click)="copiarRemessa(remessa)"
+                          class="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
+                          title="Copiar remessa"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          (click)="removerRemessa(remessa.id)"
+                          class="text-red-600 hover:text-red-900 transition-colors duration-200"
+                          title="Excluir remessa"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>}
+                @if( remessasFiltradas.length === 0){<tr>
+                  <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                    Nenhuma remessa encontrada.
+                  </td>
+                </tr>}
+                </tbody>
+              </table>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200  shrink-0">
+              <div class="text-sm text-gray-700">
+                Total de remessas:
+                <span class="font-medium">{{ remessas.length }}</span>
+              </div>
+            </div>
+
+          <!-- -->
+        </div>
+
+      }
+    }
+
+    </div>
+  <!-- Modal de Visualização de Remessa -->
+  <dialog
+    #remessaDialog
+    class="fixed inset-0 overflow-y-auto bg-transparent p-0 m-0 w-full h-full z-50 max-w-[100lvw] max-h-[100lvh] fade-in duration-300 ease-in-out backdrop-blur-md"
+    [attr.open]="remessaVisualizada ? true : null"
+  >
+    <!-- Container da modal com backdrop -->
+    <div
+      class="flex items-center justify-center min-h-full w-full backdrop-blur-sm bg-black/5 p-4"
+    >
+      <!-- Modal content -->
+      <div
+        class="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-4xl mx-auto"
+        *ngIf="remessaVisualizada"
+      >
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              Detalhes da Remessa
+            </h3>
+
+            <button
+              (click)="fecharDetalhesRemessa()"
+              class="text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                >ID da Remessa</label
+                >
+                <p class="mt-1 text-sm text-gray-900">
+                  {{ remessaVisualizada.id }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                >Data</label
+                >
+                <p class="mt-1 text-sm text-gray-900">
+                  {{ remessaVisualizada.data | date : "dd/MM/yyyy" }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                >Laboratório</label
+                >
+                <p class="mt-1 text-sm text-gray-900">
+                  {{ getLaboratorioNome(remessaVisualizada.destino) }}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Amostras</label
+              >
+              <div class="border border-gray-200 rounded-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Amostra
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Sub-Identificação
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Período
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Elementos Analisados
+                    </th>
+                  </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                  <tr *ngFor="let amostra of remessaVisualizada.amostras">
+                    <td
+                      class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
+                    >
+                      {{ amostra.amostra_name }}
+                    </td>
+                    <td
+                      class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
+                    >
+                      {{ amostra.sub_identificacao || "-" }}
+                    </td>
+                    <td
+                      class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
+                    >
+                      {{ amostra.periodo.inicio | date : "dd/MM/yyyy" }} até
+                      {{ amostra.periodo.fim | date : "dd/MM/yyyy" }}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                      <div class="flex flex-wrap gap-1">
+                          <span
+                            *ngFor="
+                              let elemento of amostra.elementos_analisados
+                            "
+                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
+                          >
+                            {{ elemento }}
+                          </span>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- Linha para quando não há amostras -->
+                  <tr
+                    *ngIf="
+                        !remessaVisualizada.amostras ||
+                        remessaVisualizada.amostras.length === 0
+                      "
+                  >
+                    <td
+                      colspan="4"
+                      class="px-4 py-3 text-center text-sm text-gray-500"
+                    >
+                      Nenhuma amostra encontrada para esta remessa.
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button
+            type="button"
+            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            (click)="imprimirEtiquetas(remessaVisualizada)"
+          >
+            Imprimir
+          </button>
+          <!--
+        <button
+          type="button"
+          (click)="fecharDetalhesRemessa()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+        >
+          Fechar
+        </button>
+        -->
+        </div>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+
+
+

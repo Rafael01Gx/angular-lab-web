@@ -22,7 +22,7 @@ import {
   heroAdjustmentsHorizontal,
   heroTag,
   heroCube,
-  heroBriefcase
+  heroBriefcase,heroListBullet,heroArchiveBox,heroSquare2Stack,heroGlobeAmericas
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
 import { IMenuItem } from '../../../shared/interfaces/layout.interface';
@@ -52,7 +52,11 @@ import { IMenuItem } from '../../../shared/interfaces/layout.interface';
       heroAdjustmentsHorizontal,
       heroTag,
       heroCube,
-      heroBriefcase
+      heroBriefcase,
+      heroListBullet,
+      heroArchiveBox,
+      heroSquare2Stack,
+      heroGlobeAmericas
     })
   ],
   host: { class: 'block max-h-full'
@@ -133,6 +137,18 @@ router = inject(Router);
         { id: 'manage-authorized', label: 'Autorizada', icon: 'heroCheckCircle', route: '/manage-orders/authorized' },
         { id: 'manage-executing', label: 'Em Execução', icon: 'heroPlay', route: '/manage-orders/executing' },
         { id: 'manage-completed', label: 'Finalizadas', icon: 'heroCheckCircle', route: '/manage-orders/completed' }
+      ]
+    },
+    {
+      id: 'external-labs',
+      label: 'Laboratórios Externos',
+      icon: 'heroListBullet',
+      expanded: false,
+      children: [
+        { id: 'remessa', label: 'Remessa', icon: 'heroArchiveBox', route: '/external-labs/remessa' },
+        { id: 'amostras', label: 'Amostras', icon: 'heroSquare2Stack', route: '/external-labs/amostras' },
+        { id: 'chemical-elements', label: 'Elementos Químicos', icon: 'heroBeaker', route: '/external-labs/elementos-quimicos' },
+        { id: 'labs', label: 'Laboratórios', icon: 'heroGlobeAmericas', route: '/external-labs/laboratorios' },
       ]
     },
     {

@@ -59,7 +59,7 @@ setTimeout(() => {
     this.modalRef.destroy();
     this.modalRef = null;
   }
-}, 500);
+}, 200);
 }
 
 
