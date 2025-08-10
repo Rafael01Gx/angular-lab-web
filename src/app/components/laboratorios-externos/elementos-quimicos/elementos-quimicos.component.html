@@ -1,11 +1,11 @@
 <div
-  class="h-full w-full gap-6 bg-gradient-to-b from-blue-50 to-slate-50/80 dark:from-blue-50/70 dark:to-slate-50/50 p-0 rounded-sm flex flex-col"
+  class="h-full w-full gap-2 bg-gradient-to-b from-blue-50 to-slate-50/80 dark:from-blue-50/70 dark:to-slate-50/50 p-0 rounded-sm flex flex-col"
 >
       <!-- Formulário de Cadastro -->
       <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Cadastrar Novo Elemento</h2>
+        <h2 class="text-lg font-semibold text-slate-700">Cadastrar Novo Elemento</h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 mt-6 gap-4">
           <div>
             <label for="element_name" class="block text-sm font-medium text-gray-700 mb-1">Símbolo do Elemento</label>
             <input
@@ -35,10 +35,10 @@
       </div>
 
       <!-- Tabela de Elementos -->
-      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="flex-1 min-h-0 flex flex-col bg-white rounded-lg shadow-md">
         <div class="p-4 border-b border-gray-200">
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-800">Elementos Cadastrados</h2>
+            <h2 class="text-lg font-semibold text-slate-700">Elementos Cadastrados</h2>
             <div class="relative rounded-md shadow-sm">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,7 +58,7 @@
         </div>
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gray-50 sticky top-0">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Símbolo</th>

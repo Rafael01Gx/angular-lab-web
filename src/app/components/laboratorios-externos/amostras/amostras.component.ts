@@ -2,10 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {Amostra, ElementoQuimico} from '../../../shared/interfaces/laboratorios-externos.interfaces';
+import {NgIcon, provideIcons} from '@ng-icons/core';
+import {heroClipboardDocument,heroTrash,heroXMark,heroPlus} from '@ng-icons/heroicons/outline'
+
 
 @Component({
   selector: 'app-amostras',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgIcon],
+  viewProviders: [provideIcons({heroClipboardDocument,heroTrash,heroXMark,heroPlus})],
   templateUrl: './amostras.component.html',
 })
 export class AmostrasComponent implements OnInit {

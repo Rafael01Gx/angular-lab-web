@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {Component, ElementRef, inject, OnInit, signal, ViewChild} from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {EtiquetasService} from '../../../services/impressao-de-etiquetas.service';
 import {
   Amostra, AmostraRemessa,
@@ -11,13 +11,21 @@ import {
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
 import {ToastrService} from '../../layout/toastr/toastr.service';
 import {NgIcon, provideIcons} from '@ng-icons/core';
-import {heroPencilSquare} from '@ng-icons/heroicons/outline'
+import {
+  heroPencilSquare,
+  heroArrowPathRoundedSquare,
+  heroCheck,
+  heroMagnifyingGlass,
+  heroTrash,
+  heroPlus,
+  heroEye,heroClipboardDocument,heroXMark
+} from '@ng-icons/heroicons/outline'
 
 @Component({
   selector: 'app-remessa',
   imports: [CommonModule, FormsModule, NgIcon],
-  viewProviders:[provideIcons({
-    heroPencilSquare
+  viewProviders: [provideIcons({
+    heroPencilSquare, heroArrowPathRoundedSquare, heroXMark,heroCheck, heroMagnifyingGlass, heroTrash, heroPlus, heroEye,heroClipboardDocument
   })],
   templateUrl: './remessa.component.html',
 })
@@ -28,21 +36,21 @@ export class RemessaComponent implements OnInit {
   selectTable = signal<number>(0)
   // Lista de elementos químicos (simulando dados do banco)
   elementos: ElementoQuimico[] = [
-    { id: 'a1b2c3d4e5f6g7h8i9j0', element_name: 'H' },
-    { id: 'k9l8m7n6o5p4q3r2s1t0', element_name: 'He' },
-    { id: 'z9y8x7w6v5u4t3s2r1q0', element_name: 'Li' },
-    { id: 'm1n2b3v4c5x6z7a8s9d0', element_name: 'Be' },
-    { id: 'f1g2h3j4k5l6q7w8e9r0', element_name: 'B' },
-    { id: 'u9i8o7p6a5s4d3f2g1h0', element_name: 'C' },
-    { id: 'j1k2l3z4x5c6v7b8n9m0', element_name: 'N' },
-    { id: 'p9o8i7u6y5t4r3e2w1q0', element_name: 'O' },
-    { id: 'l1k2j3h4g5f6d7s8a9z0', element_name: 'F' },
-    { id: 'x9c8v7b6n5m4l3k2j1h0', element_name: 'Ne' },
-    { id: 'w1e2r3t4y5u6i7o8p9a0', element_name: 'Na' },
-    { id: 's9d8f7g6h5j4k3l2z1x0', element_name: 'Mg' },
-    { id: 'q1w2e3r4t5y6u7i8o9p0', element_name: 'Al' },
-    { id: 'n9m8b7v6c5x4z3a2s1d0', element_name: 'Si' },
-    { id: 'v1b2n3m4l5k6j7h8g9f0', element_name: 'K' },
+    {id: 'a1b2c3d4e5f6g7h8i9j0', element_name: 'H'},
+    {id: 'k9l8m7n6o5p4q3r2s1t0', element_name: 'He'},
+    {id: 'z9y8x7w6v5u4t3s2r1q0', element_name: 'Li'},
+    {id: 'm1n2b3v4c5x6z7a8s9d0', element_name: 'Be'},
+    {id: 'f1g2h3j4k5l6q7w8e9r0', element_name: 'B'},
+    {id: 'u9i8o7p6a5s4d3f2g1h0', element_name: 'C'},
+    {id: 'j1k2l3z4x5c6v7b8n9m0', element_name: 'N'},
+    {id: 'p9o8i7u6y5t4r3e2w1q0', element_name: 'O'},
+    {id: 'l1k2j3h4g5f6d7s8a9z0', element_name: 'F'},
+    {id: 'x9c8v7b6n5m4l3k2j1h0', element_name: 'Ne'},
+    {id: 'w1e2r3t4y5u6i7o8p9a0', element_name: 'Na'},
+    {id: 's9d8f7g6h5j4k3l2z1x0', element_name: 'Mg'},
+    {id: 'q1w2e3r4t5y6u7i8o9p0', element_name: 'Al'},
+    {id: 'n9m8b7v6c5x4z3a2s1d0', element_name: 'Si'},
+    {id: 'v1b2n3m4l5k6j7h8g9f0', element_name: 'K'},
   ];
 
   // Lista de amostras (simulando dados do banco)
@@ -71,10 +79,10 @@ export class RemessaComponent implements OnInit {
 
   // Lista de laboratórios (simulando dados do banco)
   laboratorios: Laboratorio[] = [
-    { id: 'lab001', nome: 'Laboratório Central de Análises' },
-    { id: 'lab002', nome: 'Laboratório Geo-Química' },
-    { id: 'lab003', nome: 'Instituto de Análises Minerais' },
-    { id: 'lab004', nome: 'Centro de Pesquisas Avançadas' },
+    {id: 'lab001', nome: 'Laboratório Central de Análises'},
+    {id: 'lab002', nome: 'Laboratório Geo-Química'},
+    {id: 'lab003', nome: 'Instituto de Análises Minerais'},
+    {id: 'lab004', nome: 'Centro de Pesquisas Avançadas'},
   ];
 
   // Lista de remessas (simulando dados do banco)
@@ -162,9 +170,10 @@ export class RemessaComponent implements OnInit {
     }
   }
 
-  tableSelect(table: number){
+  tableSelect(table: number) {
     return this.selectTable.set(table)
   }
+
   // Filtrar remessas com base no termo de pesquisa
   filtrarRemessas(): void {
     if (!this.searchTerm) {
@@ -190,11 +199,11 @@ export class RemessaComponent implements OnInit {
 
   // Fechar formulário
   fecharFormulario(): void {
-   this.#confirmModal.confirmWarning("Limpar","Deseja limpar o formulário?").then((res)=>{
-     if(res){
-       this.resetarFormulario();
-     }
-   })
+    this.#confirmModal.confirmWarning("Limpar", "Deseja limpar o formulário?").then((res) => {
+      if (res) {
+        this.resetarFormulario();
+      }
+    })
   }
 
   // Resetar formulário
@@ -263,7 +272,7 @@ export class RemessaComponent implements OnInit {
         (r) => r.id === this.novaRemessa.id
       );
       if (index !== -1) {
-        this.remessas[index] = { ...this.novaRemessa };
+        this.remessas[index] = {...this.novaRemessa};
         alert(`Remessa ${this.novaRemessa.id} atualizada com sucesso!`);
       }
     } else {
@@ -273,7 +282,7 @@ export class RemessaComponent implements OnInit {
         id: novoId,
         data: this.novaRemessa.data,
         destino: this.novaRemessa.destino,
-        amostras: [...this.novaRemessa.amostras.map(amostra => ({ ...amostra }))],
+        amostras: [...this.novaRemessa.amostras.map(amostra => ({...amostra}))],
       };
 
       this.remessas.unshift(novaRemessa);
@@ -287,23 +296,24 @@ export class RemessaComponent implements OnInit {
 
   // Remover remessa
   removerRemessa(id: string): void {
-    this.#confirmModal.confirmDelete('','Tem certeza que deseja remover esta remessa?').then((res)=>{
-        if(res){
-          const remessaIndex = this.remessas.findIndex(
-            (remessa) => remessa.id === id
-          );
-          if (remessaIndex !== -1) {
-            const remessaRemovida = this.remessas[remessaIndex];
-            this.remessas.splice(remessaIndex, 1);
+    this.#confirmModal.confirmDelete('', 'Tem certeza que deseja remover esta remessa?').then((res) => {
+      if (res) {
+        const remessaIndex = this.remessas.findIndex(
+          (remessa) => remessa.id === id
+        );
+        if (remessaIndex !== -1) {
+          const remessaRemovida = this.remessas[remessaIndex];
+          this.remessas.splice(remessaIndex, 1);
 
-            // Atualiza a última remessa se necessário
-            if (this.ultimaRemessa && this.ultimaRemessa.id === id) {
-              this.ultimaRemessa = this.remessas.length > 0 ? this.remessas[0] : null;
-            }
+          // Atualiza a última remessa se necessário
+          if (this.ultimaRemessa && this.ultimaRemessa.id === id) {
+            this.ultimaRemessa = this.remessas.length > 0 ? this.remessas[0] : null;
+          }
 
-            this.filtrarRemessas();
-            this.#toast.success(`Remessa ${remessaRemovida.id} removida com sucesso!`);
-        }}
+          this.filtrarRemessas();
+          this.#toast.success(`Remessa ${remessaRemovida.id} removida com sucesso!`);
+        }
+      }
     })
 
 
@@ -331,16 +341,16 @@ export class RemessaComponent implements OnInit {
   // Carregar última remessa
   carregarUltimaRemessa(): void {
     if (!this.ultimaRemessa) return;
-    this.#confirmModal.confirmInfo("Copiar Remessa","Os dados atuais não serão salvos!").then((res)=>{
-    if(res){
-      this.copiarRemessa(this.ultimaRemessa!);
-    }
+    this.#confirmModal.confirmInfo("Copiar Remessa", "Os dados atuais não serão salvos!").then((res) => {
+      if (res) {
+        this.copiarRemessa(this.ultimaRemessa!);
+      }
     })
   }
 
   // Visualizar detalhes da remessa
   visualizarRemessa(remessa: Remessa): void {
-     this.remessaVisualizada = {...remessa};
+    this.remessaVisualizada = {...remessa};
 
     // Precisamos usar setTimeout para garantir que o ViewChild esteja disponível
     // após a detecção de mudanças, especialmente importante com SSR
@@ -384,8 +394,9 @@ export class RemessaComponent implements OnInit {
     return numero.toString().padStart(3, '0');
   }
 
-   @ViewChild('remessaDialog') remessaDialog!: ElementRef<HTMLDialogElement>;
-   // Manipular clique no backdrop (opcional)
+  @ViewChild('remessaDialog') remessaDialog!: ElementRef<HTMLDialogElement>;
+
+  // Manipular clique no backdrop (opcional)
   handleDialogClick(event: MouseEvent) {
     // Verifica se o clique foi no backdrop e não no conteúdo
     if (event.target === this.remessaDialog.nativeElement) {
@@ -393,8 +404,10 @@ export class RemessaComponent implements OnInit {
     }
   }
 
-  imprimirEtiquetas(remessa:Remessa){
-    try{ this.etiquetasService.prepararParaImpressaoBrowser(remessa)}catch(err){
+  imprimirEtiquetas(remessa: Remessa) {
+    try {
+      this.etiquetasService.prepararParaImpressaoBrowser(remessa)
+    } catch (err) {
       console.log(err)
 
     }
