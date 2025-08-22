@@ -82,7 +82,7 @@
                   >
                     <option [ngValue]="null" disabled>Escolha uma amostra</option>
                     <option *ngFor="let amostra of amostras" [ngValue]="amostra">
-                      {{ amostra.amostra_name }}
+                      {{ amostra.amostraName }}
                     </option>
                   </select>
                   <button
@@ -128,7 +128,7 @@
                     scope="col"
                     class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-            {{ elemento.element_name }}
+            {{ elemento.elementName }}
             </th>
             <th
               scope="col"
@@ -143,12 +143,12 @@
             <td
               class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
             >
-            {{ amostra.amostra_name }}
+            {{ amostra.amostraName }}
             </td>
             <td class="px-4 py-3 whitespace-nowrap">
               <input
                 type="text"
-                [(ngModel)]="amostra.sub_identificacao"
+                [(ngModel)]="amostra.subIdentificacao"
                 class="w-full p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ex: Lote 01"
               />
@@ -158,7 +158,7 @@
                 <div>
                   <input
                     type="date"
-                    [(ngModel)]="amostra.periodo.inicio"
+                    [(ngModel)]="amostra.dataInicio"
                     class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
@@ -166,30 +166,29 @@
                 <div>
                   <input
                     type="date"
-                    [(ngModel)]="amostra.periodo.fim"
+                    [(ngModel)]="amostra.dataFim"
                     class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
               </div>
             </td>
             <!-- Células dinâmicas para cada elemento -->
-            <td
-              *ngFor="let elemento of elementos"
+            @for(elemento of elementos; track elemento.id){<td
               class="px-2 py-3 whitespace-nowrap text-center"
             >
               <div class="flex justify-center">
                 <input
                   type="checkbox"
                   [checked]="
-                amostra.elementos_analisados.includes(
-                  elemento.element_name
+                amostra.elementosSolicitados.includes(
+                  elemento.id!
                 )
               "
-                  (change)="toggleElementoAmostra(i, elemento.element_name)"
+                  (change)="toggleElementoAmostra(i, elemento.id!)"
                   class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
                 />
               </div>
-            </td>
+            </td>}
             <td
               class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"
             >
@@ -302,13 +301,13 @@
                     class="px-6 py-4 truncate text-sm text-gray-500"
                     [title]="remessa.id"
                   >
-                {{ remessa.id.substring(0, 8) }}...
+                {{ remessa.id ? remessa.id : "Editando"}}
                   </td>
                   <td class="px-6 py-4 truncate text-sm text-gray-900">
                 {{ remessa.data | date : "dd/MM/yyyy" }}
                 </td>
                 <td class="px-6 py-4 truncate text-sm text-gray-900">
-                {{ getLaboratorioNome(remessa.destino) }}
+                {{ getLaboratorioNome(remessa.destinoId) }}
                 </td>
                 <td class="px-6 py-4 truncate text-sm text-gray-900">
                 {{ remessa.amostras.length }} amostra(s)
@@ -335,7 +334,7 @@
                         <ng-icon name="heroClipboardDocument"  size="19" />
                         </button>
                         <button
-                          (click)="removerRemessa(remessa.id)"
+                          (click)="removerRemessa(remessa.id!)"
                           class="text-red-600 hover:text-red-900 transition-colors duration-200"
                           title="Excluir remessa"
                         >
@@ -418,7 +417,7 @@
                 >Laboratório</label
                 >
                 <p class="mt-1 text-sm text-gray-900">
-                  {{ getLaboratorioNome(remessaVisualizada.destino) }}
+                  {{ getLaboratorioNome(remessaVisualizada.destinoId) }}
                 </p>
               </div>
             </div>
@@ -462,24 +461,24 @@
                     <td
                       class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
                     >
-                      {{ amostra.amostra_name }}
+                      {{ amostra.amostraName }}
                     </td>
                     <td
                       class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
                     >
-                      {{ amostra.sub_identificacao || "-" }}
+                      {{ amostra.subIdentificacao || "-" }}
                     </td>
                     <td
                       class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
                     >
-                      {{ amostra.periodo.inicio | date : "dd/MM/yyyy" }} até
-                      {{ amostra.periodo.fim | date : "dd/MM/yyyy" }}
+                      {{ amostra.dataInicio | date : "dd/MM/yyyy" }} até
+                      {{ amostra.dataFim | date : "dd/MM/yyyy" }}
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                       <div class="flex flex-wrap gap-1">
                           <span
                             *ngFor="
-                              let elemento of amostra.elementos_analisados
+                              let elemento of amostra.elementosAnalisados
                             "
                             class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
                           >

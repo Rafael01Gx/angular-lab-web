@@ -146,7 +146,8 @@
           </tr>
         </thead>
         <tbody>
-          @if(materiasPrimasFiltro()){ @for(item of itensPaginados; track item.id;
+          @if(materiasPrimasFiltro().length > 0){
+            @for(item of itensPaginados; track item.id;
           let i = $index){
           <tr
             class="hover:bg-slate-50/50 transition-colors duration-150 border-b border-gray-200/80"

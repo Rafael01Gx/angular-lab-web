@@ -1,26 +1,14 @@
 import { Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import {Remessa} from '../shared/interfaces/laboratorios-externos.interfaces';
 
 interface Periodo {
   inicio: string;
   fim: string;
 }
 
-interface AmostraRemessa {
-  id: string;
-  amostra_name: string;
-  sub_identificacao?: string;
-  periodo: Periodo;
-  elementos_analisados: string[];
-}
 
-interface Remessa {
-  id: string;
-  data: string;
-  destino: string; // ID do laboratório
-  amostras: AmostraRemessa[];
-}
 
 @Injectable({
   providedIn: 'root',
@@ -55,8 +43,8 @@ export class EtiquetasService {
       // Iniciar uma nova página
       htmlCompleto += `
         <div class="pagina-etiquetas" style="
-          width: 29.7cm; 
-          height: 21cm; 
+          width: 29.7cm;
+          height: 21cm;
           position: relative;
           page-break-after: always;
           padding: 1cm;
@@ -75,11 +63,11 @@ export class EtiquetasService {
         const top = row * 4 + 'cm'; // 3.8cm de altura + espaço entre etiquetas
 
         const materiaPrima =
-          amostra.amostra_name +
-          (amostra.sub_identificacao ? ` (${amostra.sub_identificacao})` : '');
+          amostra.amostraName +
+          (amostra.subIdentificacao ? ` (${amostra.subIdentificacao})` : '');
         const periodo = `${this.dateToBr(
-          amostra.periodo.inicio
-        )} á ${this.dateToBr(amostra.periodo.fim)}`;
+          amostra.dataInicio
+        )} á ${this.dateToBr(amostra.dataFim)}`;
 
         htmlCompleto += `
           <div class="etiqueta" style="
@@ -99,36 +87,36 @@ export class EtiquetasService {
               </div>
               <div class="titulo" style="
                 display: flex;
-                flex-direction: column; 
+                flex-direction: column;
                 font-weight: 500;
                 width: 3.9cm;
-                
+
 
               ">
-    
+
                 <div style="display:flex;align-items:center;justify-content: center;font-size: 11px;flex-grow:1;border-bottom:1px solid black; border-collapse: collapse;text-align: center; width:100% ;heigth:100%;"><strong >ETIQUETA DE AMOSTRA</strong></div>
                 <div style="display:flex;align-items:center;justify-content: center;font-size: 10px;text-align: center;flex-grow:2; ; width:100%;heigth:100%;"><span>GERÊNCIA: GAPSI</span></div>
-                
+
               </div>
             </div>
-            
-              
+
+
             <div style="margin-top:0.1cm;font-size:10px; border: 1px solid black; display:flex; flex-direction: column; height:2cm;">
               <div style="height:0.5cm;border-bottom: 1px solid black; display: flex;">
                 <div style="margin-left:4px;display:flex;align-items:center;width: 100%;font-weight: 500;">DESTINO: ${destino}</div>
-                
+
               </div>
-              
+
               <div style="height:0.5cm; border-bottom: 1px solid black; display: flex;">
                 <div style="margin-left:4px;display:flex;align-items:center;width: auto; font-weight: 500;">MATÉRIA-PRIMA: ${materiaPrima}</div>
-                
+
               </div>
-              
+
               <div style="height:0.5cm;border-bottom: 1px solid black; display: flex;">
                 <div style="margin-left:4px;display:flex;align-items:center;width: auto; font-weight: 500;">PERÍODO: ${periodo}</div>
-                
+
               </div>
-              
+
               <div style="height:0.5cm;display: flex;">
                 <div style="margin-left:4px;display:flex;align-items:center;width: auto; font-weight: 500;">ENSAIO QUÍMICO: </div>
                 <div style=" margin-left:auto;margin-right:0.1cm;display:flex;align-items:center;">

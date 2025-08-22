@@ -3,7 +3,7 @@ import {Component, ElementRef, inject, OnInit, signal, ViewChild} from '@angular
 import {FormsModule} from '@angular/forms';
 import {EtiquetasService} from '../../../services/impressao-de-etiquetas.service';
 import {
-  Amostra, AmostraRemessa,
+  AmostraLabExterno, AmostraRemessa,
   ElementoQuimico,
   Laboratorio,
   Remessa
@@ -34,119 +34,23 @@ export class RemessaComponent implements OnInit {
   #toast = inject(ToastrService);
   etiquetasService = inject(EtiquetasService);
   selectTable = signal<number>(0)
-  // Lista de elementos químicos (simulando dados do banco)
-  elementos: ElementoQuimico[] = [
-    {id: 'a1b2c3d4e5f6g7h8i9j0', element_name: 'H'},
-    {id: 'k9l8m7n6o5p4q3r2s1t0', element_name: 'He'},
-    {id: 'z9y8x7w6v5u4t3s2r1q0', element_name: 'Li'},
-    {id: 'm1n2b3v4c5x6z7a8s9d0', element_name: 'Be'},
-    {id: 'f1g2h3j4k5l6q7w8e9r0', element_name: 'B'},
-    {id: 'u9i8o7p6a5s4d3f2g1h0', element_name: 'C'},
-    {id: 'j1k2l3z4x5c6v7b8n9m0', element_name: 'N'},
-    {id: 'p9o8i7u6y5t4r3e2w1q0', element_name: 'O'},
-    {id: 'l1k2j3h4g5f6d7s8a9z0', element_name: 'F'},
-    {id: 'x9c8v7b6n5m4l3k2j1h0', element_name: 'Ne'},
-    {id: 'w1e2r3t4y5u6i7o8p9a0', element_name: 'Na'},
-    {id: 's9d8f7g6h5j4k3l2z1x0', element_name: 'Mg'},
-    {id: 'q1w2e3r4t5y6u7i8o9p0', element_name: 'Al'},
-    {id: 'n9m8b7v6c5x4z3a2s1d0', element_name: 'Si'},
-    {id: 'v1b2n3m4l5k6j7h8g9f0', element_name: 'K'},
-  ];
 
-  // Lista de amostras (simulando dados do banco)
-  amostras: Amostra[] = [
-    {
-      id: 'a0b1c2d3e4f5g6h7i8j9',
-      amostra_name: 'Antracito',
-      elementos_analisados: ['H', 'Si', 'O'],
-    },
-    {
-      id: 'j9i8h7g6f5e4d3c2b1a0',
-      amostra_name: 'Calcário',
-      elementos_analisados: ['Ca', 'C', 'O'],
-    },
-    {
-      id: 'z0x9c8v7b6n5m4l3k2j1',
-      amostra_name: 'Argila',
-      elementos_analisados: ['Al', 'Si', 'O', 'H'],
-    },
-    {
-      id: 'p0o9i8u7y6t5r4e3w2q1',
-      amostra_name: 'Granito',
-      elementos_analisados: ['Si', 'Al', 'K', 'Na', 'O'],
-    },
-  ];
+  elementos: ElementoQuimico[] = [];
+  amostras: AmostraLabExterno[] = [];
+  laboratorios: Laboratorio[] = [];
 
-  // Lista de laboratórios (simulando dados do banco)
-  laboratorios: Laboratorio[] = [
-    {id: 'lab001', nome: 'Laboratório Central de Análises'},
-    {id: 'lab002', nome: 'Laboratório Geo-Química'},
-    {id: 'lab003', nome: 'Instituto de Análises Minerais'},
-    {id: 'lab004', nome: 'Centro de Pesquisas Avançadas'},
-  ];
-
-  // Lista de remessas (simulando dados do banco)
-  remessas: Remessa[] = [
-    {
-      id: 'rem001',
-      data: '2025-05-10',
-      destino: 'lab001',
-      amostras: [
-        {
-          id: 'a0b1c2d3e4f5g6h7i8j9',
-          amostra_name: 'Antracito',
-          sub_identificacao: 'Lote 01',
-          periodo: {
-            inicio: '2025-05-01',
-            fim: '2025-05-05',
-          },
-          elementos_analisados: ['H', 'Si', 'O'],
-        },
-        {
-          id: 'z0x9c8v7b6n5m4l3k2j1',
-          amostra_name: 'Argila',
-          sub_identificacao: 'Amostra A',
-          periodo: {
-            inicio: '2025-05-01',
-            fim: '2025-05-07',
-          },
-          elementos_analisados: ['Al', 'Si', 'O', 'H'],
-        },
-      ],
-    },
-    {
-      id: 'rem002',
-      data: '2025-05-12',
-      destino: 'lab003',
-      amostras: [
-        {
-          id: 'p0o9i8u7y6t5r4e3w2q1',
-          amostra_name: 'Granito',
-          sub_identificacao: 'Tipo A',
-          periodo: {
-            inicio: '2025-05-05',
-            fim: '2025-05-10',
-          },
-          elementos_analisados: ['Si', 'Al', 'K', 'Na'],
-        },
-      ],
-    },
-
-  ];
-
-  // Remessas filtradas (usado na tabela)
+  remessas: Remessa[] = [];
   remessasFiltradas: Remessa[] = [];
 
-  // Nova remessa para cadastro
   novaRemessa: Remessa = {
     id: '',
     data: new Date().toISOString().split('T')[0],
-    destino: '',
+    destinoId:'',
     amostras: [],
   };
 
   // Amostra selecionada para adicionar à remessa
-  amostraSelecionada: Amostra | null = null;
+  amostraSelecionada: AmostraLabExterno | null = null;
 
   // Termo de pesquisa
   searchTerm: string = '';
@@ -185,13 +89,12 @@ export class RemessaComponent implements OnInit {
     this.remessasFiltradas = this.remessas.filter(
       (remessa) => {
         // Busca no ID, data ou laboratório
-        return remessa.id.toLowerCase().includes(term) ||
-          new Date(remessa.data).toLocaleDateString().toLowerCase().includes(term) ||
-          this.getLaboratorioNome(remessa.destino).toLowerCase().includes(term) ||
+        return new Date(remessa.data).toLocaleDateString().toLowerCase().includes(term) ||
+          this.getLaboratorioNome(remessa.destinoId).toLowerCase().includes(term) ||
           // Busca nas amostras
           remessa.amostras.some(amostra =>
-            amostra.amostra_name.toLowerCase().includes(term) ||
-            (amostra.sub_identificacao && amostra.sub_identificacao.toLowerCase().includes(term))
+            amostra.amostraName.toLowerCase().includes(term) ||
+            (amostra.subIdentificacao && amostra.subIdentificacao.toLowerCase().includes(term))
           );
       }
     );
@@ -211,7 +114,7 @@ export class RemessaComponent implements OnInit {
     this.novaRemessa = {
       id: '',
       data: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
-      destino: '',
+      destinoId: '',
       amostras: [],
     };
     this.amostraSelecionada = null;
@@ -224,19 +127,14 @@ export class RemessaComponent implements OnInit {
 
     // Cria uma nova amostra para a remessa
     const novaAmostraRemessa: AmostraRemessa = {
-      id: this.amostraSelecionada.id,
-      amostra_name: this.amostraSelecionada.amostra_name,
-      sub_identificacao: '',
-      periodo: {
-        inicio: new Date().toISOString().split('T')[0], // Data atual como início
-        fim: new Date().toISOString().split('T')[0], // Data atual como fim
-      },
-      elementos_analisados: [...this.amostraSelecionada.elementos_analisados],
+      amostraName: this.amostraSelecionada.amostraName,
+      subIdentificacao: '',
+      dataInicio: new Date().toISOString().split('T')[0],
+      dataFim: new Date().toISOString().split('T')[0],
+      elementosSolicitados: [...this.amostraSelecionada.elementosAnalisados],
     };
-
     // Adiciona à lista de amostras da remessa
     this.novaRemessa.amostras.push(novaAmostraRemessa);
-
     // Limpa a seleção atual
     this.amostraSelecionada = null;
   }
@@ -247,16 +145,16 @@ export class RemessaComponent implements OnInit {
   }
 
   // Toggle elemento em uma amostra da remessa
-  toggleElementoAmostra(amostraIndex: number, elementName: string): void {
+  toggleElementoAmostra(amostraIndex: number, elementId: number): void {
     const amostra = this.novaRemessa.amostras[amostraIndex];
-    const index = amostra.elementos_analisados.indexOf(elementName);
+    const index = amostra.elementosSolicitados.indexOf(elementId);
 
     if (index === -1) {
       // Adicionar elemento
-      amostra.elementos_analisados.push(elementName);
+      amostra.elementosSolicitados.push(elementId);
     } else {
       // Remover elemento
-      amostra.elementos_analisados.splice(index, 1);
+      amostra.elementosSolicitados.splice(index, 1);
     }
   }
 
@@ -277,17 +175,14 @@ export class RemessaComponent implements OnInit {
       }
     } else {
       // Adicionar nova remessa
-      const novoId = `rem${this.gerarIdAleatorio()}`;
       const novaRemessa: Remessa = {
-        id: novoId,
         data: this.novaRemessa.data,
-        destino: this.novaRemessa.destino,
+        destinoId: this.novaRemessa.destinoId,
         amostras: [...this.novaRemessa.amostras.map(amostra => ({...amostra}))],
       };
 
       this.remessas.unshift(novaRemessa);
       this.ultimaRemessa = novaRemessa;
-      alert(`Remessa ${novoId} adicionada com sucesso!`);
     }
 
     this.filtrarRemessas();
@@ -322,18 +217,14 @@ export class RemessaComponent implements OnInit {
   // Copiar remessa
   copiarRemessa(remessa: Remessa): void {
     this.novaRemessa = {
-      id: '',
       data: new Date().toISOString().split('T')[0], // Data atual
-      destino: remessa.destino,
+      destinoId: remessa.destinoId,
       amostras: remessa.amostras.map(amostra => ({
         ...amostra,
-        periodo: {
-          inicio: new Date().toISOString().split('T')[0], // Data atual
-          fim: new Date().toISOString().split('T')[0], // Data atual
-        }
+        dataInicio: new Date().toISOString().split('T')[0], // Data atual
+        dataFim: new Date().toISOString().split('T')[0], // Data atual
       })),
     };
-
     this.editando = false;
     this.selectTable() !== 0 ? this.tableSelect(0) : null;
   }
@@ -384,7 +275,7 @@ export class RemessaComponent implements OnInit {
   // Listar amostras da remessa em formato texto curto
   listarAmostras(remessa: Remessa): string {
     return remessa.amostras
-      .map(a => a.amostra_name + (a.sub_identificacao ? ` (${a.sub_identificacao})` : ''))
+      .map(a => a.amostraName + (a.subIdentificacao ? ` (${a.subIdentificacao})` : ''))
       .join(', ');
   }
 
@@ -405,6 +296,7 @@ export class RemessaComponent implements OnInit {
   }
 
   imprimirEtiquetas(remessa: Remessa) {
+    if(!remessa)return;
     try {
       this.etiquetasService.prepararParaImpressaoBrowser(remessa)
     } catch (err) {

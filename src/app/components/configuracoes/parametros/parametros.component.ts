@@ -66,7 +66,7 @@ export class ParametrosComponent implements OnInit {
     ]),
     unidadeMedida: new FormControl<string>(''),
     unidadeResultado: new FormControl<string>(''),
-    casasDecimais: new FormControl<number>(0),
+    casasDecimais: new FormControl<number>(0, Validators.nullValidator),
   });
 
   ngOnInit(): void {
@@ -182,7 +182,13 @@ export class ParametrosComponent implements OnInit {
       });
     }
 
-    this.materiaPrimaForm.reset();
+    this.materiaPrimaForm.setValue({
+      casasDecimais: 0,
+      unidadeMedida: '',
+      descricao: '',
+      unidadeResultado: '',
+      tipoAnaliseId: ''
+    })
 
     // paginação
     if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {
