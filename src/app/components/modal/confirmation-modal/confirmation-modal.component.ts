@@ -39,8 +39,8 @@ import { ConfirmationModalConfig } from '../../../shared/interfaces/modals.inter
 
     <!-- Container -->
     <div
-    class="relative w-full max-w-md bg-blue-50/80 backdrop-blur-sm rounded-md shadow-2xl
-    border border-white/50 animate-scale-in overflow-hidden dark:bg-gray-800 dark:text-gray-600"
+    class="relative w-full max-w-md  backdrop-blur-sm rounded-md shadow-2xl
+    border border-white/50 animate-scale-in overflow-hidden bg-gray-800 text-gray-600"
     (click)="$event.stopPropagation()"
     >
     <!-- Header -->
@@ -71,12 +71,12 @@ import { ConfirmationModalConfig } from '../../../shared/interfaces/modals.inter
     </div>
 
     <!-- Title -->
-    <h2 class="text-xl font-bold text-center text-slate-800 dark:text-white mb-2">
+    <h2 class="text-xl font-bold text-center text-white mb-2">
     {{ config().title || getDefaultTitle() }}
     </h2>
 
     <!-- Message -->
-    <div class="text-center text-slate-600 dark:text-gray-400 space-y-2">
+    <div class="text-center text-gray-400 space-y-2">
     <p class="leading-relaxed">
     {{ config().message || getDefaultMessage() }}
     </p>

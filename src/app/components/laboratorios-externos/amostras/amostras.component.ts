@@ -6,7 +6,7 @@ import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroClipboardDocument, heroPlus, heroTrash, heroXMark} from '@ng-icons/heroicons/outline'
 import {ElementoQuimicoLabExternosService} from '../../../services/elemento-quimico-lab-externos.service';
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
-import {ToastrService} from '../../layout/toastr/toastr.service';
+import {ToastrService} from '../../../services/toastr.service';
 import {AmostrasLabExternos} from '../../../services/amostras-lab-externos.service';
 import {map} from 'rxjs';
 
@@ -151,9 +151,10 @@ export class AmostrasComponent implements OnInit {
           const _amostra: AmostraLabExterno = {
             id: res.id,
             amostraName: res.amostraName,
-            elementosAnalisados: res.elementosAnalisados,
+            elementosAnalisados: res.elementosAnalisados.map(ele => ele.id) as number[],
           }
           this.amostras.update(value => [...value, _amostra]);
+          this.amostrasFiltradas.set(this.amostras());
           this.#toast.success("Amostra adicionada com sucesso!")
         }
       })

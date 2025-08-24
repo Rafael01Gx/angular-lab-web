@@ -23,7 +23,7 @@ import {
 import { IUser } from '../../../shared/interfaces/user.interface';
 import { AuthService } from '../../../services/auth.service';
 import { NgxMaskDirective } from 'ngx-mask';
-import { ToastrService } from '../../layout/toastr/toastr.service';
+import { ToastrService } from '../../../services/toastr.service';
 
 @Component({
   selector: 'app-user-registration',

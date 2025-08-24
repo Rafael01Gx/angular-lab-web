@@ -22,7 +22,7 @@ import {
   heroArrowUp,
 } from '@ng-icons/heroicons/outline';
 import { mapUserRole } from '../../../shared/enums/roles.enum';
-import { ToastrService } from '../../layout/toastr/toastr.service';
+import { ToastrService } from '../../../services/toastr.service';
 import { UserService } from '../../../services/user.service';
 import { AuthService } from '../../../services/auth.service';
 

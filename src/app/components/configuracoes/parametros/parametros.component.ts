@@ -23,7 +23,7 @@ import {IParameters} from '../../../shared/interfaces/parameters.interface';
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
 import {isPlatformServer} from '@angular/common';
 import {catchError, of} from 'rxjs';
-import {ToastrService} from '../../layout/toastr/toastr.service';
+import {ToastrService} from '../../../services/toastr.service';
 
 const PARAMETROS_KEY = makeStateKey<IParameters[]>('appParametros');
 const ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appParamTipoAnalise');

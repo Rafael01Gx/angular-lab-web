@@ -4,7 +4,7 @@ import {environment} from '../../environments/environment';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {IOrders} from '../shared/interfaces/orders.interface';
 import {IAmostra} from '../shared/interfaces/amostra.interface';
-import {ToastrService} from '../components/layout/toastr/toastr.service';
+import {ToastrService} from './toastr.service';
 
 @Injectable({
   providedIn: 'root',

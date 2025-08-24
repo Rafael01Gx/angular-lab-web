@@ -3,7 +3,7 @@ import {inject, Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {IMateriaPrima} from '../shared/interfaces/materia-prima.interface';
-import {ToastrService} from '../components/layout/toastr/toastr.service';
+import {ToastrService} from './toastr.service';
 
 @Injectable({
   providedIn: 'root',

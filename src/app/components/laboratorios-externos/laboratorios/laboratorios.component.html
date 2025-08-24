@@ -1,0 +1,687 @@
+<div
+  class="h-full w-full bg-gradient-to-b from-blue-50/70 to-slate-50/50 p-0 rounded-sm flex flex-col"
+>
+  <div class="border-b border-gray-200 mb-2">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content" data-tabs-active-classes="text-purple-500 hover:text-purple-500 border-purple-500" data-tabs-inactive-classes="border-transparent  text-gray-400 hover:border-gray-300 border-gray-700 text-gray-300" role="tablist">
+      <li class="flex-1" role="presentation">
+        <button (click)="tableSelect(0)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 0)" id="nova-remessa-styled-tab" data-tabs-target="#styled-nova-remessa" type="button" role="tab" aria-controls="nova-remessa" aria-selected="false"><ng-icon name="heroBuildingOffice2" class="text-purple-500 text-md"></ng-icon> {{ editando() ? "Editar" : "Cadastrar" }} Laboratório</button>
+      </li>
+      <li class="flex-1" role="presentation">
+        <button (click)="tableSelect(1)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 1)" id="dashboard-styled-tab" data-tabs-target="#styled-remessas-cadastradas" type="button" role="tab" aria-controls="remessas-cadastradas" aria-selected="false">Remessas Cadastradas</button>
+      </li>
+    </ul>
+  </div>
+  <div class="flex-1 flex min-h-0" id="default-styled-tab-content">
+    @switch (selectTable()){
+      @case (0){
+        <div class="flex-1 bg-gray-50 flex flex-col min-h-0" id="styled-nova-remessa" role="tabpanel" aria-labelledby="nova-remessa-tab">
+          <div class="flex flex-col gap-4 min-h-0 flex-1">
+            <form
+              [formGroup]="laboratorioForm"
+              (ngSubmit)="onSubmit()"
+              class="space-y-1 flex-1 flex flex-col min-h-0"
+            >
+
+              <!-- Formulário -->
+              <div class="bg-gray/50 backdrop-blur-sm shadow-xl border border-purple-100 p-8 flex-1 overflow-y-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <!-- Nome do Laboratório -->
+                  <div class="space-y-2 lg:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700">
+                      Nome do Laboratório
+                    </label>
+                    <div class="relative">
+                      <input
+                        type="text"
+                        formControlName="nome"
+                        class="w-full input-icon-left"
+                        placeholder="Digite o nome do laboratório"
+                      />
+                      <ng-icon
+                        name="heroBuildingOffice2"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="laboratorioForm.get('nome')?.touched && laboratorioForm.get('nome')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="laboratorioForm.get('nome')?.errors?.['required']">
+                  Nome é obrigatório
+                </span>
+                      <span *ngIf="laboratorioForm.get('nome')?.errors?.['minlength']">
+                  Nome deve ter pelo menos 3 caracteres
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- Telefone -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Telefone</label>
+                    <div class="relative">
+                      <input
+                        #tel
+                        type="tel"
+                        formControlName="telefone"
+                        class="w-full input-icon-left"
+                        placeholder="(11) 99999-9999"
+                        (focusout)="setMask(tel)"
+                        (focusin)="resetMask()"
+                        [mask]="telMask()"
+                        maxlength="17"
+                      />
+                      <ng-icon
+                        name="heroPhone"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="laboratorioForm.get('telefone')?.touched && laboratorioForm.get('telefone')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="laboratorioForm.get('telefone')?.errors?.['pattern']">
+                  Formato inválido. Use: (xx) xxxx-xxxx ou (xx) x xxxx-xxxx
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">E-mail</label>
+                    <div class="relative">
+                      <input
+                        type="email"
+                        formControlName="email"
+                        class="w-full input-icon-left"
+                        placeholder="laboratorio@exemplo.com"
+                      />
+                      <ng-icon
+                        name="heroEnvelope"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="laboratorioForm.get('email')?.touched && laboratorioForm.get('email')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="laboratorioForm.get('email')?.errors?.['email']">
+                  E-mail inválido
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- CEP -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">CEP</label>
+                    <div class="relative" formGroupName="endereco">
+                      <input
+                        type="text"
+                        formControlName="cep"
+                        class="w-full input-icon-left"
+                        placeholder="00000-000"
+                        mask="00000-000"
+                        maxlength="9"
+                        (keyup)="buscarCep()"
+                      />
+                      <ng-icon
+                        name="heroMapPin"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="enderecoForm.get('cep')?.touched && enderecoForm.get('cep')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="enderecoForm.get('cep')?.errors?.['required']">
+                  CEP é obrigatório
+                </span>
+                      <span *ngIf="enderecoForm.get('cep')?.errors?.['pattern']">
+                  Formato inválido. Use: 00000-000
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- Logradouro -->
+                  <div class="space-y-2 lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Logradouro</label>
+                    <div class="relative" formGroupName="endereco">
+                      <input
+                        type="text"
+                        formControlName="logradouro"
+                        class="w-full input-icon-left"
+                        placeholder="Rua, Avenida, etc."
+                      />
+                      <ng-icon
+                        name="heroHome"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="enderecoForm.get('logradouro')?.touched && enderecoForm.get('logradouro')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="enderecoForm.get('logradouro')?.errors?.['required']">
+                  Logradouro é obrigatório
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- Número -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Número</label>
+                    <div class="relative" formGroupName="endereco">
+                      <input
+                        type="text"
+                        formControlName="numero"
+                        class="w-full input-icon-left"
+                        placeholder="123"
+                      />
+                      <ng-icon
+                        name="heroHashtag"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="enderecoForm.get('numero')?.touched && enderecoForm.get('numero')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="enderecoForm.get('numero')?.errors?.['required']">
+                  Número é obrigatório
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- Complemento -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Complemento</label>
+                    <div class="relative" formGroupName="endereco">
+                      <input
+                        type="text"
+                        formControlName="complemento"
+                        class="w-full input-icon-left"
+                        placeholder="Apto 101, Sala 203..."
+                      />
+                      <ng-icon
+                        name="heroHome"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                  </div>
+
+                  <!-- Bairro -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Bairro</label>
+                    <div class="relative" formGroupName="endereco">
+                      <input
+                        type="text"
+                        formControlName="bairro"
+                        class="w-full input-icon-left"
+                        placeholder="Nome do bairro"
+                      />
+                      <ng-icon
+                        name="heroMapPin"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="enderecoForm.get('bairro')?.touched && enderecoForm.get('bairro')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="enderecoForm.get('bairro')?.errors?.['required']">
+                  Bairro é obrigatório
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- Cidade -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Cidade</label>
+                    <div class="relative" formGroupName="endereco">
+                      <input
+                        type="text"
+                        formControlName="cidade"
+                        class="w-full input-icon-left"
+                        placeholder="Nome da cidade"
+                      />
+                      <ng-icon
+                        name="heroGlobeAlt"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="enderecoForm.get('cidade')?.touched && enderecoForm.get('cidade')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="enderecoForm.get('cidade')?.errors?.['required']">
+                  Cidade é obrigatória
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- Estado -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Estado</label>
+                    <div class="relative" formGroupName="endereco">
+                      <select
+                        formControlName="estado"
+                        class="w-full pl-12 pr-4 py-3 border border-gray-300 disable:text-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 appearance-none bg-white"
+                      >
+                        <option disabled value="">Selecione o estado</option>
+                        <option value="AC">Acre</option>
+                        <option value="AL">Alagoas</option>
+                        <option value="AP">Amapá</option>
+                        <option value="AM">Amazonas</option>
+                        <option value="BA">Bahia</option>
+                        <option value="CE">Ceará</option>
+                        <option value="DF">Distrito Federal</option>
+                        <option value="ES">Espírito Santo</option>
+                        <option value="GO">Goiás</option>
+                        <option value="MA">Maranhão</option>
+                        <option value="MT">Mato Grosso</option>
+                        <option value="MS">Mato Grosso do Sul</option>
+                        <option value="MG">Minas Gerais</option>
+                        <option value="PA">Pará</option>
+                        <option value="PB">Paraíba</option>
+                        <option value="PR">Paraná</option>
+                        <option value="PE">Pernambuco</option>
+                        <option value="PI">Piauí</option>
+                        <option value="RJ">Rio de Janeiro</option>
+                        <option value="RN">Rio Grande do Norte</option>
+                        <option value="RS">Rio Grande do Sul</option>
+                        <option value="RO">Rondônia</option>
+                        <option value="RR">Roraima</option>
+                        <option value="SC">Santa Catarina</option>
+                        <option value="SP">São Paulo</option>
+                        <option value="SE">Sergipe</option>
+                        <option value="TO">Tocantins</option>
+                      </select>
+                      <ng-icon
+                        name="heroMapPin"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                    <div
+                      *ngIf="enderecoForm.get('estado')?.touched && enderecoForm.get('estado')?.errors"
+                      class="text-red-500 text-sm"
+                    >
+                <span *ngIf="enderecoForm.get('estado')?.errors?.['required']">
+                  Estado é obrigatório
+                </span>
+                    </div>
+                  </div>
+
+                  <!-- País -->
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">País</label>
+                    <div class="relative" formGroupName="endereco">
+                      <input
+                        type="text"
+                        formControlName="pais"
+                        class="w-full input-icon-left"
+                        placeholder="Brasil"
+                        value="Brasil"
+                      />
+                      <ng-icon
+                        name="heroGlobeAlt"
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
+                      ></ng-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botões de Ação -->
+              <div class="flex justify-end mt-auto space-x-4 bg-white/70 backdrop-blur-sm  p-2 shadow-xl border border-purple-100">
+                <button
+                  type="button"
+                  (click)="cancelar()"
+                  class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium flex items-center space-x-2"
+                >
+                  <ng-icon name="heroXMark"></ng-icon>
+                  <span>Cancelar</span>
+                </button>
+                <button
+                  type="submit"
+                  [disabled]="laboratorioForm.invalid || isLoading()"
+                  class="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center space-x-2"
+                >
+                  <ng-icon
+                    *ngIf="isLoading()"
+                    name="heroCheck"
+                    class="animate-spin"
+                  ></ng-icon>
+                  <span>{{ isLoading() ? "Salvando..." : (editando() ? "Atualizar":"Salvar ") }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+          <!-- -->
+        </div>
+      }
+      @case (1){
+        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0" id="styled-remessas-cadastradas" role="tabpanel" aria-labelledby="remessas-cadastradas-tab">
+          <!-- -->
+
+          <div class="p-4 border-b border-gray-200 shrink-0">
+            <div class="flex justify-between items-center">
+              <h2 class="text-lg font-semibold text-slate-700">
+                Remessas Cadastradas
+              </h2>
+              <div class="relative rounded-md shadow-sm">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <ng-icon name="heroMagnifyingGlass" class="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  [(ngModel)]="searchTerm"
+                  (ngModelChange)="filtrarLaboratorios()"
+                  type="text"
+                  name="search"
+                  id="search"
+                  class="block w-full pl-10 p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Pesquisar laboratório"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="flex-1 overflow-auto min-h-0">
+            <table class="w-full divide-y divide-gray-200 table-fixed">
+              <thead class="bg-slate-50/90 sticky top-0">
+              <tr>
+                <th
+                  scope="col"
+                  class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  ID
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Laboratório
+                </th>
+                <th
+                  scope="col"
+                  class="w-2/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Endereço
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Telefone
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Email
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6  px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Ações
+                </th>
+              </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                @for( laboratorio of laboratoriosFiltrados(); track laboratorio.id){<tr>
+                  <td
+                    class="px-6 py-4 truncate text-sm text-gray-500"
+                    [title]="laboratorio.id"
+                  >
+                    {{ laboratorio.id }}
+                  </td>
+                  <td class="px-6 py-4 truncate text-sm text-gray-900">
+                    {{ laboratorio.nome}}
+                  </td>
+                  <td class="px-6 py-4 truncate text-sm text-gray-900">
+                    {{ laboratorio.endereco?.logradouro +", "+ laboratorio.endereco?.numero +", "+ laboratorio.endereco?.bairro +", "+ laboratorio.endereco?.cidade +", "+ laboratorio.endereco?.estado +", "+ laboratorio.endereco?.pais }}
+                  </td>
+                  <td class="px-6 py-4 truncate text-sm text-gray-900">
+                    {{ laboratorio.telefone}}
+                  </td>
+                  <td class="px-6 py-4 truncate text-sm text-gray-900">
+                    {{ laboratorio.email}}
+                  </td>
+                  <td
+                    class="px-6 py-4 truncate text-right text-sm font-medium"
+                  >
+                    <div class="flex justify-end space-x-2">
+                      <button
+                        (click)="visualizarLaboratorio(laboratorio)"
+                        class="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                        title="Visualizar detalhes"
+                      >
+                        <ng-icon name="heroEye"  size="19" />
+                      </button>
+                      <button
+                        (click)="editarLaboratorio(laboratorio)"
+                        class="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
+                        title="Editar"
+                      >
+                        <ng-icon name="heroPencilSquare"  size="19" />
+                      </button>
+                      <button
+                        (click)="removerLaboratorio(laboratorio.id!)"
+                        class="text-red-600 hover:text-red-900 transition-colors duration-200"
+                        title="Excluir"
+                      >
+                        <ng-icon name="heroTrash" size="19"/>
+                      </button>
+                    </div>
+                  </td>
+                </tr>}
+                @if( laboratoriosFiltrados().length === 0){<tr>
+                  <td colspan="7" class="py-12 text-center text-slate-500">
+                    <div class="flex flex-col items-center gap-3 ">
+                      <div
+                        class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center"
+                      >
+                        <ng-icon
+                          name="heroMagnifyingGlass"
+                          size="24"
+                          class="text-slate-400"
+                        ></ng-icon>
+                      </div>
+                      <p class="text-lg font-medium">
+                        Nenhum Laboratório cadastrado
+                      </p>
+                      <p class="text-sm">
+                        Adicione o primeiro Laboratório ultilizando a aba "Cadastrar Laboratório"
+                      </p>
+                    </div>
+                  </td>
+                </tr>}
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-4 bg-gray-50 border-t border-gray-200  shrink-0">
+            <div class="text-sm text-gray-700">
+              Total de laboratórios:
+              <span class="font-medium">{{ laboratorios().length }}</span>
+            </div>
+          </div>
+
+          <!-- -->
+        </div>
+
+
+      }
+    }
+
+  </div>
+
+  <!-- Modal de Visualização do Laboratório -->
+  <dialog
+    [open]="openModal()"
+    class="fixed inset-0 z-50 backdrop:bg-black/70 backdrop:backdrop-blur-md rounded-xl shadow-2xl border-0 max-w-5xl w-full h-full max-h-[90vh] mx-auto my-auto overflow-hidden"
+  >
+    <div class="w-full h-full flex flex-col bg-white rounded-xl overflow-hidden">
+      <!-- Header da Modal -->
+      <div class="flex items-center justify-between p-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <ng-icon name="heroBeaker" size="20" class="text-white"></ng-icon>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold">Detalhes do Laboratório</h2>
+            <p class="text-indigo-100 text-sm">Informações completas</p>
+          </div>
+        </div>
+        <button
+          (click)="fecharModal()"
+          class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+          title="Fechar modal"
+        >
+          <ng-icon name="heroXMark" size="18" class="text-white"></ng-icon>
+        </button>
+      </div>
+
+      <!-- Conteúdo da Modal -->
+      <div class="p-6 flex-1 overflow-y-auto min-h-0">
+        @if (laboratorioSelecionado(); as laboratorio) {
+          <div class="space-y-6">
+            <!-- Informações Básicas -->
+            <div class="bg-gray-50 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <ng-icon name="heroInformationCircle" size="20" class="text-indigo-600"></ng-icon>
+                Informações Básicas
+              </h3>
+              <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                  <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</label>
+                  <p class="text-sm font-semibold text-gray-900 bg-white px-3 py-2 rounded-md border">{{ laboratorio.nome }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contatos -->
+            <div class="bg-blue-50 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <ng-icon name="heroPhone" size="20" class="text-blue-600"></ng-icon>
+                Contatos
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</label>
+                  <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border flex items-center gap-2">
+                    @if (laboratorio.telefone) {
+                      <ng-icon name="heroPhone" size="16" class="text-blue-600"></ng-icon>
+                      {{ laboratorio.telefone }}
+                    } @else {
+                      <span class="text-gray-400 italic">Não informado</span>
+                    }
+                  </p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</label>
+                  <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border flex items-center gap-2">
+                    @if (laboratorio.email) {
+                      <ng-icon name="heroEnvelope" size="16" class="text-blue-600"></ng-icon>
+                      <a [href]="'mailto:' + laboratorio.email" class="text-blue-600 hover:underline">
+                        {{ laboratorio.email }}
+                      </a>
+                    } @else {
+                      <span class="text-gray-400 italic">Não informado</span>
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Endereço -->
+            @if (laboratorio.endereco; as endereco) {
+              <div class="bg-green-50 rounded-lg p-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <ng-icon name="heroMapPin" size="20" class="text-green-600"></ng-icon>
+                  Endereço
+                </h3>
+                <div class="space-y-4">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">CEP</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border font-mono">{{ endereco.cep || 'N/A' }}</p>
+                    </div>
+                    <div class="md:col-span-2 space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Logradouro</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border">{{ endereco.logradouro || 'N/A' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Número</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border">{{ endereco.numero || 'N/A' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Complemento</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border">{{ endereco.complemento || 'N/A' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Bairro</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border">{{ endereco.bairro || 'N/A' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Cidade</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border">{{ endereco.cidade || 'N/A' }}</p>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border">{{ endereco.estado || 'N/A' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                      <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">País</label>
+                      <p class="text-sm text-gray-900 bg-white px-3 py-2 rounded-md border">{{ endereco.pais || 'N/A' }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Endereço Completo -->
+                  <div class="mt-4 p-3 bg-white rounded-md border border-green-200">
+                    <label class="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2">Endereço Completo</label>
+                    <p class="text-sm text-gray-900 leading-relaxed">
+                      {{ formatarEnderecoCompleto(endereco) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-center gap-3">
+                  <ng-icon name="heroExclamationTriangle" size="20" class="text-yellow-600"></ng-icon>
+                  <p class="text-sm text-yellow-800">Endereço não cadastrado para este laboratório.</p>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Loading state -->
+          <div class="flex items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        }
+      </div>
+
+      <!-- Footer da Modal -->
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 shrink-0">
+        <button
+          (click)="fecharModal()"
+          class="h-8 w-24 button-gradient-blue"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+

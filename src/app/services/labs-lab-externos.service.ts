@@ -1,16 +1,17 @@
-import {catchError, Observable, of, throwError} from 'rxjs';
 import {inject, Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {ITipoAnalise} from '../shared/interfaces/analysis-type.interface';
 import {ToastrService} from './toastr.service';
-
+import {catchError, Observable, of, throwError} from 'rxjs';
+import {
+  Laboratorio
+} from '../shared/interfaces/laboratorios-externos.interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AnalysisTypeService {
-  #apiUrl = `${environment.apiURL}/tipo-de-analise`;
+export class LabsLabExternosService {
+  #apiUrl = `${environment.apiURL}/laboratorio-externo`;
   #http = inject(HttpClient);
   #toastr = inject(ToastrService);
 
@@ -24,25 +25,25 @@ export class AnalysisTypeService {
     return of([]);
   }
 
-  findAll(): Observable<ITipoAnalise[]> {
-    return this.#http.get<ITipoAnalise[]>(`${this.#apiUrl}`, {
+  findAll(): Observable<Laboratorio[]> {
+    return this.#http.get<Laboratorio[]>(`${this.#apiUrl}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
-  create(body: ITipoAnalise): Observable<ITipoAnalise> {
-    return this.#http.post<ITipoAnalise>(`${this.#apiUrl}`, body, {
+  create(body: Partial<Laboratorio>): Observable<Laboratorio> {
+    return this.#http.post<Laboratorio>(`${this.#apiUrl}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
-  update(id: number, body: ITipoAnalise): Observable<ITipoAnalise> {
-    return this.#http.patch<ITipoAnalise>(`${this.#apiUrl}/${id}`, body, {
+  update(id: number | string, body: Laboratorio): Observable<Laboratorio> {
+    return this.#http.patch<Laboratorio>(`${this.#apiUrl}/${id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
-  delete(id: number): Observable<any> {
+  delete(id: number | string): Observable<any> {
     return this.#http.delete(`${this.#apiUrl}/${id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));

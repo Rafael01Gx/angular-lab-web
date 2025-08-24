@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {ToastrService} from '../components/layout/toastr/toastr.service';
+import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {ElementoQuimico} from '../shared/interfaces/laboratorios-externos.interfaces';
 

@@ -1,14 +1,14 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { IToast, ToastrService } from './toastr.service';
+import { IToast, ToastrService } from '../../../services/toastr.service';
 import { Subscription } from 'rxjs';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { 
-  heroCheckCircle, 
-  heroExclamationTriangle, 
-  heroInformationCircle, 
+import {
+  heroCheckCircle,
+  heroExclamationTriangle,
+  heroInformationCircle,
   heroXCircle,
-  heroXMark 
+  heroXMark
 } from '@ng-icons/heroicons/outline';
 
 @Component({
@@ -26,14 +26,14 @@ import {
   template: `
     <div class="fixed top-5 right-5 z-[1000] flex flex-col items-end pointer-events-none">
       @for(toast of toasts; track toast.id){
-      <div 
+      <div
         class="flex items-center w-80 min-h-16 rounded-lg mb-4 overflow-hidden relative shadow-lg backdrop-blur-sm transition-all duration-300 ease-out pointer-events-auto"
         [class]="getToastClasses(toast.type)"
         [@toastAnimation]>
-        
+
         <div class="flex items-center justify-center w-12 h-12 ml-3">
-          <ng-icon 
-            [name]="getIconName(toast.type)" 
+          <ng-icon
+            [name]="getIconName(toast.type)"
             class="w-6 h-6"
             [class]="getIconClasses(toast.type)">
           </ng-icon>
@@ -44,14 +44,14 @@ import {
           <div class="text-sm opacity-90">{{ toast.message }}</div>
         </div>
 
-        <button 
+        <button
           class="absolute top-2 right-2 p-1 opacity-70 hover:opacity-100 transition-opacity duration-200 rounded-full hover:bg-black/10"
           (click)="removeToast(toast.id)"
           type="button">
           <ng-icon name="heroXMark" class="w-4 h-4"></ng-icon>
         </button>
-      
-        <div 
+
+        <div
           class="absolute bottom-0 left-0 h-1 rounded-bl-lg animate-[toast-loader_3s_linear_forwards]"
           [class]="getLoaderClasses(toast.type)">
         </div>
@@ -62,24 +62,24 @@ import {
   animations: [
     trigger('toastAnimation', [
       transition(':enter', [
-        style({ 
-          transform: 'translateX(100%) scale(0.95)', 
-          opacity: 0 
+        style({
+          transform: 'translateX(100%) scale(0.95)',
+          opacity: 0
         }),
         animate(
           '300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          style({ 
-            transform: 'translateX(0) scale(1)', 
-            opacity: 1 
+          style({
+            transform: 'translateX(0) scale(1)',
+            opacity: 1
           })
         ),
       ]),
       transition(':leave', [
         animate(
           '200ms cubic-bezier(0.55, 0.055, 0.675, 0.19)',
-          style({ 
-            transform: 'translateX(100%) scale(0.95)', 
-            opacity: 0 
+          style({
+            transform: 'translateX(100%) scale(0.95)',
+            opacity: 0
           })
         )
       ]),
@@ -119,7 +119,7 @@ export class ToastrComponent implements OnInit, OnDestroy {
 
   getToastClasses(type: string): string {
     const baseClasses = 'border-l-4';
-    
+
     switch (type) {
       case 'success':
         return `${baseClasses} bg-green-50 border-green-500 text-green-800`;

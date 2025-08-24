@@ -32,7 +32,7 @@ export interface MultiSelectConfig {
       <!-- Trigger -->
       <button
         type="button"
-        class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-left shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+        class="w-full input-primary"
         (click)="toggleDropdown()"
         [class.ring-2]="isOpen"
         [class.ring-blue-500]="isOpen"

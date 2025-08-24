@@ -3,7 +3,7 @@ import {inject, Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {IParameters} from '../shared/interfaces/parameters.interface';
 import {catchError, Observable, of, throwError} from 'rxjs';
-import {ToastrService} from '../components/layout/toastr/toastr.service';
+import {ToastrService} from './toastr.service';
 
 @Injectable({
   providedIn: 'root'

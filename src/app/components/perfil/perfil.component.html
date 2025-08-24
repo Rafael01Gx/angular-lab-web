@@ -91,7 +91,7 @@
                   <input
                     type="text"
                     formControlName="name"
-                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    class="w-full input-icon-left"
                     placeholder="Digite seu nome completo"
                   />
                   <ng-icon
@@ -124,7 +124,7 @@
                     type="email"
                     formControlName="email"
                     readonly
-                    class="w-full px-4 py-3 pl-12 border border-gray-200 rounded-xl bg-gray-50 text-gray-600 cursor-not-allowed"
+                    class="w-full input-icon-left cursor-not-allowed"
                     placeholder="seu@email.com"
                   />
                   <ng-icon
@@ -140,7 +140,7 @@
                   <input
                     type="tel"
                     formControlName="phone"
-                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    class="w-full input-icon-left"
                     placeholder="(11) 99999-9999"
                     mask="(00) 0 0000-0000"
                     maxlength="15"
@@ -160,7 +160,7 @@
                   <input
                     type="text"
                     formControlName="area"
-                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    class="w-full input-icon-left"
                     placeholder="Sua área de atuação"
                   />
                   <ng-icon
@@ -178,7 +178,7 @@
                   <input
                     type="text"
                     formControlName="funcao"
-                    class="w-full px-4 py-3 pl-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                    class="w-full input-icon-left"
                     placeholder="Sua função/cargo"
                   />
                   <ng-icon
@@ -209,7 +209,7 @@
                   type="checkbox"
                   #changePassword
                   (change)="togglePasswordChange($event)"
-                  class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                  class="w-4 h-4 input-icon-left"
                 />
                 <label
                   for="changePassword"
@@ -232,7 +232,7 @@
                       [type]="showOldPassword() ? 'text' : 'password'"
                       formControlName="oldPassword"
                       autocomplete="current-password"
-                      class="w-full px-4 py-3 pl-12 pr-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                      class="w-full input-icon-left"
                       placeholder="Digite sua senha atual"
                     />
                     <ng-icon
@@ -272,7 +272,7 @@
                       [type]="showNewPassword() ? 'text' : 'password'"
                       formControlName="password"
                       autocomplete="new-password"
-                      class="w-full px-4 py-3 pl-12 pr-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                      class="w-full input-icon-left"
                       placeholder="Digite sua nova senha"
                     />
                     <ng-icon
@@ -318,7 +318,7 @@
                       [type]="showConfirmPassword() ? 'text' : 'password'"
                       formControlName="confirmPassword"
                       autocomplete="new-password"
-                      class="w-full px-4 py-3 pl-12 pr-12 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all duration-200 bg-white/50"
+                      class="w-full input-icon-left"
                       placeholder="Confirme sua nova senha"
                     />
                     <ng-icon

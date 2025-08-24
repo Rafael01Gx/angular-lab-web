@@ -1,5 +1,6 @@
 <header
-  class="fixed dark:bg-gray-800 top-0 left-0 right-0 z-50 w-full bg-blue-50 backdrop-blur-md border-b border-slate-200/60 shadow-md"
+  class="fixed bg-gray-800 top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b border-slate-200/60 shadow-md"
+  class="fixed bg-gray-800 top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b border-slate-200/60 shadow-md"
 >
   <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
     <div class="flex items-center space-x-3 min-w-0 flex-shrink-0">
@@ -17,7 +18,7 @@
 
     <div class="flex items-center space-x-2 min-w-0 flex-1 justify-center px-4">
       <div
-        class="flex items-center dark:text-gray-400 space-x-2 bg-white/60 dark:bg-gray-800 dark:border-gray-400 rounded-xl px-4 py-2 shadow-sm border border-slate-200/40"
+        class="flex items-center text-gray-400 space-x-2 bg-gray-800 border-gray-400 rounded-xl px-4 py-2 shadow-sm border"
       >
         <ng-icon
           [name]="getCurrentRouteIcon()"
@@ -25,7 +26,7 @@
           class="text-slate-600 flex-shrink-0"
         ></ng-icon>
         <span
-          class="text-sm font-medium text-slate-700 dark:text-gray-400 truncate"
+          class="text-sm font-medium text-gray-400 truncate"
         >
           {{ getCurrentRouteName() }}
         </span>
@@ -37,7 +38,7 @@
       <div class="hidden md:flex items-center space-x-2">
         @if(user()){
         <span
-          class="text-sm font-medium text-slate-700 dark:text-white truncate max-w-32"
+          class="text-sm font-medium text-white truncate max-w-32"
         >
           {{ user()?.name }} </span
         >}
@@ -45,7 +46,7 @@
 
       <!-- Notifications -->
       <button
-        class="relative dark:text-gray-400 p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
+        class="relative text-gray-400 p-2 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
         (click)="onNotificationClick()"
         [attr.aria-label]="
           'Notificações' +
@@ -65,7 +66,7 @@
       </button>
 
       <button
-        class="p-2 dark:text-gray-400 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
+        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
         (click)="onProfileClick()"
         aria-label="Perfil do usuário"
       >
@@ -73,7 +74,7 @@
       </button>
 
       <button
-        class="p-2 dark:text-gray-400 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+        class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
         (click)="onLogout()"
         aria-label="Sair do sistema"
       >

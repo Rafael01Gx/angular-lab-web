@@ -35,7 +35,7 @@ import {
   MultiSelectConfig,
 } from '../../layout/input-select/multi-select.component';
 import {AnalysisSettingsService} from '../../../services/analysis-settings.service';
-import {ToastrService} from '../../layout/toastr/toastr.service';
+import {ToastrService} from '../../../services/toastr.service';
 
 const TIPOS_ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appSettingsTypeAnalysis');
 const PARAMETROS_KEY = makeStateKey<IParameters[]>('appSettingsTypeParam');

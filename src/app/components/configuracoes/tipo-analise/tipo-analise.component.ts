@@ -21,7 +21,7 @@ import {
 import { AnalysisTypeService } from '../../../services/analysis-type.service';
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 import {isPlatformBrowser, isPlatformServer} from '@angular/common';
-import {ToastrService} from '../../layout/toastr/toastr.service';
+import {ToastrService} from '../../../services/toastr.service';
 
 const TIPOS_ANALISE_KEY = makeStateKey<ITipoAnalise[]>('appTiposAnalise');
 

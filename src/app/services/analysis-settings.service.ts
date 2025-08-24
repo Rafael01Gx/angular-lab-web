@@ -3,7 +3,7 @@ import {environment} from '../../environments/environment';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {IAnalysisSettings} from '../shared/interfaces/analysis-settings.interface';
 import {catchError, Observable, of, throwError} from 'rxjs';
-import {ToastrService} from '../components/layout/toastr/toastr.service';
+import {ToastrService} from './toastr.service';
 
 
 @Injectable({

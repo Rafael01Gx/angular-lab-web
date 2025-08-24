@@ -9,7 +9,7 @@ import {
   Remessa
 } from '../../../shared/interfaces/laboratorios-externos.interfaces';
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
-import {ToastrService} from '../../layout/toastr/toastr.service';
+import {ToastrService} from '../../../services/toastr.service';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {
   heroPencilSquare,

@@ -1,4 +1,4 @@
-import { Message } from './../../../../../node_modules/esbuild/lib/main.d';
+import { Message } from 'esbuild';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 

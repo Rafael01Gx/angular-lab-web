@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {ToastrService} from '../components/layout/toastr/toastr.service';
+import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {AmostraLabExterno, AmostraLabExternoFull} from '../shared/interfaces/laboratorios-externos.interfaces';
 
@@ -30,9 +30,8 @@ export class AmostrasLabExternos {
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
-  create(body: AmostraLabExterno): Observable<AmostraLabExterno> {
-    console.log(body)
-    return this.#http.post<AmostraLabExterno>(`${this.#apiUrl}`, body, {
+  create(body: AmostraLabExterno): Observable<AmostraLabExternoFull> {
+    return this.#http.post<AmostraLabExternoFull>(`${this.#apiUrl}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }

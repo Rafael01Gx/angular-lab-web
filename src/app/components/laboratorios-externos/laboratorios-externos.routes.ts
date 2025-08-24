@@ -22,5 +22,12 @@ export const LABORATORIOS_EXTERNOS_ROUTES: Routes = [
         './elementos-quimicos/elementos-quimicos.component'
         ).then((m) => m.ElementosQuimicosComponent),
   },
+  {
+    path: 'laboratorios',
+    loadComponent: () =>
+      import(
+        './laboratorios/laboratorios.component'
+        ).then((m) => m.LaboratoriosComponent),
+  },
 
 ]

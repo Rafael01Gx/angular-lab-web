@@ -3,7 +3,7 @@ import {Component, inject, makeStateKey, OnInit, PLATFORM_ID, signal, TransferSt
 import {FormsModule} from '@angular/forms';
 import {ElementoQuimico} from '../../../shared/interfaces/laboratorios-externos.interfaces';
 import {ElementoQuimicoLabExternosService} from '../../../services/elemento-quimico-lab-externos.service';
-import {ToastrService} from '../../layout/toastr/toastr.service';
+import {ToastrService} from '../../../services/toastr.service';
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
 
 const ELEMENT_KEY = makeStateKey<ElementoQuimico[]>('elementosQuimicosComponent');

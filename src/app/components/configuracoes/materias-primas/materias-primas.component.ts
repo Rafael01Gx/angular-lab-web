@@ -21,7 +21,7 @@ import { MateriaPrimaService } from '../../../services/materia-prima.service';
 import { IMateriaPrima } from '../../../shared/interfaces/materia-prima.interface';
 import {catchError, of} from 'rxjs';
 import {isPlatformBrowser, isPlatformServer} from '@angular/common';
-import {ToastrService} from '../../layout/toastr/toastr.service';
+import {ToastrService} from '../../../services/toastr.service';
 
 const MATERIA_PRIMA_KEY = makeStateKey<IMateriaPrima[]>('appMateriasPrimas');
 
