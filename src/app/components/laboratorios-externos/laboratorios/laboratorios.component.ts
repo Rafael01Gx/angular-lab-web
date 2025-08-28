@@ -63,7 +63,6 @@ const LABS_KEY = makeStateKey<Laboratorio[]>('appLaboratorios');
 export class LaboratoriosComponent implements OnInit {
   #confirmModal = inject(ConfirmationModalService);
   #toast = inject(ToastrService);
-  #confirmationModalService = inject(ConfirmationModalService);
   #transferState = inject(TransferState);
   #platformId = inject(PLATFORM_ID);
   #labService = inject(LabsLabExternosService);
@@ -88,6 +87,7 @@ export class LaboratoriosComponent implements OnInit {
     if (isPlatformBrowser(this.#platformId) && labs) {
       this.laboratorios.set(labs);
       this.laboratoriosFiltrados.set(labs);
+      this.#transferState.remove(LABS_KEY);
     } else {
       this.loadLabs();
     }
@@ -107,7 +107,6 @@ export class LaboratoriosComponent implements OnInit {
 
   setMask(element: HTMLInputElement) {
     const digitos = element.value.replace(/\D/g, '');
-    console.log(digitos);
     if (digitos.length == 10) {
       this.telMask.set('(00) 0000-0000')
     } else {
@@ -167,7 +166,7 @@ export class LaboratoriosComponent implements OnInit {
   onSubmit(): void {
     if (this.laboratorioForm.valid) {
       this.isLoading.set(true);
-      if (!this.editando) {
+      if (!this.editando()) {
         const laboratorio: Partial<Laboratorio> = {
           nome: this.laboratorioForm.value.nome,
           endereco: this.laboratorioForm.value.endereco,
@@ -286,7 +285,7 @@ export class LaboratoriosComponent implements OnInit {
   }
 
   cancelar(): void {
-    this.#confirmationModalService.confirmWarning('Cancelar', 'Ao confirmar o formulário será limpo. Deseja continuar?').then((res) => {
+    this.#confirmModal.confirmWarning('Cancelar', 'Ao confirmar o formulário será limpo. Deseja continuar?').then((res) => {
       if (res) {
         this.laboratorioForm.reset();
         this.editando.set(false);

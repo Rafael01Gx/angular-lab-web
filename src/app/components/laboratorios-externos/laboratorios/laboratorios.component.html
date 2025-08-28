@@ -4,17 +4,17 @@
   <div class="border-b border-gray-200 mb-2">
     <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content" data-tabs-active-classes="text-purple-500 hover:text-purple-500 border-purple-500" data-tabs-inactive-classes="border-transparent  text-gray-400 hover:border-gray-300 border-gray-700 text-gray-300" role="tablist">
       <li class="flex-1" role="presentation">
-        <button (click)="tableSelect(0)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 0)" id="nova-remessa-styled-tab" data-tabs-target="#styled-nova-remessa" type="button" role="tab" aria-controls="nova-remessa" aria-selected="false"><ng-icon name="heroBuildingOffice2" class="text-purple-500 text-md"></ng-icon> {{ editando() ? "Editar" : "Cadastrar" }} Laboratório</button>
+        <button (click)="tableSelect(0)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 0)" id="nova-laboratorio-styled-tab" data-tabs-target="#styled-nova-laboratorio" type="button" role="tab" aria-controls="nova-laboratorio" aria-selected="false"><ng-icon name="heroBuildingOffice2" class="text-purple-500 text-md"></ng-icon> {{ editando() ? "Editar" : "Cadastrar" }} Laboratório</button>
       </li>
       <li class="flex-1" role="presentation">
-        <button (click)="tableSelect(1)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 1)" id="dashboard-styled-tab" data-tabs-target="#styled-remessas-cadastradas" type="button" role="tab" aria-controls="remessas-cadastradas" aria-selected="false">Remessas Cadastradas</button>
+        <button (click)="tableSelect(1)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 1)" id="dashboard-styled-tab" data-tabs-target="#styled-laboratorios-cadastradas" type="button" role="tab" aria-controls="laboratorios-cadastradas" aria-selected="false">Laboratórios Cadastradas</button>
       </li>
     </ul>
   </div>
   <div class="flex-1 flex min-h-0" id="default-styled-tab-content">
     @switch (selectTable()){
       @case (0){
-        <div class="flex-1 bg-gray-50 flex flex-col min-h-0" id="styled-nova-remessa" role="tabpanel" aria-labelledby="nova-remessa-tab">
+        <div class="flex-1 bg-gray-50 flex flex-col min-h-0" id="styled-nova-laboratorio" role="tabpanel" aria-labelledby="nova-laboratorio-tab">
           <div class="flex flex-col gap-4 min-h-0 flex-1">
             <form
               [formGroup]="laboratorioForm"
@@ -359,13 +359,13 @@
         </div>
       }
       @case (1){
-        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0" id="styled-remessas-cadastradas" role="tabpanel" aria-labelledby="remessas-cadastradas-tab">
+        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0" id="styled-laboratorios-cadastradas" role="tabpanel" aria-labelledby="laboratorios-cadastradas-tab">
           <!-- -->
 
           <div class="p-4 border-b border-gray-200 shrink-0">
             <div class="flex justify-between items-center">
               <h2 class="text-lg font-semibold text-slate-700">
-                Remessas Cadastradas
+                Laboratórios Cadastradas
               </h2>
               <div class="relative rounded-md shadow-sm">
                 <div
@@ -522,7 +522,7 @@
   >
     <div class="w-full h-full flex flex-col bg-white rounded-xl overflow-hidden">
       <!-- Header da Modal -->
-      <div class="flex items-center justify-between p-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white shrink-0">
+      <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white shrink-0">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
             <ng-icon name="heroBeaker" size="20" class="text-white"></ng-icon>

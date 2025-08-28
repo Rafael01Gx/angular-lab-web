@@ -32,8 +32,8 @@ export interface AmostraRemessa {
   subIdentificacao?: string | null;
   dataInicio: string;
   dataFim: string;
-  elementosSolicitados: number[] ;
-  elementosAnalisados?: number[] ;
+  elementosSolicitados: string[] ;
+  elementosAnalisados?: string[] ;
   analiseConcluida?: boolean;
   remessaLabExternoId?: number;
 }

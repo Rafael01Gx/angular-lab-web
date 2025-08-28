@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import {Remessa} from '../shared/interfaces/laboratorios-externos.interfaces';
+import {ElementoQuimico, Remessa} from '../shared/interfaces/laboratorios-externos.interfaces';
 
 interface Periodo {
   inicio: string;
   fim: string;
 }
-
-
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +23,7 @@ export class EtiquetasService {
     // Calcular quantas páginas serão necessárias
 
     const totalAmostras = remessa.amostras.length;
-    const destino = remessa.destino;
+    const destino = remessa.destino?.nome ?? '';
     const etiquetasPorPagina = 12;
     const totalPaginas = Math.ceil(totalAmostras / etiquetasPorPagina);
 
@@ -60,14 +58,14 @@ export class EtiquetasService {
 
         // Posicionar a etiqueta na grade 3x4
         const left = col * 8.3 + 'cm'; // 8.1cm de largura + espaço entre etiquetas
-        const top = row * 4 + 'cm'; // 3.8cm de altura + espaço entre etiquetas
+        const top = row * 4.5 + 'cm'; // 3.8cm de altura + espaço entre etiquetas
 
         const materiaPrima =
           amostra.amostraName +
           (amostra.subIdentificacao ? ` (${amostra.subIdentificacao})` : '');
-        const periodo = `${this.dateToBr(
+        const periodo =amostra.dataInicio !== amostra.dataFim ? `${this.dateToBr(
           amostra.dataInicio
-        )} á ${this.dateToBr(amostra.dataFim)}`;
+        )} á ${this.dateToBr(amostra.dataFim)}`: this.dateToBr(amostra.dataInicio) ;
 
         htmlCompleto += `
           <div class="etiqueta" style="
@@ -83,7 +81,7 @@ export class EtiquetasService {
           ">
             <div class="etiqueta-header" style="display: flex; justify-content: space-between; border: 1px solid black;border-collapse: collapse;">
               <div class="logo" style="width: 4cm; height: 1.5cm; display: flex; align-items: center; padding: 0.1cm; border: 1px solid black;border-collapse: collapse;">
-                <img src="/img/arcelormittal-logo.png" alt="ArcelorMittal" style="max-width: 80%; max-height: 80%;">
+                <img src="/img/arcelor.png" alt="ArcelorMittal" style="max-width: 80%; max-height: 80%;">
               </div>
               <div class="titulo" style="
                 display: flex;
@@ -255,6 +253,233 @@ export class EtiquetasService {
       }, 500);
     }
   }
+  // ---------------------------------- Tabela ----------------
+
+  /**
+   * Gera uma tabela de análises em PDF formato A4 landscape
+   * @param remessa Dados da remessa
+   * @param elementosQuimicos Array de elementos químicos disponíveis
+   */
+  async gerarTabelaAnalisesPDF(remessa: Remessa, elementosQuimicos: ElementoQuimico[]): Promise<void> {
+    // Criar um elemento temporário para renderizar a tabela
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = this.gerarHtmlTabelaAnalises(remessa, elementosQuimicos);
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.width = '29.7cm';
+    document.body.appendChild(tempDiv);
+
+    try {
+      // Usar html2canvas para converter em imagem
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        width: tempDiv.scrollWidth,
+        height: tempDiv.scrollHeight
+      });
+
+      // Criar PDF em formato landscape
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'cm',
+        format: 'a4'
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+      // Calcular dimensões para ajustar na página
+      const pageWidth = 29.7; // A4 landscape width in cm
+      const pageHeight = 21; // A4 landscape height in cm
+      const margin = 1;
+
+      const availableWidth = pageWidth - (2 * margin);
+      const availableHeight = pageHeight - (2 * margin);
+
+      // Adicionar a imagem ao PDF
+      pdf.addImage(imgData, 'JPEG', margin, margin, availableWidth, availableHeight);
+
+      // Salvar o PDF
+      pdf.save(`tabela-analises-remessa-${remessa.id}.pdf`);
+
+    } finally {
+      // Limpar o elemento temporário
+      document.body.removeChild(tempDiv);
+    }
+  }
+
+  /**
+   * Gera o HTML da tabela de análises
+   * @param remessa Dados da remessa
+   * @param elementosQuimicos Array de elementos químicos
+   * @returns HTML string da tabela
+   */
+  private gerarHtmlTabelaAnalises(remessa: Remessa, elementosQuimicos: ElementoQuimico[]): string {
+    const destino = remessa.destino?.nome ?? 'Não informado';
+    const dataRemessa = this.dateToBr(remessa.data) ?? remessa.data;
+
+    // Cabeçalho do documento
+    const cabecalho = `
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: bold;">
+          DESCRIÇÃO DAS AMOSTRAS
+        </h2>
+        <p style="margin: 5px 0; font-size: 14px;">
+          Destino: ${destino} | Data: ${dataRemessa}
+        </p>
+      </div>
+    `;
+
+    // Cabeçalho da tabela
+    let cabecalhoTabela = `
+      <tr style="background-color: #f0f0f0;">
+        <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold; min-width: 200px;">
+          Identificação das Amostras
+        </th>
+        <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold; min-width: 150px;">
+          Data das Amostras
+        </th>
+    `;
+
+    // Adicionar coluna para cada elemento químico
+    elementosQuimicos.forEach(elemento => {
+      cabecalhoTabela += `
+        <th style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold; width: 1.2cm; text-orientation: mixed;">
+          ${elemento.simbolo}
+        </th>
+      `;
+    });
+
+    cabecalhoTabela += '</tr>';
+
+    // Linhas das amostras
+    let linhasAmostras = '';
+    remessa.amostras.forEach((amostra, index) => {
+      const identificacao = amostra.amostraName +
+        (amostra.subIdentificacao ? ` ${amostra.subIdentificacao}` : '');
+
+      const periodo = amostra.dataInicio !== amostra.dataFim ?
+        `${this.dateToBr(amostra.dataInicio)} à ${this.dateToBr(amostra.dataFim)}` :
+        this.dateToBr(amostra.dataInicio);
+
+      // Cor alternada para as linhas
+      const corLinha = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+
+      linhasAmostras += `
+        <tr style="background-color: ${corLinha};">
+          <td style="border: 1px solid #000; padding: 8px; text-align: left;">
+            ${identificacao}
+          </td>
+          <td style="border: 1px solid #000; padding: 8px; text-align: center;">
+            ${periodo}
+          </td>
+      `;
+
+      // Para cada elemento químico, verificar se está nos elementos solicitados
+      elementosQuimicos.forEach(elemento => {
+        const temElemento = amostra.elementosSolicitados.includes(elemento.simbolo);
+        linhasAmostras += `
+          <td style="border: 1px solid #000; padding: 8px; text-align: center; font-weight: bold; font-size: 14px;">
+            ${temElemento ? 'X' : ''}
+          </td>
+        `;
+      });
+
+      linhasAmostras += '</tr>';
+    });
+
+    // HTML completo
+    const htmlCompleto = `
+      <div style="
+        width: 29.7cm;
+        padding: 1cm;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        box-sizing: border-box;
+      ">
+        ${cabecalho}
+
+        <table style="
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        ">
+          ${cabecalhoTabela}
+          ${linhasAmostras}
+        </table>
+
+        <div style="margin-top: 30px; font-size: 10px; color: #666;">
+          <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+          <p>Total de amostras: ${remessa.amostras.length}</p>
+          <p>Elementos Solicitados*: ${elementosQuimicos.map(e => e.simbolo + ` (${e.elementName})`).join(', ')}</p>
+        </div>
+      </div>
+    `;
+
+    return htmlCompleto;
+  }
+
+  /**
+   * Versão alternativa para impressão direta no browser
+   * @param remessa Dados da remessa
+   * @param elementosQuimicos Array de elementos químicos
+   */
+  imprimirTabelaAnalisesBrowser(remessa: Remessa, elementosQuimicos: ElementoQuimico[]): void {
+    const conteudoTabela = this.gerarHtmlTabelaAnalises(remessa, elementosQuimicos);
+
+    // Criar um iframe para a impressão
+    const iframeImprimir = document.createElement('iframe');
+    iframeImprimir.style.position = 'absolute';
+    iframeImprimir.style.top = '-9999px';
+    iframeImprimir.style.left = '-9999px';
+    iframeImprimir.style.width = '29.7cm';
+    iframeImprimir.style.height = '21cm';
+
+    document.body.appendChild(iframeImprimir);
+
+    const iframeDoc = iframeImprimir.contentDocument || iframeImprimir.contentWindow?.document;
+
+    if (iframeDoc) {
+      iframeDoc.open();
+      iframeDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Tabela de Análises - Remessa ${remessa.id}</title>
+          <style>
+            @page {
+              size: A4 landscape;
+              margin: 1cm;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: Arial, sans-serif;
+            }
+            @media print {
+              body {
+                width: 29.7cm;
+                height: 21cm;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          ${conteudoTabela}
+        </body>
+        </html>
+      `);
+      iframeDoc.close();
+
+      setTimeout(() => {
+        iframeImprimir.contentWindow?.print();
+        setTimeout(() => {
+          document.body.removeChild(iframeImprimir);
+        }, 1000);
+      }, 500);
+    }
+  }
+
 
   dateToBr(data: string): string | null {
     const [ ano, mes, dia ] = data.split('-');

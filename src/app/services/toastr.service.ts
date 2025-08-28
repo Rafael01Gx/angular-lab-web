@@ -28,7 +28,7 @@ export class ToastrService {
     this.#toastSubject.next(this.#toasts);
     setTimeout(() => {
       this.remove(id);
-    }, 3000);
+    }, 5000);
   }
   remove(id: number) {
     this.#toasts = this.#toasts.filter((t) => t.id !== id);
