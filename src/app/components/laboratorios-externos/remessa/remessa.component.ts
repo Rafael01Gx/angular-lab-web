@@ -1,6 +1,6 @@
 import {CommonModule, isPlatformBrowser, isPlatformServer} from '@angular/common';
 import {
-  Component,
+  Component, effect,
   ElementRef,
   inject,
   makeStateKey,
@@ -28,7 +28,7 @@ import {
   heroMagnifyingGlass,
   heroTrash,
   heroPlus,
-  heroEye, heroClipboardDocument, heroXMark, heroPaperClip, heroPrinter
+  heroEye, heroClipboardDocument, heroXMark, heroPaperClip, heroPrinter,heroArrowDownOnSquare
 } from '@ng-icons/heroicons/outline'
 import {LabsLabExternosService} from '../../../services/labs-lab-externos.service';
 import {AmostrasLabExternos} from '../../../services/amostras-lab-externos.service';
@@ -54,7 +54,7 @@ const REMESSAS_KEY = makeStateKey<Remessa[]>('appRemessaRemessas');
     heroPlus,
     heroEye,
     heroClipboardDocument,
-    heroPaperClip, heroPrinter
+    heroPaperClip, heroPrinter,heroArrowDownOnSquare
   })],
   templateUrl: './remessa.component.html',
 })
@@ -95,13 +95,20 @@ export class RemessaComponent implements OnInit {
   editando = signal<boolean>(false);
 
   // Referência para a última remessa cadastrada
-  ultimaRemessa: Remessa | null = null;
+  ultimaRemessa=signal<Remessa | null>(null);
 
   // Remessa sendo visualizada nos detalhes
-  remessaVisualizada: Remessa | null = null;
+  remessaVisualizada=signal<Remessa|null>(null);
 
   ngOnInit(): void {
     this.loadAllData();
+  }
+  constructor() {
+    effect(() => {
+      if(this.remessas()){
+        this.ultimaRemessa.set(this.remessas()[0])
+      }
+    });
   }
 
   loadLabs() {
@@ -190,8 +197,9 @@ export class RemessaComponent implements OnInit {
     // Inicializa as remessas filtradas com todas as remessas
     this.remessasFiltradas.set([...this.remessas()]);
     // Define a última remessa (se houver)
-    if (this.remessas.length > 0) {
-      this.ultimaRemessa = this.remessas().at(-1) || null; // Assume que a primeira da lista é a mais recente
+    if (this.remessas().length > 0) {
+      const ultimaRemessa =this.remessas()[0];
+      this.ultimaRemessa.set(ultimaRemessa);
     }
   }
 
@@ -343,7 +351,7 @@ export class RemessaComponent implements OnInit {
           if (res) {
             this.#toast.success(`Remessa salva com sucesso!`);
             this.remessas.update((remessas) => [...remessas, res]);
-            this.ultimaRemessa = res;
+            this.ultimaRemessa.set(res);
             this.resetarFormulario();
           }
         })
@@ -369,8 +377,9 @@ export class RemessaComponent implements OnInit {
               const remessaRemovida = this.remessas()[remessaIndex];
               this.remessas().splice(remessaIndex, 1);
               // Atualiza a última remessa se necessário
-              if (this.ultimaRemessa && this.ultimaRemessa.id === id) {
-                this.ultimaRemessa = this.remessas.length > 0 ? this.remessas()[0] : null;
+              if (this.ultimaRemessa() && this.ultimaRemessa()?.id === id) {
+                const ultimaRemessa = this.remessas().length > 0 ? this.remessas()[0] : null;
+                this.ultimaRemessa.set(ultimaRemessa);
               }
               this.filtrarRemessas();
               this.#toast.success(`Remessa ${remessaRemovida.id} removida com sucesso!`);
@@ -390,8 +399,8 @@ export class RemessaComponent implements OnInit {
       destinoId: remessa.destinoId,
       amostras: remessa.amostras.map(amostra => ({
         ...amostra,
-        dataInicio: new Date().toISOString().split('T')[0], // Data atual
-        dataFim: new Date().toISOString().split('T')[0], // Data atual
+        dataInicio: amostra.dataInicio, // Data atual
+        dataFim: amostra.dataFim, // Data atual
       })),
     };
     this.editando.set(false);
@@ -400,10 +409,10 @@ export class RemessaComponent implements OnInit {
 
   // Carregar última remessa
   carregarUltimaRemessa(): void {
-    if (!this.ultimaRemessa) return;
+    if (!this.ultimaRemessa()) return;
     this.#confirmModal.confirmInfo("Copiar Remessa", "Os dados atuais não serão salvos!").then((res) => {
       if (res) {
-        this.copiarRemessa(this.ultimaRemessa!);
+        this.copiarRemessa(this.ultimaRemessa()!);
       }
     })
   }
@@ -440,7 +449,7 @@ export class RemessaComponent implements OnInit {
 
   // Visualizar detalhes da remessa
   visualizarRemessa(remessa: Remessa): void {
-    this.remessaVisualizada = {...remessa};
+    this.remessaVisualizada.set(remessa);
 
     // Precisamos usar setTimeout para garantir que o ViewChild esteja disponível
     // após a detecção de mudanças, especialmente importante com SSR
@@ -460,7 +469,7 @@ export class RemessaComponent implements OnInit {
       this.remessaDialog.nativeElement.close();
       // Limpar a remessa visualizada após fechar o diálogo
       setTimeout(() => {
-        this.remessaVisualizada = null;
+        this.remessaVisualizada.set(null);
       }, 100); // Um pequeno delay para garantir animação suave
     }
   }
@@ -500,7 +509,7 @@ export class RemessaComponent implements OnInit {
 
   imprimirEtiquetas(remessa: Remessa) {
     if (!remessa) return;
-    const destino = this.laboratorios().find(l => l.id == remessa.destinoId);
+    const destino = remessa.destino ? remessa.destino : this.laboratorios().find(l => l.id == remessa.destinoId);
     if (!destino) return;
     remessa.destino = destino;
     try {
@@ -511,15 +520,15 @@ export class RemessaComponent implements OnInit {
     }
   }
 
-  imprimirRelacao() {
-    const remessa = this.novaRemessa;
+  imprimirRelacao(data?:Remessa) {
+    const remessa = data ? data : this.novaRemessa;
     if (remessa.amostras.length == 0) return;
-    const destino = this.laboratorios().find(l => l.id == this.novaRemessa.destinoId);
+    const destino = this.laboratorios().find(l => l.id == remessa.destinoId);
     if (!destino) return;
     remessa.destino = destino;
     const elementosquimicos = this.elementos()
     try {
-      this.etiquetasService.imprimirTabelaAnalisesBrowser(this.novaRemessa, elementosquimicos)
+      this.etiquetasService.imprimirTabelaAnalisesBrowser(remessa, elementosquimicos)
     } catch (err) {
       console.log(err)
 

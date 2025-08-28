@@ -13,6 +13,7 @@ interface Periodo {
 })
 export class EtiquetasService {
   constructor() {}
+
   /**
    * Gera o HTML para impressão das etiquetas de amostras
    * @param remessa Objeto remessa contendo as amostras
@@ -20,8 +21,6 @@ export class EtiquetasService {
    * @returns HTML String para renderização das etiquetas
    */
   gerarHtmlEtiquetas(remessa: Remessa): string {
-    // Calcular quantas páginas serão necessárias
-
     const totalAmostras = remessa.amostras.length;
     const destino = remessa.destino?.nome ?? '';
     const etiquetasPorPagina = 12;
@@ -47,40 +46,51 @@ export class EtiquetasService {
           page-break-after: always;
           padding: 1cm;
           box-sizing: border-box;
+          display: grid;
+          grid-template-columns: repeat(3, 8.1cm);
+          grid-template-rows: repeat(4, 4.5cm);
+          gap: 0.2cm;
         ">
       `;
 
       // Criar as etiquetas para esta página
       for (let i = 0; i < amostrasNaPagina.length; i++) {
         const amostra = amostrasNaPagina[i];
-        const row = Math.floor(i / 3);
-        const col = i % 3;
-
-        // Posicionar a etiqueta na grade 3x4
-        const left = col * 8.3 + 'cm'; // 8.1cm de largura + espaço entre etiquetas
-        const top = row * 4.5 + 'cm'; // 3.8cm de altura + espaço entre etiquetas
 
         const materiaPrima =
           amostra.amostraName +
-          (amostra.subIdentificacao ? ` (${amostra.subIdentificacao})` : '');
-        const periodo =amostra.dataInicio !== amostra.dataFim ? `${this.dateToBr(
-          amostra.dataInicio
-        )} á ${this.dateToBr(amostra.dataFim)}`: this.dateToBr(amostra.dataInicio) ;
+          (amostra.subIdentificacao ? ` ${amostra.subIdentificacao}` : '');
+
+        const periodo = amostra.dataInicio !== amostra.dataFim
+          ? `${this.dateToBr(amostra.dataInicio)} á ${this.dateToBr(amostra.dataFim)}`
+          : this.dateToBr(amostra.dataInicio);
 
         htmlCompleto += `
           <div class="etiqueta" style="
-            position: absolute;
-            left: ${left};
-            top: ${top};
             width: 8.1cm;
-            border-collapse: collapse;
+            height: 4.2cm;
             border: 1px solid black;
             box-sizing: border-box;
             padding: 0.1cm;
-            margin:1cm;
+            display: flex;
+            flex-direction: column;
           ">
-            <div class="etiqueta-header" style="display: flex; justify-content: space-between; border: 1px solid black;border-collapse: collapse;">
-              <div class="logo" style="width: 4cm; height: 1.5cm; display: flex; align-items: center; padding: 0.1cm; border: 1px solid black;border-collapse: collapse;">
+            <div class="etiqueta-header" style="
+              display: flex;
+              justify-content: space-between;
+              border: 1px solid black;
+              border-collapse: collapse;
+              height: 1.5cm;
+            ">
+              <div class="logo" style="
+                width: 4cm;
+                height: 1.5cm;
+                display: flex;
+                align-items: center;
+                padding: 0.1cm;
+                border-right: 1px solid black;
+                border-collapse: collapse;
+              ">
                 <img src="/img/arcelor.png" alt="ArcelorMittal" style="max-width: 80%; max-height: 80%;">
               </div>
               <div class="titulo" style="
@@ -88,41 +98,118 @@ export class EtiquetasService {
                 flex-direction: column;
                 font-weight: 500;
                 width: 3.9cm;
-
-
+                height: 100%;
               ">
-
-                <div style="display:flex;align-items:center;justify-content: center;font-size: 11px;flex-grow:1;border-bottom:1px solid black; border-collapse: collapse;text-align: center; width:100% ;heigth:100%;"><strong >ETIQUETA DE AMOSTRA</strong></div>
-                <div style="display:flex;align-items:center;justify-content: center;font-size: 10px;text-align: center;flex-grow:2; ; width:100%;heigth:100%;"><span>GERÊNCIA: GAPSI</span></div>
-
+                <div style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 11px;
+                  flex-grow: 1;
+                  border-bottom: 1px solid black;
+                  border-collapse: collapse;
+                  text-align: center;
+                  width: 100%;
+                ">
+                  <strong>ETIQUETA DE AMOSTRA</strong>
+                </div>
+                <div style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 10px;
+                  text-align: center;
+                  flex-grow: 2;
+                  width: 100%;
+                ">
+                  <span>GERÊNCIA: GAPSI</span>
+                </div>
               </div>
             </div>
 
-
-            <div style="margin-top:0.1cm;font-size:10px; border: 1px solid black; display:flex; flex-direction: column; height:2cm;">
-              <div style="height:0.5cm;border-bottom: 1px solid black; display: flex;">
-                <div style="margin-left:4px;display:flex;align-items:center;width: 100%;font-weight: 500;">DESTINO: ${destino}</div>
-
-              </div>
-
-              <div style="height:0.5cm; border-bottom: 1px solid black; display: flex;">
-                <div style="margin-left:4px;display:flex;align-items:center;width: auto; font-weight: 500;">MATÉRIA-PRIMA: ${materiaPrima}</div>
-
-              </div>
-
-              <div style="height:0.5cm;border-bottom: 1px solid black; display: flex;">
-                <div style="margin-left:4px;display:flex;align-items:center;width: auto; font-weight: 500;">PERÍODO: ${periodo}</div>
-
-              </div>
-
-              <div style="height:0.5cm;display: flex;">
-                <div style="margin-left:4px;display:flex;align-items:center;width: auto; font-weight: 500;">ENSAIO QUÍMICO: </div>
-                <div style=" margin-left:auto;margin-right:0.1cm;display:flex;align-items:center;">
-                  <span style=" margin-right:1cm;">( ) NÃO </span>
-                  <span>(X) SIM </span>
+            <div style="
+              margin-top: 0.1cm;
+              font-size: 10px;
+              border: 1px solid black;
+              display: flex;
+              flex-direction: column;
+              flex-grow: 1;
+            ">
+              <div style="
+                height: 0.5cm;
+                border-bottom: 1px solid black;
+                display: flex;
+                align-items: center;
+              ">
+                <div style="
+                  margin-left: 4px;
+                  display: flex;
+                  align-items: center;
+                  width: 100%;
+                  font-weight: 500;
+                ">
+                  DESTINO: ${destino}
                 </div>
               </div>
-</div>
+
+              <div style="
+                height: 0.5cm;
+                border-bottom: 1px solid black;
+                display: flex;
+                align-items: center;
+              ">
+                <div style="
+                  margin-left: 4px;
+                  display: flex;
+                  align-items: center;
+                  width: auto;
+                  font-weight: 500;
+                ">
+                  MATÉRIA-PRIMA: ${materiaPrima}
+                </div>
+              </div>
+
+              <div style="
+                height: 0.5cm;
+                border-bottom: 1px solid black;
+                display: flex;
+                align-items: center;
+              ">
+                <div style="
+                  margin-left: 4px;
+                  display: flex;
+                  align-items: center;
+                  width: auto;
+                  font-weight: 500;
+                ">
+                  PERÍODO: ${periodo}
+                </div>
+              </div>
+
+              <div style="
+                height: 0.5cm;
+                display: flex;
+                align-items: center;
+              ">
+                <div style="
+                  margin-left: 4px;
+                  display: flex;
+                  align-items: center;
+                  width: auto;
+                  font-weight: 500;
+                ">
+                  ENSAIO QUÍMICO:
+                </div>
+                <div style="
+                  margin-left: auto;
+                  margin-right: 0.1cm;
+                  display: flex;
+                  align-items: center;
+                ">
+                  <span style="margin-right: 1cm;">( ) NÃO</span>
+                  <span>(X) SIM</span>
+                </div>
+              </div>
             </div>
           </div>
         `;
@@ -138,7 +225,6 @@ export class EtiquetasService {
   /**
    * Gera e imprime as etiquetas para uma remessa
    * @param remessa Dados da remessa
-   * @param laboratorioNome Nome do laboratório de destino
    */
   imprimirEtiquetas(remessa: Remessa): void {
     // Criar um elemento temporário para renderizar as etiquetas
@@ -154,7 +240,6 @@ export class EtiquetasService {
       orientation: 'landscape',
       unit: 'cm',
       format: 'a4',
-
     });
 
     // Converter cada página para canvas e adicionar ao PDF
@@ -171,7 +256,6 @@ export class EtiquetasService {
         scale: 2, // Maior qualidade
         useCORS: true,
         logging: false,
-
       });
 
       // Se não for a primeira página, adicionar uma nova
@@ -180,7 +264,7 @@ export class EtiquetasService {
       }
 
       const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      pdf.addImage(imgData, 'JPEG', 10, 10, 29.7, 21);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 29.7, 21);
 
       // Processar a próxima página
       processarPagina(index + 1);
@@ -233,6 +317,12 @@ export class EtiquetasService {
                 width: 29.7cm;
                 height: 21cm;
               }
+              .pagina-etiquetas {
+                page-break-after: always;
+              }
+              .pagina-etiquetas:last-child {
+                page-break-after: avoid;
+              }
             }
           </style>
         </head>
@@ -253,8 +343,6 @@ export class EtiquetasService {
       }, 500);
     }
   }
-  // ---------------------------------- Tabela ----------------
-
   /**
    * Gera uma tabela de análises em PDF formato A4 landscape
    * @param remessa Dados da remessa

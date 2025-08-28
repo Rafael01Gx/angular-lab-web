@@ -2,33 +2,82 @@
   class="h-full w-full bg-gradient-to-b from-blue-50/70 to-slate-50/50 p-0 rounded-sm flex flex-col"
 >
   <div class="border-b border-gray-200 mb-2">
-    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content" data-tabs-active-classes="text-purple-500 hover:text-purple-500 border-purple-500" data-tabs-inactive-classes="border-transparent hover:text-gray-600 text-gray-400 hover:border-gray-300 border-gray-700 hover:text-gray-300" role="tablist">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab"
+        data-tabs-toggle="#default-styled-tab-content"
+        data-tabs-active-classes="text-purple-500 hover:text-purple-500 border-purple-500"
+        data-tabs-inactive-classes="border-transparent hover:text-gray-600 text-gray-400 hover:border-gray-300 border-gray-700 hover:text-gray-300"
+        role="tablist">
       <li class="flex-1" role="presentation">
-        <button (click)="tableSelect(0)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 0)" id="nova-remessa-styled-tab" data-tabs-target="#styled-nova-remessa" type="button" role="tab" aria-controls="nova-remessa" aria-selected="false">{{ editando() ? "Editar" : "Cadastrar Nova" }} Remessa</button>
+        <button (click)="tableSelect(0)"
+                class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary"
+                [class.border-b-2]="(selectTable() == 0)" id="nova-remessa-styled-tab"
+                data-tabs-target="#styled-nova-remessa" type="button" role="tab" aria-controls="nova-remessa"
+                aria-selected="false">{{ editando() ? "Editar" : "Cadastrar Nova" }} Remessa
+        </button>
       </li>
       <li class="flex-1" role="presentation">
-        <button (click)="tableSelect(1)" class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary" [class.border-b-2]="(selectTable() == 1)" id="dashboard-styled-tab" data-tabs-target="#styled-remessas-cadastradas" type="button" role="tab" aria-controls="remessas-cadastradas" aria-selected="false">Remessas Cadastradas</button>
+        <button (click)="tableSelect(1)"
+                class="w-full inline-block p-4 rounded-t-lg transition-all duration-100 ease-in-out cursor-pointer border-primary"
+                [class.border-b-2]="(selectTable() == 1)" id="dashboard-styled-tab"
+                data-tabs-target="#styled-remessas-cadastradas" type="button" role="tab"
+                aria-controls="remessas-cadastradas" aria-selected="false">Remessas Cadastradas
+        </button>
       </li>
     </ul>
   </div>
   <div class="flex-1 flex min-h-0" id="default-styled-tab-content">
-    @switch (selectTable()){
-      @case (0){
-        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0 max-w-full overflow-hidden" id="styled-nova-remessa" role="tabpanel" aria-labelledby="nova-remessa-tab">
+    @switch (selectTable()) {
+      @case (0) {
+        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0 max-w-full overflow-hidden" id="styled-nova-remessa"
+             role="tabpanel" aria-labelledby="nova-remessa-tab">
           <!-- -->
           <div class="flex justify-between items-center mb-4 p-4">
             <h2 class="text-lg font-semibold text-slate-700">
               {{ editando() ? "Editar" : "Cadastrar Nova" }} Remessa
             </h2>
-            <button
-              (click)="fecharFormulario()"
-              class="text-gray-500 hover:text-gray-700 hover:cursor-pointer"
-            >
-              <div class="flex items-center gap-2">
-                <span> Limpar</span>
-                <ng-icon name="heroPencilSquare"></ng-icon>
+
+              <div class="flex justify-end items-center gap-2 transition-all duration-500">
+                @if(novaRemessa.amostras.length > 0){
+                <button
+                  (click)="salvarRascunho()"
+                  class="bg-blue-400 hover:bg-blue-600 text-white px-2 rounded-md flex items-center transition-colors duration-200"
+                >
+                  <ng-icon name="heroArrowDownOnSquare" class="size-5 mr-2"/>
+                  Salvar Rascunho
+                </button>}
+                <button
+                  (click)="carregarRascunho()"
+                  class="bg-blue-400 hover:bg-blue-600 text-white px-2 rounded-md flex items-center transition-colors duration-200"
+                >
+                  <ng-icon name="heroPaperClip" class="size-5 mr-2"/>
+                  Obter Rascunho
+                </button>
+                @if(novaRemessa.amostras.length > 0){<button
+                  (click)="imprimirRelacao()"
+                  class="bg-blue-400 hover:bg-blue-600 text-white px-2 rounded-md flex items-center transition-colors duration-200"
+                >
+                  Imprimir Relação
+                  <ng-icon name="heroPrinter" class="ml-2 size-5"/>
+                </button>
+                <button
+                  (click)="imprimirParcial()"
+                  class="bg-blue-400 hover:bg-blue-600 text-white px-2 rounded-md flex items-center transition-colors duration-200"
+                >
+                  Imprimir Etiquetas
+                  <ng-icon name="heroPrinter" class="ml-2 size-5"/>
+                </button>}
+                <button
+                  (click)="fecharFormulario()"
+                  class="bg-red-400 hover:bg-red-600 text-white px-2 rounded-md flex items-center transition-colors duration-200"
+                >
+                  <div class="flex items-center gap-2">
+                    <span> Limpar</span>
+                    <ng-icon name="heroPencilSquare"></ng-icon>
+                  </div>
+                </button>
               </div>
-            </button>
+
+
           </div>
           <div class="flex flex-col gap-4 min-h-0 flex-1">
             <div class="flex gap-4">
@@ -61,9 +110,11 @@
                   class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
                 >
                   <option [value]="null" disabled>Selecione um laboratório</option>
-                  @for(lab of laboratorios(); track lab.id){<option [value]="lab.id">
-                  {{ lab.nome }}
-                  </option>}
+                  @for (lab of laboratorios(); track lab.id) {
+                    <option [value]="lab.id">
+                      {{ lab.nome }}
+                    </option>
+                  }
                 </select>
               </div>
               <!-- Seleção de Amostras -->
@@ -77,9 +128,11 @@
                     class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200"
                   >
                     <option [ngValue]="null" disabled>Escolha uma amostra</option>
-                    @for(amostra of amostras();track amostra.id){<option [ngValue]="amostra">
-                    {{ amostra.amostraName }}
-                    </option>}
+                    @for (amostra of amostras(); track amostra.id) {
+                      <option [ngValue]="amostra">
+                        {{ amostra.amostraName }}
+                      </option>
+                    }
                   </select>
                   <button
                     (click)="adicionarAmostraRemessa()"
@@ -87,7 +140,7 @@
                     class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-md flex items-center transition-colors duration-200"
                     [ngClass]="{ 'opacity-50 cursor-not-allowed': !amostraSelecionada }"
                   >
-                    <ng-icon name="heroPlus" class="size-5" />
+                    <ng-icon name="heroPlus" class="size-5"/>
                   </button>
                 </div>
               </div>
@@ -98,137 +151,128 @@
               class="border border-gray-200 rounded-lg overflow-hidden min-h-0 flex flex-1"
             >
               <div class="overflow-x-auto flex-1">
-              <table class="w-full divide-y divide-gray-200 min-w-max">
-                <thead class="bg-gray-50 text-center sticky top-0 z-10">
-                <tr>
-                  <th
-                    scope="col"
-                    class="w-[150px] text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Amostra
-                  </th>
-                  <th
-                    scope="col"
-                    class="w-[150px] px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Sub-Identificação
-                  </th>
-                  <th
-                    scope="col"
-                    class="w-[400px] py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Período
-                  </th>
-                  <!-- Cabeçalhos dinâmicos para cada elemento -->
-                  @for(elemento of elementos();track elemento.id){<th
-                    scope="col"
-                    class="w-[50px] px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                  {{ elemento.simbolo }}
-                  </th>}
-            <th
-              scope="col"
-              class="w-[100px] px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Ações
-            </th>
-          </tr>
-          </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-          @for(  amostra of novaRemessa.amostras;track amostra ;let i = $index){<tr >
-            <td
-              class="w-[150px] px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
-            >
-          {{ amostra.amostraName }}
-          </td>
-          <td class="px-4 py-3 whitespace-nowrap">
-            <input
-              type="text"
-              [(ngModel)]="amostra.subIdentificacao"
-              class="w-[150px] p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Ex: Lote 01"
-            />
-          </td>
-          <td class="w-[400px] px-4 py-3 whitespace-nowrap">
-            <div class="flex w-full items-center justify-center space-x-2">
-              <div>
-                <input
-                  type="date"
-                  [(ngModel)]="amostra.dataInicio"
-                  class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-              <span class="text-gray-500">até</span>
-              <div>
-                <input
-                  [min]="amostra.dataInicio"
-                  type="date"
-                  [(ngModel)]="amostra.dataFim"
-                  class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div>
-          </td>
-          <!-- Células dinâmicas para cada elemento -->
-          @for(elemento of elementos(); track elemento.id){
-          <td
-            class="w-[50px] px-2 py-3 whitespace-nowrap text-center"
-          >
-            <div class="flex justify-center">
-              <input
-                type="checkbox"
-                [checked]="
+                <table class="w-full divide-y divide-gray-200 min-w-max">
+                  <thead class="bg-gray-50 text-center sticky top-0 z-10">
+                  <tr>
+                    <th
+                      scope="col"
+                      class="w-[150px] text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Amostra
+                    </th>
+                    <th
+                      scope="col"
+                      class="w-[150px] px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Sub-Identificação
+                    </th>
+                    <th
+                      scope="col"
+                      class="w-[400px] py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Período
+                    </th>
+                    <!-- Cabeçalhos dinâmicos para cada elemento -->
+                    @for (elemento of elementos(); track elemento.id) {
+                      <th
+                        scope="col"
+                        class="w-[50px] px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {{ elemento.simbolo }}
+                      </th>
+                    }
+                    <th
+                      scope="col"
+                      class="w-[100px] px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Ações
+                    </th>
+                  </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    @for (amostra of novaRemessa.amostras; track amostra; let i = $index) {
+                      <tr>
+                        <td
+                          class="w-[150px] px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900"
+                        >
+                          {{ amostra.amostraName }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            [(ngModel)]="amostra.subIdentificacao"
+                            class="w-[150px] p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Ex: Lote 01"
+                          />
+                        </td>
+                        <td class="w-[400px] px-4 py-3 whitespace-nowrap">
+                          <div class="flex w-full items-center justify-center space-x-2">
+                            <div>
+                              <input
+                                type="date"
+                                [(ngModel)]="amostra.dataInicio"
+                                class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                              />
+                            </div>
+                            <span class="text-gray-500">até</span>
+                            <div>
+                              <input
+                                [min]="amostra.dataInicio"
+                                type="date"
+                                [(ngModel)]="amostra.dataFim"
+                                class="p-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <!-- Células dinâmicas para cada elemento -->
+                        @for (elemento of elementos(); track elemento.id) {
+                          <td
+                            class="w-[50px] px-2 py-3 whitespace-nowrap text-center"
+                          >
+                            <div class="flex justify-center">
+                              <input
+                                type="checkbox"
+                                [checked]="
                 amostra.elementosSolicitados.includes(
                   elemento.simbolo!
                 )
               "
-                (change)="toggleElementoAmostra(i, elemento.simbolo!)"
-                class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-              />
+                                (change)="toggleElementoAmostra(i, elemento.simbolo!)"
+                                class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                              />
+                            </div>
+                          </td>
+                        }
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"
+                        >
+                          <button
+                            (click)="removerAmostraRemessa(i)"
+                            class="text-red-600 hover:text-red-900 transition-colors duration-200"
+                            title="Remover amostra"
+                          >
+                            <ng-icon name="heroTrash" class="size-5"/>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </td>
-          }
-          <td
-            class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"
-          >
-            <button
-              (click)="removerAmostraRemessa(i)"
-              class="text-red-600 hover:text-red-900 transition-colors duration-200"
-              title="Remover amostra"
-            >
-              <ng-icon name="heroTrash" class="size-5" />
-            </button>
-          </td>
-        </tr>}
-          </tbody>
-              </table>
-              </div>
-      </div>
 
-            <div class="flex justify-end shrink-0 space-x-2 p-4">
-              <div class="mr-auto flex gap-2">
-              <button
-                (click)="carregarRascunho()"
-                class="bg-blue-400 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
-              >
-                <ng-icon name="heroPaperClip" class="size-5 mr-2" />
-                Obter Rascunho
-              </button>
-              <button
-                (click)="imprimirRelacao()"
-                class="bg-blue-400 mr-auto hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
-              >
-                <ng-icon name="heroPrinter" class="size-5" />
-              </button>
-              </div>
-              @if(ultimaRemessa && !editando()){<button
-                (click)="carregarUltimaRemessa()"
-                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
-              >
-                <ng-icon name="heroArrowPathRoundedSquare" class="size-5 mr-2" />
+            <div class="flex justify-end shrink-0 space-x-2 px-4 pt-2 pb-4">
+              @if (ultimaRemessa() && !editando()) {
+                <button
+                  (click)="carregarUltimaRemessa()"
+                  class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
+                >
+                  <ng-icon name="heroArrowPathRoundedSquare" class="size-5 mr-2"/>
 
-                Usar Última Remessa
-              </button>}
+                  Cópiar Última Remessa
+                </button>
+              }
               <button
                 (click)="salvarRemessa()"
                 class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md flex items-center transition-colors duration-200"
@@ -238,7 +282,7 @@
               !novaRemessa.destinoId || novaRemessa.amostras.length === 0
           }"
               >
-                <ng-icon name="heroCheck" class="h-5 w-5 mr-2" />
+                <ng-icon name="heroCheck" class="h-5 w-5 mr-2"/>
                 {{ editando() ? "Atualizar" : "Salvar" }} Remessa
               </button>
             </div>
@@ -246,86 +290,88 @@
           <!-- -->
         </div>
       }
-      @case (1){
-        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0" id="styled-remessas-cadastradas" role="tabpanel" aria-labelledby="remessas-cadastradas-tab">
+      @case (1) {
+        <div class="flex-1 px-6 bg-gray-50 flex flex-col min-h-0" id="styled-remessas-cadastradas" role="tabpanel"
+             aria-labelledby="remessas-cadastradas-tab">
           <!-- -->
 
-            <div class="p-4 border-b border-gray-200 shrink-0">
-              <div class="flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-slate-700">
-                  Remessas Cadastradas
-                </h2>
-                <div class="relative rounded-md shadow-sm">
-                  <div
-                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-                  >
-                    <ng-icon name="heroMagnifyingGlass" class="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    [(ngModel)]="searchTerm"
-                    (ngModelChange)="filtrarRemessas()"
-                    type="text"
-                    name="search"
-                    id="search"
-                    class="block w-full pl-10 p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Pesquisar remessa"
-                  />
+          <div class="p-4 border-b border-gray-200 shrink-0">
+            <div class="flex justify-between items-center">
+              <h2 class="text-lg font-semibold text-slate-700">
+                Remessas Cadastradas
+              </h2>
+              <div class="relative rounded-md shadow-sm">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <ng-icon name="heroMagnifyingGlass" class="h-5 w-5 text-gray-400"/>
                 </div>
+                <input
+                  [(ngModel)]="searchTerm"
+                  (ngModelChange)="filtrarRemessas()"
+                  type="text"
+                  name="search"
+                  id="search"
+                  class="block w-full pl-10 p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Pesquisar remessa"
+                />
               </div>
             </div>
-            <div class="flex-1 overflow-auto min-h-0">
-              <table class="w-full divide-y divide-gray-200 table-fixed">
-                <thead class="bg-slate-50/90 sticky top-0">
-                <tr>
-                  <th
-                    scope="col"
-                    class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    ID
-                  </th>
-                  <th
-                    scope="col"
-                    class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Data
-                  </th>
-                  <th
-                    scope="col"
-                    class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Laboratório
-                  </th>
-                  <th
-                    scope="col"
-                    class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Amostras
-                  </th>
-                  <th
-                    scope="col"
-                    class="w-1/6  px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Ações
-                  </th>
-                </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                @for( remessa of remessasFiltradas(); track remessa.id){<tr>
-                  <td
-                    class="px-6 py-4 truncate text-sm text-gray-500"
-                    [title]="remessa.id"
-                  >
-                {{ remessa.id }}
-                  </td>
-                  <td class="px-6 py-4 truncate text-sm text-gray-900">
-                {{ remessa.data | date : "dd/MM/yyyy" }}
-                </td>
-                <td class="px-6 py-4 truncate text-sm text-gray-900">
-                {{ getLaboratorioNome(remessa.destinoId) }}
-                </td>
-                <td class="px-6 py-4 truncate text-sm text-gray-900">
-                {{ remessa.amostras.length }} amostra(s)
-                    <span class="text-xs text-gray-500">
+          </div>
+          <div class="flex-1 overflow-auto min-h-0">
+            <table class="w-full divide-y divide-gray-200 table-fixed">
+              <thead class="bg-slate-50/90 sticky top-0">
+              <tr>
+                <th
+                  scope="col"
+                  class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  ID
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Data
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Laboratório
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Amostras
+                </th>
+                <th
+                  scope="col"
+                  class="w-1/6  px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Ações
+                </th>
+              </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                @for (remessa of remessasFiltradas(); track remessa.id) {
+                  <tr>
+                    <td
+                      class="px-6 py-4 truncate text-sm text-gray-500"
+                      [title]="remessa.id"
+                    >
+                      {{ remessa.id }}
+                    </td>
+                    <td class="px-6 py-4 truncate text-sm text-gray-900">
+                      {{ remessa.data | date : "dd/MM/yyyy" }}
+                    </td>
+                    <td class="px-6 py-4 truncate text-sm text-gray-900">
+                      {{ getLaboratorioNome(remessa.destinoId) }}
+                    </td>
+                    <td class="px-6 py-4 truncate text-sm text-gray-900">
+                      {{ remessa.amostras.length }} amostra(s)
+                      <span class="text-xs text-gray-500">
                 {{ listarAmostras(remessa) }}
                 </span>
                     </td>
@@ -338,39 +384,42 @@
                           class="text-gray-600 hover:text-gray-900 transition-colors duration-200"
                           title="Visualizar detalhes"
                         >
-                          <ng-icon name="heroEye"  size="19" />
+                          <ng-icon name="heroEye" size="19"/>
                         </button>
                         <button
                           (click)="copiarRemessa(remessa)"
                           class="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
                           title="Copiar remessa"
                         >
-                        <ng-icon name="heroClipboardDocument"  size="19" />
+                          <ng-icon name="heroClipboardDocument" size="19"/>
                         </button>
                         <button
                           (click)="removerRemessa(remessa.id!)"
                           class="text-red-600 hover:text-red-900 transition-colors duration-200"
                           title="Excluir remessa"
                         >
-                         <ng-icon name="heroTrash" size="19"/>
+                          <ng-icon name="heroTrash" size="19"/>
                         </button>
                       </div>
                     </td>
-                  </tr>}
-                @if( remessasFiltradas().length === 0){<tr>
-                  <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
-                    Nenhuma remessa encontrada.
-                  </td>
-                </tr>}
-                </tbody>
-              </table>
+                  </tr>
+                }
+                @if (remessasFiltradas().length === 0) {
+                  <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                      Nenhuma remessa encontrada.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-4 bg-gray-50 border-t border-gray-200  shrink-0">
+            <div class="text-sm text-gray-700">
+              Total de remessas:
+              <span class="font-medium">{{ remessas().length }}</span>
             </div>
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200  shrink-0">
-              <div class="text-sm text-gray-700">
-                Total de remessas:
-                <span class="font-medium">{{ remessas().length }}</span>
-              </div>
-            </div>
+          </div>
 
           <!-- -->
         </div>
@@ -378,169 +427,219 @@
       }
     }
 
-    </div>
+  </div>
   <!-- Modal de Visualização de Remessa -->
   <dialog
     #remessaDialog
     class="fixed inset-0 overflow-y-auto bg-transparent p-0 m-0 w-full h-full z-50 max-w-[100lvw] max-h-[100lvh] fade-in duration-300 ease-in-out backdrop-blur-md"
-    [attr.open]="remessaVisualizada ? true : null"
+    [attr.open]="remessaVisualizada() ? true : null"
   >
     <!-- Container da modal com backdrop -->
     <div
       class="flex items-center justify-center min-h-full w-full backdrop-blur-sm bg-black/5 p-4"
     >
       <!-- Modal content -->
-      @if(remessaVisualizada){<div
-        class="bg-white rounded-lg shadow-xl overflow-hidden w-full max-w-[95%] mx-auto"
-      >
-        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-              Detalhes da Remessa
-            </h3>
-
-            <button
-              (click)="fecharDetalhesRemessa()"
-              class="text-gray-500 hover:text-gray-700"
-            >
-              <ng-icon name="heroXMark" size="24"/>
-            </button>
+      @if (remessaVisualizada()) {
+        <div class="bg-white/95 backdrop-blur-xl rounded-md shadow-[0_32px_64px_rgba(0,0,0,0.12)] overflow-hidden w-full max-w-7xl mx-auto border border-white/20">
+          <!-- Header with Glass Effect -->
+          <div class="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-8 py-2">
+            <div class="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+            <div class="relative flex justify-between items-start">
+              <div>
+                <div class="flex justify-center items-center gap-3">
+                  <div class="w-3 h-3 mr-auto bg-white/80 rounded-full animate-pulse"></div>
+                  <div class="text-2xl font-bold text-white tracking-tight">
+                    Detalhes e informações da Remessa
+                  </div>
+                </div>
+              </div>
+              <button
+                (click)="fecharDetalhesRemessa()"
+                class="rounded-sm my-auto flex justify-center items-center bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300 text-white hover:scale-105"
+              ><ng-icon name="heroXMark" size="20"/>
+              </button>
+            </div>
           </div>
 
-          <div class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700"
-                >ID da Remessa</label
-                >
-                <p class="mt-1 text-sm text-gray-900">
-      {{ remessaVisualizada.id }}
-      </p>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700"
-      >Data</label
-      >
-      <p class="mt-1 text-sm text-gray-900">
-      {{ remessaVisualizada.data | date : "dd/MM/yyyy" }}
-      </p>
-    </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700"
-      >Laboratório</label
-      >
-      <p class="mt-1 text-sm text-gray-900">
-      {{ getLaboratorioNome(remessaVisualizada.destinoId) }}
-      </p>
-    </div>
-  </div>
+          <!-- Content Area -->
+          <div class="p-8 bg-gradient-to-br from-gray-50 to-white">
 
-  <div>
-    <label class="block text-sm font-medium text-gray-700 mb-2"
-    >Amostras</label
-    >
-    <div class="border border-gray-200 rounded-md overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50 sticky top-0 z-10">
-        <tr>
-          <th
-            scope="col"
-            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Amostra
-          </th>
-          <th
-            scope="col"
-            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Sub-Identificação
-          </th>
-          <th
-            scope="col"
-            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Período | Data
-          </th>
-          <th
-            scope="col"
-            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-          >
-            Elementos Analisados
-          </th>
-        </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-        @for(amostra of remessaVisualizada.amostras;track amostra){
-      <tr>
-        <td
-          class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
-        >
-          {{ amostra.amostraName }}
-        </td>
-        <td
-          class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
-        >
-          {{ amostra.subIdentificacao || "-" }}
-        </td>
-        <td
-          class="px-4 py-3 whitespace-nowrap text-sm text-gray-900"
-        >
-          @if(amostra.dataInicio == amostra.dataFim){
-            {{amostra.dataInicio | date : "dd/MM/yyyy"}}
-          } @else {
-            {{ amostra.dataInicio | date : "dd/MM/yyyy" }} até
-            {{ amostra.dataFim | date : "dd/MM/yyyy" }}
-          }
+            <div class="flex justify-center items-center mb-4 gap-6 w-full">
+              <div class="flex-1 flex justify-between items-center gap-4">
+                <div class="flex-1 flex items-center justify-between p-4 gap-4 rounded-md bg-gradient-to-br from-blue-500 to-cyan-400">
+                  <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <div class="flex flex-col justify-between">
+                    <p class="text-white/80 text-sm font-medium mb-1">Data da Remessa</p>
+                    <p class="text-white text-2xl font-bold tracking-tight">
+                      {{ remessaVisualizada()?.data! | date : "dd/MM/yyyy" }}
+                    </p>
+                  </div>
 
-        </td>
-        <td class="px-4 py-3 text-sm text-gray-900">
-          <div class="flex flex-wrap gap-1">
-            @for (elemento of amostra.elementosSolicitados; track elemento) {
-              <span
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800"
-              >
-                        {{ elemento }}
-                        </span>}
                 </div>
-              </td>
-            </tr>}
-                <!-- Linha para quando não há amostras -->
-        @if(!remessaVisualizada.amostras ||
-        remessaVisualizada.amostras.length === 0){<tr
-              >
-                <td
-                  colspan="4"
-                  class="px-4 py-3 text-center text-sm text-gray-500"
-                >
-                  Nenhuma amostra encontrada para esta remessa.
-                </td>
-              </tr>}
-              </tbody>
-              </table>
+                <div class="flex-1 flex items-center justify-between p-4 gap-4 rounded-md bg-gradient-to-br from-emerald-500 to-teal-400">
+                  <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 7.172V5L8 4z"/>
+                    </svg>
+                  </div>
+                  <div class="flex flex-col justify-between">
+                    <p class="text-white/80 text-sm font-medium mb-1">Laboratório</p>
+                    <p class="text-white text-xl font-bold tracking-tight truncate">
+                      {{ getLaboratorioNome(remessaVisualizada()?.destinoId!) }}
+                    </p>
+                  </div>
+
+                </div>
+                <div class="flex-1 flex items-center justify-between p-4 gap-4 rounded-md bg-gradient-to-br from-violet-500 to-purple-400">
+                  <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                  </div>
+                  <div class="flex flex-col justify-between">
+                    <p class="text-white/80 text-sm font-medium mb-1">Total Amostras</p>
+                    <p class="text-white text-center text-2xl font-bold tracking-tight">
+                      {{ remessaVisualizada()?.amostras?.length || 0 }}
+                    </p>
+                  </div>
+
+                </div>
+
               </div>
-              </div>
-              </div>
-              </div>
-              <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <!-- Action Buttons -->
+              <div class="flex flex-col justify-center items-end gap-2 ">
                 <button
-                  type="button"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                  (click)="imprimirEtiquetas(remessaVisualizada)"
+                  (click)="imprimirEtiquetas(remessaVisualizada()!)"
+                  class="w-full overflow-hidden rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 text-white font-semibold shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300 hover:-translate-y-0.5"
                 >
-                  Imprimir
+                  <ng-icon name="heroPrinter" class="mr-4" size="20"/>
+                     Etiquetas
                 </button>
-                <!--
-              <button
-                type="button"
-                (click)="fecharDetalhesRemessa()"
-                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-              >
-                Fechar
-              </button>
-              -->
+
+                <button
+                  (click)="imprimirRelacao(remessaVisualizada()!)"
+                  class="w-full overflow-hidden rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 text-white font-semibold shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <ng-icon name="heroPrinter" class="mr-4" size="20"/>
+                     Relação
+                </button>
               </div>
+            </div>
+
+
+
+            <!-- Samples Section -->
+            <div class="space-y-6">
+              <div class="flex items-center gap-4">
+                <div class="flex-1 h-px bg-gradient-to-l from-gray-200 to-transparent"></div>
+                <h4 class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  Amostras Incluídas
+                </h4>
+                <div class="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
               </div>
-            }
+
+              <div class="rounded-md bg-white/80 border border-gray-200/50 overflow-hidden">
+                @if (remessaVisualizada()?.amostras && remessaVisualizada()?.amostras!.length > 0) {
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead>
+                      <tr class="bg-gradient-to-r from-gray-50 to-gray-100/50 backdrop-blur-sm border-b border-gray-200/50">
+                        <th class="px-8 py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                          Amostra
+                        </th>
+                        <th class="px-8 py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                          Sub-ID
+                        </th>
+                        <th class="px-8 py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                          Período
+                        </th>
+                        <th class="px-8 py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                          Elementos
+                        </th>
+                      </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200">
+                        @for (amostra of remessaVisualizada()?.amostras; track amostra; let i = $index) {
+                          <tr class="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/30 transition-all duration-300 group">
+                            <td class="px-8 py-6">
+                              <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full group-hover:scale-125 transition-transform duration-300"></div>
+                                <span class="font-semibold text-gray-900 group-hover:text-blue-900 transition-colors duration-300">
+                            {{ amostra.amostraName }}
+                          </span>
+                              </div>
+                            </td>
+                            <td class="px-8 py-6">
+                        <span class="text-gray-600 font-medium">
+                          {{ amostra.subIdentificacao || "—" }}
+                        </span>
+                            </td>
+                            <td class="px-8 py-6">
+                              <div class="text-sm">
+                                @if (amostra.dataInicio == amostra.dataFim) {
+                                  <span class=" items-center px-3 py-1 rounded-xl bg-gray-100 text-gray-700 font-medium">
+                              {{ amostra.dataInicio | date : "dd/MM/yyyy" }}
+                            </span>
+                                } @else {
+                                  <div class="flex items-center gap-2">
+                              <span class="items-center px-3 py-1 rounded-xl bg-green-100 text-green-700 font-medium">
+                                {{ amostra.dataInicio | date : "dd/MM/yyyy" }}
+                              </span>
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                    </svg>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-xl bg-blue-100 text-blue-700 font-medium">
+                                {{ amostra.dataFim | date : "dd/MM/yyyy" }}
+                              </span>
+                                  </div>
+                                }
+                              </div>
+                            </td>
+                            <td class="px-8 py-6">
+                              <div class="flex flex-wrap gap-1"><span
+                                class="items-center p-2 rounded-md text-xs font-semibold bg-blue-400 text-white shadow-lg shadow-indigo-500/25 cursor-default"
+                              >
+                                @for (elemento of amostra.elementosSolicitados; track elemento; let j = $index) {
+
+                              {{ elemento +(amostra.elementosSolicitados.length - 1 > j ? ", " : "")}}
+                                }
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="flex flex-col items-center justify-center py-20">
+                    <div class="relative mb-6">
+                      <div class="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                      </div>
+                      <div class="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-2">Nenhuma Amostra Encontrada</h5>
+                    <p class="text-gray-500 text-center max-w-md">
+                      Esta remessa ainda não possui amostras cadastradas. Adicione amostras para visualizá-las aqui.
+                    </p>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </dialog>
 </div>
