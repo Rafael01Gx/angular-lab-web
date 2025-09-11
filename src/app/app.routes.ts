@@ -45,6 +45,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'orders/pending',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./components/orders/orders-pending-table/orders-pending-table.component').then(
+            (m) => m.OrdersPendingTableComponent
+          ),
+      },
+      {
         path: 'access-management',
         redirectTo: 'access-management/access-create',
         pathMatch: 'full',

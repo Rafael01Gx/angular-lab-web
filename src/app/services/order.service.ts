@@ -25,7 +25,7 @@ export class OrderService {
   }
 
   findAll(): Observable<IOrders[]> {
-    return this.#http.get<IOrders[]>(`${this.#apiUrl}`, {
+    return this.#http.get<IOrders[]>(`${this.#apiUrl}/user`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }

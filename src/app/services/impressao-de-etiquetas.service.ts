@@ -428,7 +428,6 @@ export class EtiquetasService {
           Data das Amostras
         </th>
     `;
-
     // Adicionar coluna para cada elemento químico
     elementosQuimicos.forEach(elemento => {
       cabecalhoTabela += `
@@ -496,10 +495,10 @@ export class EtiquetasService {
           ${linhasAmostras}
         </table>
 
-        <div style="margin-top: 30px; font-size: 10px; color: #666;">
-          <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-          <p>Total de amostras: ${remessa.amostras.length}</p>
-          <p>Elementos Solicitados*: ${elementosQuimicos.map(e => e.simbolo + ` (${e.elementName})`).join(', ')}</p>
+        <div style="margin-top: 30px; font-size: 12px; color: #666;">
+          <p><strong>Gerado em: ${new Date().toLocaleString('pt-BR')}</strong></p>
+          <p><strong>Total de amostras: ${remessa.amostras.length}</strong></p>
+          <p><strong>Elementos Solicitados*:</strong> ${elementosQuimicos.map(e => e.simbolo + ` (${e.elementName})`).join(', ')}</p>
         </div>
       </div>
     `;
