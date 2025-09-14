@@ -33,24 +33,11 @@ export const routes: Routes = [
       },
       {
         path: 'orders',
-        redirectTo: 'orders/create',
-        pathMatch: 'full',
+        loadChildren: () => import('./components/orders/orders.routes').then(m => m.ORDERS_ROUTES),
       },
       {
-        path: 'orders/create',
-        pathMatch: 'full',
-        loadComponent: () =>
-          import('./components/orders/orders-create/orders-create.component').then(
-            (m) => m.OrdersCreateComponent
-          ),
-      },
-      {
-        path: 'orders/pending',
-        pathMatch: 'full',
-        loadComponent: () =>
-          import('./components/orders/orders-pending-table/orders-pending-table.component').then(
-            (m) => m.OrdersPendingTableComponent
-          ),
+        path: 'manage-orders',
+        loadChildren: () => import('./components/orders/manage-orders.routes').then(m => m.MANAGE_ORDERS_ROUTES),
       },
       {
         path: 'access-management',

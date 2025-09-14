@@ -1,16 +1,20 @@
-import {Component, Input, Output, EventEmitter, inject, input, output, OutputEmitterRef} from '@angular/core';
+import {Component, inject, input, output, OutputEmitterRef, signal} from '@angular/core';
 import {CommonModule, DatePipe} from '@angular/common';
-import {IOrders} from '../../../shared/interfaces/orders.interface';
-import {IAmostra} from '../../../shared/interfaces/amostra.interface';
-import {Status} from '../../../shared/enums/status.enum';
-import {OrderService} from '../../../services/order.service';
+import {IOrders} from '../../shared/interfaces/orders.interface';
+import {IAmostra} from '../../shared/interfaces/amostra.interface';
+import {mapStatus, Status} from '../../shared/enums/status.enum';
+import {NgIcon, provideIcons} from '@ng-icons/core';
+import {heroPrinter, heroXMark, heroExclamationCircle, heroCheckCircle,heroPencil} from '@ng-icons/heroicons/outline';
+import {EtiquetasService} from '../../services/impressao-de-etiquetas.service';
+
 
 @Component({
   selector: 'app-ordem-servico-table',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, NgIcon],
+  viewProviders: [provideIcons({heroPrinter, heroXMark, heroExclamationCircle, heroCheckCircle,heroPencil})],
   template: `
-    <div class="bg-white flex flex-col rounded-xl shadow-sm border border-gray-200 w-full h-full min-h-0 ">
+    <div class="bg-white flex flex-col rounded-md shadow-sm border border-gray-200 w-full h-full min-h-0 ">
       <!-- Table Container -->
       <div class="flex-1 min-h-0 overflow-y-auto">
         <table class="w-full">
@@ -18,7 +22,7 @@ import {OrderService} from '../../../services/order.service';
           <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
           <tr>
             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              ID
+              ID/OS
             </th>
             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Data
@@ -70,7 +74,7 @@ import {OrderService} from '../../../services/order.service';
             <span class="w-1.5 h-1.5 rounded-full mr-1.5"
                   [ngClass]="getStatusDotClass(ordem.status)">
             </span>
-            {{ ordem.status || 'N/A' }}
+            {{ mapStatus(ordem.status!) || 'N/A' }}
           </span>
                   </td>
 
@@ -93,16 +97,23 @@ import {OrderService} from '../../../services/order.service';
                   </td>
 
                   <!-- Actions Column -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <button
-                      (click)="cancelarOrdem(ordem?.id!, $event)"
-                      class="inline-flex items-center px-3 py-1.5 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
-                      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M6 18L18 6M6 6l12 12"></path>
-                      </svg>
-                      Cancelar OS
-                    </button>
+                  <td class="px-6 py-4 flex gap-2 whitespace-nowrap">
+                    @if (impressao()) {
+                      <button
+                        (click)="imprimir(ordem, $event)"
+                        class="inline-flex items-center px-3 py-1.5 button-gradient-blue">
+                        <ng-icon name="heroPrinter"/>
+                      </button>
+                    }
+                    @if (cancelarOs()) {
+                      <button
+                        [disabled]="ordem.status === Status.AGUARDANDO"
+                        (click)="cancelarOrdem(ordem?.id!, $event)"
+                        class="inline-flex items-center px-3 py-1.5 button-gradient-orange">
+                        <ng-icon name="heroXMark" class="mr-2"/>
+                        Cancelar OS
+                      </button>
+                    }
                   </td>
 
                   <!-- Expand Arrow Column -->
@@ -130,11 +141,7 @@ import {OrderService} from '../../../services/order.service';
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div class="bg-white rounded-lg p-4 border border-gray-200">
                             <h4 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                              <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
-                                   viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                              </svg>
+                              <ng-icon name="heroExclamationCircle" color="blue" size="18" class="mr-2"/>
                               Informações Gerais
                             </h4>
                             <div class="space-y-2 text-sm">
@@ -157,11 +164,7 @@ import {OrderService} from '../../../services/order.service';
 
                           <div class="bg-white rounded-lg p-4 border border-gray-200">
                             <h4 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                              <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                   viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                              </svg>
+                              <ng-icon name="heroCheckCircle" color="green" size="18" class="mr-2"/>
                               Progresso
                             </h4>
                             <div class="space-y-3">
@@ -269,7 +272,7 @@ import {OrderService} from '../../../services/order.service';
                                   <div>
                                     <span class="text-gray-500">Data Recepção:</span>
                                     <div
-                                      class="text-gray-900 font-medium">{{amostra.dataRecepcao }}
+                                      class="text-gray-900 font-medium">{{ amostra.dataRecepcao }}
                                     </div>
                                   </div>
                                 </div>
@@ -356,8 +359,13 @@ import {OrderService} from '../../../services/order.service';
   `]
 })
 export class OrdemServicoTableComponent {
-ordensServico= input<IOrders[]>([]);
-cancelarOrdemEvent: OutputEmitterRef<string> = output<string>();
+  #etiqueta = inject(EtiquetasService);
+
+  impressao = input<boolean>(false);
+  cancelarOs = input<boolean>(false);
+  ordemSelecionada = output<IOrders|null>();
+  ordensServico = input<IOrders[]>([]);
+  cancelarOrdemEvent: OutputEmitterRef<string> = output<string>();
 
   expandedRows = new Set<string>();
 
@@ -369,22 +377,21 @@ cancelarOrdemEvent: OutputEmitterRef<string> = output<string>();
     }
   }
 
+  imprimir(ordem: IOrders, event: Event) {
+    event.stopPropagation();
+    if (!ordem) return;
+    this.#etiqueta.gerarEtiquetaAmostrasOS(ordem).catch((err) => console.log(err));
+  }
+
+
   cancelarOrdem(ordemId: string, event: Event): void {
     event.stopPropagation(); // Prevent row expansion
     this.cancelarOrdemEvent.emit(ordemId);
   }
 
-  trackByOrdemId(index: number, ordem: IOrders): string {
-    return ordem.id!;
-  }
-
-  trackByAmostraId(index: number, amostra: IAmostra): number {
-    return Number(amostra.id);
-  }
-
 
   getStatusClass(status: string | Status | undefined): string {
-    const statusValue = status as Status;
+    const statusValue = mapStatus(status as Status);
 
     switch (statusValue) {
       case Status.AGUARDANDO:
@@ -401,8 +408,7 @@ cancelarOrdemEvent: OutputEmitterRef<string> = output<string>();
   }
 
   getStatusDotClass(status: string | Status | undefined): string {
-    const statusValue = status as Status;
-
+    const statusValue = mapStatus(status as Status);
     switch (statusValue) {
       case Status.AGUARDANDO:
         return 'bg-yellow-400';
@@ -428,4 +434,6 @@ cancelarOrdemEvent: OutputEmitterRef<string> = output<string>();
   }
 
   protected readonly Date = Date;
+  protected readonly Status = Status;
+  protected readonly mapStatus = mapStatus;
 }

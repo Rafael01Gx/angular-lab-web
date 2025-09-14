@@ -18,6 +18,7 @@ import {
 } from '@ng-icons/heroicons/outline';
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
 import {OrderService} from '../../../services/order.service';
+import {EtiquetasService} from '../../../services/impressao-de-etiquetas.service';
 
 @Component({
   selector: 'app-orders-create',
@@ -37,7 +38,8 @@ import {OrderService} from '../../../services/order.service';
 export class OrdersCreateComponent implements OnInit {
   #analysisService = inject(AnalysisTypeService);
   #orderService = inject(OrderService);
-  #confirm = inject(ConfirmationModalService)
+  #confirm = inject(ConfirmationModalService);
+  #etiqueta = inject(EtiquetasService);
 
   identificacao = signal('');
   data = signal('');
@@ -48,7 +50,7 @@ export class OrdersCreateComponent implements OnInit {
   amostras= signal<Partial<IAmostra>[] >([]);
 
   isValid = computed(() => {
-    return !!(
+    return (
       this.identificacao().length > 2 &&
       this.data().length > 0 &&
       this.selectedEnsaios().length > 0
@@ -113,9 +115,21 @@ export class OrdersCreateComponent implements OnInit {
     if(!amostras){
       return
     }
-    this.#orderService.create(amostras as  Partial<IAmostra[]>).subscribe((res)=>{
-      if(res){
-        console.log(res)
+    this.#confirm.confirmWarning("Enviar","Confirmar envio das remessa?").then((confirm)=>{
+      if(confirm){
+        this.#orderService.create(amostras as  Partial<IAmostra[]>).subscribe((ordem)=>{
+          if(ordem){
+            setTimeout(()=>{
+              this.#confirm.confirmInfo("Imprimir","Deseja imprimir as etiquetas?").then((res)=>{
+                if(res){
+                  this.#etiqueta.gerarEtiquetaAmostrasOS(ordem).catch((err)=> console.log(err))
+                }
+              })
+            },500)
+          }
+          this.clearForm();
+          this.amostras.set([])
+        })
       }
     })
   }

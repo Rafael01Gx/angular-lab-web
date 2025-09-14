@@ -22,7 +22,7 @@ import {
   heroAdjustmentsHorizontal,
   heroTag,
   heroCube,
-  heroBriefcase,heroListBullet,heroArchiveBox,heroSquare2Stack,heroGlobeAmericas
+  heroBriefcase,heroListBullet,heroArchiveBox,heroSquare2Stack,heroGlobeAmericas,heroPresentationChartBar
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
 import { IMenuItem } from '../../../shared/interfaces/layout.interface';
@@ -56,7 +56,8 @@ import { IMenuItem } from '../../../shared/interfaces/layout.interface';
       heroListBullet,
       heroArchiveBox,
       heroSquare2Stack,
-      heroGlobeAmericas
+      heroGlobeAmericas,
+      heroPresentationChartBar
     })
   ],
   host: { class: 'block max-h-full'
@@ -133,8 +134,9 @@ router = inject(Router);
       icon: 'heroAdjustmentsHorizontal',
       expanded: false,
       children: [
+        { id: 'manage-dashboard', label: 'Dashboard', icon: 'heroPresentationChartBar', route: '/manage-orders/dashboard' },
         { id: 'manage-waiting', label: 'Aguardando', icon: 'heroClock', route: '/manage-orders/waiting' },
-        { id: 'manage-authorized', label: 'Autorizada', icon: 'heroCheckCircle', route: '/manage-orders/authorized' },
+       // { id: 'manage-authorized', label: 'Autorizada', icon: 'heroCheckCircle', route: '/manage-orders/authorized' },
         { id: 'manage-executing', label: 'Em Execução', icon: 'heroPlay', route: '/manage-orders/executing' },
         { id: 'manage-completed', label: 'Finalizadas', icon: 'heroCheckCircle', route: '/manage-orders/completed' }
       ]
