@@ -14,12 +14,12 @@ export class MateriaPrimaService {
   #toastr = inject(ToastrService);
 
   handleSetError(err: HttpErrorResponse): Observable<never> {
-    this.#toastr.error(err.message);
-    return throwError(() => new Error(err.message));
+    this.#toastr.error(err.error.message);
+    return throwError(() => new Error(err.error.message));
   }
 
   handleGetError(err: HttpErrorResponse): Observable<any> {
-    this.#toastr.error(err.message);
+    this.#toastr.error(err.error.message);
     return of([]);
   }
 
