@@ -4,11 +4,6 @@ import html2canvas from 'html2canvas';
 import {ElementoQuimico, Remessa} from '../shared/interfaces/laboratorios-externos.interfaces';
 import {IOrders} from '../shared/interfaces/orders.interface';
 
-interface Periodo {
-  inicio: string;
-  fim: string;
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -300,7 +295,7 @@ export class EtiquetasService {
       iframeDoc.open();
       iframeDoc.write(`
         <!DOCTYPE html>
-        <html>
+        <html lang="pt-BR">
         <head>
           <title>Etiquetas de Amostras - Remessa ${remessa.id}</title>
           <style>

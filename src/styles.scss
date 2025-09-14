@@ -4,9 +4,11 @@
   @apply box-border;
   @apply placeholder-slate-400;
 }
+
 body {
   @apply overflow-hidden;
 }
+
 html,
 body {
   width: 100lvw;
@@ -98,21 +100,30 @@ body {
 }
 
 .button-gradient-orange {
-  @apply bg-gradient-to-r from-red-400 to-orange-500 text-white font-semibold rounded-md hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-200 transform hover:scale-105 shadow-lg;
+  @apply bg-gradient-to-r from-red-400 to-orange-500 text-white font-semibold rounded-md hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 disabled:from-gray-400 disabled:to-gray-500 cursor-pointer disabled:cursor-not-allowed  transition-all duration-200 transform hover:scale-105 shadow-lg;
 }
+
+.button-gradient-purple {
+  @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-sm font-medium shadow-lg cursor-pointer hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md;
+}
+
 .button-gradient-blue {
-  @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-md hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 shadow-lg;
+  @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-md hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:from-gray-400 disabled:to-gray-500 cursor-pointer disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 shadow-lg;
 }
+
 .bg-gradient-blue {
   @apply bg-gradient-to-r from-blue-50 to-purple-50;
 }
+
 .bg-gradient-red {
   @apply bg-gradient-to-r from-red-50 to-orange-50;
 }
-.input-primary{
+
+.input-primary {
   @apply px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200
 }
-.input-icon-left{
+
+.input-icon-left {
   @apply px-4 py-3 pl-12 pr-12 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 transition-all duration-200
 }
 
