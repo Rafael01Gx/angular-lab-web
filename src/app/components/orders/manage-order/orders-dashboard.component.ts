@@ -26,8 +26,11 @@ import {
   heroBeaker
 } from '@ng-icons/heroicons/outline';
 import {OrderService} from '../../../services/order.service';
-import {Status} from '../../../shared/enums/status.enum';
+import {keyOfStatus, mapStatus, Status} from '../../../shared/enums/status.enum';
 import {IOrders, IOrderStatistics} from '../../../shared/interfaces/orders.interface';
+import {OrderViewService} from '../../../services/order-view.service';
+import {RouterLink} from '@angular/router';
+import {StatusModalComponent} from '../status-modal/status-modal.component';
 
 const ALL_ORDERS_KEY = makeStateKey<IOrders[]>('all-orders');
 const ESTATISTICAS_KEY = makeStateKey<IOrderStatistics>('estatisticas');
@@ -45,7 +48,7 @@ interface EstatisticasCard {
 @Component({
   selector: 'app-orders-dashboard',
   standalone: true,
-  imports: [CommonModule, NgIconComponent],
+  imports: [CommonModule, NgIconComponent, RouterLink, StatusModalComponent],
   providers: [
     provideIcons({
       heroClipboardDocumentList,
@@ -63,228 +66,235 @@ interface EstatisticasCard {
   ],
   template: `
     <div class="flex w-full h-full overflow-hidden">
-<div class="flex-1 flex flex-col justify-start gap-2 ">
+      <div class="flex-1 flex flex-col justify-start gap-2 ">
 
-  <!-- Header -->
-  <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p class="text-slate-600 mt-1">Visão geral das ordens de serviço</p>
-      </div>
-      <div class="text-right">
-        <p class="text-sm text-slate-500">Última atualização</p>
-        <p class="text-sm font-medium text-slate-900">{{ ultimaAtualizacao() | date:'dd/MM/yyyy HH:mm' }}</p>
-      </div>
-    </div>
-  </div>
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
+              <p class="text-slate-600 mt-1">Visão geral das ordens de serviço</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-slate-500">Última atualização</p>
+              <p class="text-sm font-medium text-slate-900">{{ ultimaAtualizacao() | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+        </div>
 
- <div class="flex-1 flex flex-col gap-2 overflow-y-auto">
-   <!-- Cards de Estatísticas -->
-   <div class="flex flex-1 gap-2">
-     @for (card of cardsEstatisticas(); track $index) {
-       <div
-         class="bg-white flex-1 flex flex-col gap-2 rounded-xl shadow-sm border border-slate-200/60  hover:shadow-md transition-shadow duration-200">
+        <div class="flex-1 flex flex-col gap-2 overflow-y-auto">
+          <!-- Cards de Estatísticas -->
+          <div class="flex flex-1 gap-2">
+            @for (card of cardsEstatisticas(); track $index) {
+              <div
+                class="bg-white flex-1 flex flex-col gap-2 rounded-xl shadow-sm border border-slate-200/60  hover:shadow-md transition-shadow duration-200">
 
-         <div class=" w-full text-center rounded-t-md" [ngClass]="card.cor + '-bg'"><span class="text-sm font-bold text-slate-600">{{ card.titulo }}</span></div>
-         <div class="flex-1 flex justify-between px-4">
-           <div class="flex items-center justify-between mb-4">
-             <div class="p-2 rounded-lg" [ngClass]="card.cor + '-bg'">
-               <ng-icon [name]="card.icone" class="w-6 h-6" [ngClass]="card.cor + '-text'"/>
-             </div>
-           </div>
+                <div class=" w-full text-center rounded-t-md" [ngClass]="card.cor + '-bg'"><span
+                  class="text-sm font-bold text-slate-600">{{ card.titulo }}</span></div>
+                <div class="flex-1 flex justify-between px-4">
+                  <div class="flex items-center justify-between mb-4">
+                    <div class="p-2 rounded-lg" [ngClass]="card.cor + '-bg'">
+                      <ng-icon [name]="card.icone" class="w-6 h-6" [ngClass]="card.cor + '-text'"/>
+                    </div>
+                  </div>
 
-           <div class="flex flex-col items-center justify-center">
-             <div class="flex gap-2">
-               <h3 class="text-2xl font-bold text-slate-900 mb-1">{{ card.valor | number }}</h3>
+                  <div class="flex flex-col items-center justify-center">
+                    <div class="flex gap-2">
+                      <h3 class="text-2xl font-bold text-slate-900 mb-1">{{ card.valor | number }}</h3>
 
-             </div>
-           </div>
-           @if (card.tendencia) {
-             <div class="flex justify-end items-start gap-1 h-full">
-               <ng-icon
-                 [name]="card.tendencia === 'up' ? 'heroArrowTrendingUp' : card.tendencia === 'down' ? 'heroArrowTrendingDown' : 'heroChartBar'"
-                 class="w-4 h-4"
-                 [ngClass]="getTendenciaClass(card.tendencia)">
-               </ng-icon>
-               <span class="text-xs font-medium" [ngClass]="getTendenciaClass(card.tendencia)">
+                    </div>
+                  </div>
+                  @if (card.tendencia) {
+                    <div class="flex justify-end items-start gap-1 h-full">
+                      <ng-icon
+                        [name]="card.tendencia === 'up' ? 'heroArrowTrendingUp' : card.tendencia === 'down' ? 'heroArrowTrendingDown' : 'heroChartBar'"
+                        class="w-4 h-4"
+                        [ngClass]="getTendenciaClass(card.tendencia)">
+                      </ng-icon>
+                      <span class="text-xs font-medium" [ngClass]="getTendenciaClass(card.tendencia)">
             {{ card.percentual }}%
               </span>
-             </div>
-           }
-         </div>
-       </div>
-     }
-   </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
 
-   <!-- Gráficos e informações detalhadas -->
-   <div class="flex flex-3 flex-1 gap-2">
+          <!-- Gráficos e informações detalhadas -->
+          <div class="flex flex-3 flex-1 gap-2">
 
-     <!-- Distribuição por Status -->
-     <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
-       <div class="flex items-center justify-between mb-6">
-         <h3 class="text-lg font-semibold text-slate-900">Distribuição por Status</h3>
-         <ng-icon name="heroChartBar" class="w-5 h-5 text-slate-400"/>
-       </div>
+            <!-- Distribuição por Status -->
+            <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-slate-900">Distribuição por Status</h3>
+                <ng-icon name="heroChartBar" class="w-5 h-5 text-slate-400"/>
+              </div>
 
-       <div class="space-y-4">
-         @for (item of distribuicaoStatus(); track $index) {
-           <div
-             class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div class="space-y-4">
+                @for (item of distribuicaoStatus(); track $index) {
+                  <a
+                  [routerLink]="[(item.status == 'AUTORIZADA' || item.status == 'AGUARDANDO' ? '/manage-orders/waiting': '/')]"
+                    class="flex items-center justify-between p-3 bg-slate-50 cursor-pointer hover:bg-slate-100 rounded-lg"
+                  >
 
-             <div class="flex items-center gap-3">
-               <div class="w-3 h-3 rounded-full" [style.background-color]="getStatusColor(item.status)"></div>
-               <span class="text-sm font-medium text-slate-900">{{ item.status }}</span>
-             </div>
+                    <div class="flex items-center gap-3">
+                      <div class="w-3 h-3 rounded-full" [style.background-color]="getStatusColor(item.status)"></div>
+                      <span class="text-sm font-medium text-slate-900">{{ mapStatus(item.status).toUpperCase() }}</span>
+                    </div>
 
-             <div class="flex items-center gap-2">
-               <span class="text-sm font-bold text-slate-900">{{ item.quantidade }}</span>
-               <div class="w-20 bg-slate-200 rounded-full h-2">
-                 <div
-                   class="h-2 rounded-full transition-all duration-300"
-                   [style.width.%]="item.percentual"
-                   [style.background-color]="getStatusColor(item.status)">
-                 </div>
-               </div>
-             </div>
-           </div>
-         }
-       </div>
-     </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-bold text-slate-900">{{ item.quantidade }}</span>
+                      <div class="w-20 bg-slate-200 rounded-full h-2">
+                        <div
+                          class="h-2 rounded-full transition-all duration-300"
+                          [style.width.%]="item.percentual"
+                          [style.background-color]="getStatusColor(item.status)">
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                }
+              </div>
+            </div>
 
-     <!-- Ordens Recentes -->
-     <div class="bg-white flex-1  rounded-xl shadow-sm border border-slate-200/60 p-6">
-       <div class="flex items-center justify-between mb-6">
-         <h3 class="text-lg font-semibold text-slate-900">Ordens Recentes</h3>
-         <ng-icon name="heroClipboardDocumentList" class="w-5 h-5 text-slate-400"/>
-       </div>
+            <!-- Ordens Recentes -->
+            <div class="bg-white flex-1  rounded-xl shadow-sm border border-slate-200/60 p-6">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-slate-900">Ordens Recentes</h3>
+                <ng-icon name="heroClipboardDocumentList" class="w-5 h-5 text-slate-400"/>
+              </div>
 
-       <div class="space-y-3 max-h-80 overflow-y-auto">
-         @for (ordem of ordensRecentes(); track ordem.id) {
-           <div
-             class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors duration-200 cursor-pointer">
+              <div class="space-y-3 max-h-80 overflow-y-auto">
+                @for (ordem of ordensRecentes(); track ordem.id) {
+                  <div
+                    (click)="openDetails(ordem)"
+                    class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg transition-colors duration-200 cursor-pointer">
+                    <div
+                      class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-medium">
+                      {{ getInitials(ordem.solicitante?.name || 'N/A') }}
+                    </div>
 
-             <div
-               class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-medium">
-               {{ getInitials(ordem.solicitante?.name || 'N/A') }}
-             </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-slate-900 truncate">{{ ordem.id }}</p>
+                      <p class="text-xs text-slate-500 truncate">{{ ordem.solicitante?.name }}</p>
+                    </div>
 
-             <div class="flex-1 min-w-0">
-               <p class="text-sm font-medium text-slate-900 truncate">{{ ordem.id }}</p>
-               <p class="text-xs text-slate-500 truncate">{{ ordem.solicitante?.name }}</p>
-             </div>
-
-             <div class="text-right">
+                    <div class="text-right">
                 <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium"
                       [style.background-color]="getStatusColor(ordem.status) + '20'"
                       [style.color]="getStatusColor(ordem.status)">
             {{ ordem.status }}
             </span>
-               <p class="text-xs text-slate-500 mt-1">{{ ordem.createdAt | date:'dd/MM' }}</p>
-             </div>
-           </div>
-         }
+                      <p class="text-xs text-slate-500 mt-1">{{ ordem.createdAt | date:'dd/MM' }}</p>
+                    </div>
+                  </div>
+                }
 
-         @if (!ordensRecentes().length) {
-           <div class="text-center py-8 text-slate-500">
-             <ng-icon name="heroClipboardDocumentList" class="w-8 h-8 mx-auto mb-2 text-slate-400"/>
-             <p class="text-sm">Nenhuma ordem recente</p>
-           </div>
-         }
-       </div>
-     </div>
-   </div>
+                @if (!ordensRecentes().length) {
+                  <div class="text-center py-8 text-slate-500">
+                    <ng-icon name="heroClipboardDocumentList" class="w-8 h-8 mx-auto mb-2 text-slate-400"/>
+                    <p class="text-sm">Nenhuma ordem recente</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
 
-   <!-- Métricas Adicionais -->
-   <div class="flex flex-2 gap-2">
+          <!-- Métricas Adicionais -->
+          <div class="flex flex-2 gap-2">
 
-     <!-- Produtividade -->
-     <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
-       <div class="flex items-center gap-3 mb-4">
-         <div class="p-2 bg-green-100 rounded-lg">
-           <ng-icon name="heroArrowTrendingUp" class="w-5 h-5 text-green-600"/>
-         </div>
-         <h4 class="text-lg font-semibold text-slate-900">Produtividade</h4>
-       </div>
+            <!-- Produtividade -->
+            <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-green-100 rounded-lg">
+                  <ng-icon name="heroArrowTrendingUp" class="w-5 h-5 text-green-600"/>
+                </div>
+                <h4 class="text-lg font-semibold text-slate-900">Produtividade</h4>
+              </div>
 
-       <div class="space-y-3">
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Ordens finalizadas hoje</span>
-           <span class="text-sm font-bold text-slate-900">{{ metricas().finalizadasHoje }}</span>
-         </div>
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Tempo médio de execução</span>
-           <span class="text-sm font-bold text-slate-900">{{ metricas().tempoMedioExecucao }} dias</span>
-         </div>
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Taxa de conclusão</span>
-           <span class="text-sm font-bold text-green-600">{{ metricas().taxaConclusao }}%</span>
-         </div>
-       </div>
-     </div>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Ordens finalizadas hoje</span>
+                  <span class="text-sm font-bold text-slate-900">{{ metricas().finalizadasHoje }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Tempo médio de execução</span>
+                  <span class="text-sm font-bold text-slate-900">{{ metricas().tempoMedioExecucao }} dias</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Taxa de conclusão</span>
+                  <span class="text-sm font-bold text-green-600">{{ metricas().taxaConclusao }}%</span>
+                </div>
+              </div>
+            </div>
 
-     <!-- Amostras -->
-     <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
-       <div class="flex items-center gap-3 mb-4">
-         <div class="p-2 bg-purple-100 rounded-lg">
-           <ng-icon name="heroBeaker" class="w-5 h-5 text-purple-600"/>
-         </div>
-         <h4 class="text-lg font-semibold text-slate-900">Amostras</h4>
-       </div>
+            <!-- Amostras -->
+            <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-purple-100 rounded-lg">
+                  <ng-icon name="heroBeaker" class="w-5 h-5 text-purple-600"/>
+                </div>
+                <h4 class="text-lg font-semibold text-slate-900">Amostras</h4>
+              </div>
 
-       <div class="space-y-3">
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Total de amostras</span>
-           <span class="text-sm font-bold text-slate-900">{{ metricas().totalAmostras }}</span>
-         </div>
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Em análise</span>
-           <span class="text-sm font-bold text-slate-900">{{ metricas().amostrasEmAnalise }}</span>
-         </div>
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Amostras por ordem</span>
-           <span class="text-sm font-bold text-purple-600">{{ metricas().mediaAmostrasPorOrdem }}</span>
-         </div>
-       </div>
-     </div>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Total de amostras</span>
+                  <span class="text-sm font-bold text-slate-900">{{ metricas().totalAmostras }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Em análise</span>
+                  <span class="text-sm font-bold text-slate-900">{{ metricas().amostrasEmAnalise }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Amostras por ordem</span>
+                  <span class="text-sm font-bold text-purple-600">{{ metricas().mediaAmostrasPorOrdem }}</span>
+                </div>
+              </div>
+            </div>
 
-     <!-- Solicitantes -->
-     <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
-       <div class="flex items-center gap-3 mb-4">
-         <div class="p-2 bg-blue-100 rounded-lg">
-           <ng-icon name="heroUser" class="w-5 h-5 text-blue-600"/>
-         </div>
-         <h4 class="text-lg font-semibold text-slate-900">Solicitantes</h4>
-       </div>
+            <!-- Solicitantes -->
+            <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-blue-100 rounded-lg">
+                  <ng-icon name="heroUser" class="w-5 h-5 text-blue-600"/>
+                </div>
+                <h4 class="text-lg font-semibold text-slate-900">Solicitantes</h4>
+              </div>
 
-       <div class="space-y-3">
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Solicitantes ativos</span>
-           <span class="text-sm font-bold text-slate-900">{{ metricas().solicitantesAtivos }}</span>
-         </div>
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Maior solicitante</span>
-           <span class="text-sm font-bold text-slate-900 truncate">{{ metricas().maiorSolicitante }}</span>
-         </div>
-         <div class="flex justify-between">
-           <span class="text-sm text-slate-600">Ordens por solicitante</span>
-           <span class="text-sm font-bold text-blue-600">{{ metricas().mediaOrdensPorSolicitante }}</span>
-         </div>
-       </div>
-     </div>
-   </div>
- </div>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Solicitantes ativos</span>
+                  <span class="text-sm font-bold text-slate-900">{{ metricas().solicitantesAtivos }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Maior solicitante</span>
+                  <span class="text-sm font-bold text-slate-900 truncate">{{ metricas().maiorSolicitante }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-slate-600">Ordens por solicitante</span>
+                  <span class="text-sm font-bold text-blue-600">{{ metricas().mediaOrdensPorSolicitante }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-</div>
+      </div>
     </div>
+    <app-status-modal [selectOptions]="[Status.AUTORIZADA,Status.CANCELADA]" [isOpen]="isOpen()" [ordem]="selectedOrder()" />
   `,
 })
 export class OrdersDashboardComponent implements OnInit, OnDestroy {
   #platformId = inject(PLATFORM_ID);
-  #transferState = inject(TransferState)
+  #transferState = inject(TransferState);
+  #orderView = inject(OrderViewService)
   private ordemService = inject(OrderService);
   private destroy$ = new Subject<void>();
   private ordens = signal<IOrders[]>([]);
+  selectedOrder= signal<IOrders|null>(null);
+  isOpen= signal<boolean>(false);
 
   // Signals
   ultimaAtualizacao = signal(new Date());
@@ -451,6 +461,17 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+   openDetails(ordem: IOrders) {
+    const headerButton = {
+      label: 'Alterar Status',
+      action:()=>{
+        console.log('Alterar Status')
+      }
+    }
+    this.#orderView.open({data:ordem,headerButton}).then(result => {
+    });
+  }
+
   private carregarOrdens() {
     this.ordemService.findAll().subscribe((res) => {
       if (res) {
@@ -480,7 +501,9 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
   }
 
   getStatusColor(status?: string): string {
-    switch (status) {
+    if (!status) return '#64748b';
+    const statuskey = mapStatus(status);
+    switch (statuskey) {
       case Status.AGUARDANDO:
         return '#ca8a04'; // yellow-600
       case Status.AUTORIZADA:
@@ -516,15 +539,7 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
       .substring(0, 2);
   }
 
-  trackByTitulo(index: number, item: EstatisticasCard): string {
-    return item.titulo;
-  }
 
-  trackByStatus(index: number, item: any): string {
-    return item.status;
-  }
-
-  trackByOrdemId(index: number, item: any): string {
-    return item.id;
-  }
+  protected readonly mapStatus = mapStatus;
+  protected readonly Status = Status;
 }

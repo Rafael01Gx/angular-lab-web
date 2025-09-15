@@ -44,7 +44,7 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
         <div class=" bg-white p-6 border-b border-slate-200/60">
           <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div>
-              <h2 class="text-lg font-semibold text-slate-700">{{titulo()}}</h2>
+              <h2 class="text-lg font-semibold text-slate-700">{{ titulo() }}</h2>
               <p class="text-sm text-slate-600">{{ filteredOrdens().length }} ordem(ns) encontrada(s)</p>
             </div>
 
@@ -88,7 +88,7 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
         <!-- Tabela -->
         <div class="flex-1 overflow-auto bg-white">
           <table class="w-full">
-            <thead class="bg-slate-50/80 border-b border-slate-200 sticky">
+            <thead class="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
             <tr>
               <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700 uppercase tracking-wider">
                 <div class="flex items-center gap-2">
@@ -124,7 +124,7 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
               @for (ordem of filteredOrdens(); track ordem.id) {
                 <ng-container>
                   <!-- Linha principal -->
-                  <tr class="hover:bg-slate-50/50 transition-colors duration-200 cursor-pointer group"
+                  <tr class="hover:bg-slate-50/50 transition-colors duration-200 group"
                       [class.bg-blue-50]="expandedRows().has(ordem.id!)">
                     <td class="py-4 px-6">
                       <div class="flex flex-col">
@@ -164,7 +164,7 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
                     <td class="py-4 px-6 text-center">
                       <button
                         (click)="alterarStatus(ordem); $event.stopPropagation()"
-                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+                        class="inline-flex items-center px-3 py-1.5 text-xs cursor-pointer font-medium rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
                         <ng-icon name="heroTag" class="w-3 h-3 mr-1"></ng-icon>
                         Alterar Status
                       </button>
@@ -172,7 +172,7 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
                     <td class="py-4 px-6 text-center">
                       <button
                         (click)="toggleExpand(ordem.id!)"
-                        class="p-1 rounded-lg hover:bg-slate-100 transition-colors duration-200 group-hover:bg-slate-200">
+                        class="p-1 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors duration-200 group-hover:bg-slate-200">
                         <ng-icon
                           [name]="expandedRows().has(ordem.id!) ? 'heroChevronDown' : 'heroChevronRight'"
                           class="w-5 h-5 text-slate-400 transition-transform duration-200">
@@ -186,110 +186,102 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
                     <tr
                       class="bg-gradient-to-r from-blue-50/50 to-slate-50/50 border-l-4 border-blue-400">
                       <td colspan="6" class="py-6 px-6">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-6">
                           <!-- Informações gerais -->
-                          <div class="space-y-4">
+                          <div class="flex-1">
                             <h4 class="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-3">
                               <ng-icon name="heroInformationCircle" class="w-4 h-4 text-blue-500"></ng-icon>
                               Informações Gerais
                             </h4>
 
-                            <div class="bg-white rounded-lg p-4 shadow-sm border border-slate-200/60">
-                              <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                  <span class="font-medium text-slate-700">ID:</span>
-                                  <span class="ml-2 font-mono text-slate-900">{{ ordem.id }}</span>
-                                </div>
-                                <div>
-                                  <span class="font-medium text-slate-700">Status:</span>
-                                  <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
-                                        [ngClass]="getStatusClass(ordem.status)">
+                           <div class="flex gap-2">
+                             <div class="bg-white flex-1 rounded-lg p-4 shadow-sm border border-slate-200/60">
+                               <div class="grid grid-cols-2 gap-4 text-sm">
+                                 <div>
+                                   <span class="font-medium text-slate-700">ID:</span>
+                                   <span class="ml-2 font-mono text-slate-900">{{ ordem.id }}</span>
+                                 </div>
+                                 <div>
+                                   <span class="font-medium text-slate-700">Status:</span>
+                                   <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                                         [ngClass]="getStatusClass(ordem.status)">
               {{ ordem.status || 'Sem Status' }}
               </span>
-                                </div>
-                                <div>
-                                  <span class="font-medium text-slate-700">Criado em:</span>
-                                  <span
-                                    class="ml-2 text-slate-900">{{ ordem.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-                                </div>
-                                @if (ordem.updatedAt) {
-                                  <div>
-                                    <span class="font-medium text-slate-700">Atualizado em:</span>
-                                    <span
-                                      class="ml-2 text-slate-900">{{ ordem.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
-                                  </div>
-                                }
-                              </div>
+                                 </div>
+                                 <div>
+                                   <span class="font-medium text-slate-700">Criado em:</span>
+                                   <span
+                                     class="ml-2 text-slate-900">{{ ordem.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                 </div>
+                                 @if (ordem.updatedAt) {
+                                   <div>
+                                     <span class="font-medium text-slate-700">Atualizado em:</span>
+                                     <span
+                                       class="ml-2 text-slate-900">{{ ordem.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                   </div>
+                                 }
+                               </div>
 
-                              @if (ordem.observacao) {
-                                <div class="mt-4 pt-3 border-t border-slate-200">
-                                  <span class="font-medium text-slate-700 block mb-1">Observação:</span>
-                                  <p class="text-slate-600 text-sm leading-relaxed">{{ ordem.observacao }}</p>
-                                </div>
-                              }
-                            </div>
+                               @if (ordem.observacao) {
+                                 <div class="mt-4 pt-3 border-t border-slate-200">
+                                   <span class="font-medium text-slate-700 block mb-1">Observação:</span>
+                                   <p class="text-slate-600 text-sm leading-relaxed">{{ ordem.observacao }}</p>
+                                 </div>
+                               }
+                             </div>
 
-                            <!-- Dados do solicitante -->
-                            @if (ordem.solicitante) {
-                              <div class="bg-white rounded-lg p-4 shadow-sm border border-slate-200/60">
-                                <h5 class="font-medium text-slate-900 mb-3 flex items-center gap-2">
-                                  <ng-icon name="heroUser" class="w-4 h-4 text-blue-500"></ng-icon>
-                                  Dados do Solicitante
-                                </h5>
-                                <div class="space-y-2 text-sm">
-                                  <div><span class="font-medium text-slate-700">Nome:</span> <span class="ml-2">{{
-                                      ordem.solicitante.name
-                                    }}</span></div>
-                                  <div><span class="font-medium text-slate-700">Email:</span> <span class="ml-2">{{
-                                      ordem.solicitante.email
-                                    }}</span></div>
-                                  @if (ordem.solicitante.phone) {
-                                    <div><span class="font-medium text-slate-700">Telefone:</span> <span class="ml-2">
+                             <!-- Dados do solicitante -->
+                             @if (ordem.solicitante) {
+                               <div class="bg-white flex-1 rounded-lg p-4 shadow-sm border border-slate-200/60">
+                                 <h5 class="font-medium text-slate-900 mb-3 flex items-center gap-2">
+                                   <ng-icon name="heroUser" class="w-4 h-4 text-blue-500"></ng-icon>
+                                   Dados do Solicitante
+                                 </h5>
+                                 <div class="space-y-2 text-sm">
+                                   <div><span class="font-medium text-slate-700">Nome:</span> <span class="ml-2">{{
+                                       ordem.solicitante.name
+                                     }}</span></div>
+                                   <div><span class="font-medium text-slate-700">Email:</span> <span class="ml-2">{{
+                                       ordem.solicitante.email
+                                     }}</span></div>
+                                   @if (ordem.solicitante.phone) {
+                                     <div><span class="font-medium text-slate-700">Telefone:</span> <span class="ml-2">
                           {{ ordem.solicitante.phone }}</span></div>
-                                  }
-                                  @if (ordem.solicitante.area) {
-                                    <div><span class="font-medium text-slate-700">Área:</span> <span class="ml-2">
+                                   }
+                                   @if (ordem.solicitante.area) {
+                                     <div><span class="font-medium text-slate-700">Área:</span> <span class="ml-2">
                           {{ ordem.solicitante.area }}</span></div>
-                                  }
-                                  @if (ordem.solicitante.funcao) {
-                                    <div><span class="font-medium text-slate-700">Função:</span> <span class="ml-2">
+                                   }
+                                   @if (ordem.solicitante.funcao) {
+                                     <div><span class="font-medium text-slate-700">Função:</span> <span class="ml-2">
                           {{ ordem.solicitante.funcao }}</span></div>
-                                  }
-                                </div>
-                              </div>
-                            }
+                                   }
+                                 </div>
+                               </div>
+                             }
+                           </div>
                           </div>
 
                           <!-- Amostras -->
-                          <div class="space-y-4">
+                          <div class="flex-1">
                             <h4 class="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-3">
                               <ng-icon name="heroBeaker" class="w-4 h-4 text-green-500"></ng-icon>
                               Amostras ({{ ordem.amostras.length || 0 }})
                             </h4>
 
-                            <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                              @for (amostra of ordem.amostras; track amostra.id) {
-                                <div
+                            <div class="flex flex-wrap gap-2 max-h-96 overflow-y-auto custom-scrollbar">
+                              @for (amostra of ordem.amostras; track amostra.id; let i = $index) {
+                                <div  [class]="(i == 0 || ordem.amostras.length == i + 1  ? 'basis-full': 'basis-[calc(50%-4px)]')"
                                   class="bg-white rounded-lg p-4 shadow-sm border border-slate-200/60 hover:shadow-md transition-shadow duration-200">
                                   <div class="flex items-start justify-between mb-3">
                                     <div>
-                                      <h6 class="font-medium text-slate-900">{{ amostra.nomeAmostra }}</h6>
-                                      <p class="text-xs text-slate-500 font-mono">ID: {{ amostra.id }}</p>
+                                      <h6 class="font-medium text-slate-900">{{ amostra.nomeAmostra }} </h6>
                                     </div>
-                                    <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium">
-                        {{ amostra.amostraTipo || 'Tipo não definido' }}
+                                    <span class="px-2 py-1 bg-blue-100 text-slate-700 rounded-md text-xs font-medium">
+                         {{ amostra.dataAmostra | date:'dd/MM/yyyy' }}
                         </span>
                                   </div>
 
-                                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mb-3">
-                                    <div><span class="font-medium text-slate-700">Nº OS:</span> <span
-                                      class="ml-1 font-mono">{{
-                                        amostra.numeroOs
-                                      }}</span></div>
-                                    <div><span class="font-medium text-slate-700">Data:</span> <span class="ml-1">{{
-                                        amostra.dataAmostra | date:'dd/MM/yyyy'
-                                      }}</span></div>
-                                  </div>
 
                                   @if (amostra.ensaiosSolicitados.length) {
                                     <div class="border-t border-slate-200 pt-3">

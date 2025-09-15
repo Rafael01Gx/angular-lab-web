@@ -33,7 +33,7 @@ import {EtiquetasService} from '../../services/impressao-de-etiquetas.service';
             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Progresso
             </th>
-            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
               Ações
             </th>
             <th class="w-12 px-6 py-4"></th>
@@ -97,7 +97,7 @@ import {EtiquetasService} from '../../services/impressao-de-etiquetas.service';
                   </td>
 
                   <!-- Actions Column -->
-                  <td class="px-6 py-4 flex gap-2 whitespace-nowrap">
+                  <td class="px-6 py-4 flex justify-end items-center gap-2 whitespace-nowrap">
                     @if (impressao()) {
                       <button
                         (click)="imprimir(ordem, $event)"

@@ -16,11 +16,12 @@ import {
   heroCheckCircle,
   heroExclamationTriangle,
   heroInformationCircle,
-  heroArrowPath
+  heroArrowPath,heroClock
 } from '@ng-icons/heroicons/outline';
 import {keyOfStatus, Status} from '../../../shared/enums/status.enum';
 import {OrderService} from '../../../services/order.service';
 import {AtualizarStatus, IOrders} from '../../../shared/interfaces/orders.interface';
+import {ToastrService} from '../../../services/toastr.service';
 
 
 @Component({
@@ -34,7 +35,8 @@ import {AtualizarStatus, IOrders} from '../../../shared/interfaces/orders.interf
       heroCheckCircle,
       heroExclamationTriangle,
       heroInformationCircle,
-      heroArrowPath
+      heroArrowPath,
+      heroClock
     })
   ],
   template: `
@@ -200,6 +202,7 @@ import {AtualizarStatus, IOrders} from '../../../shared/interfaces/orders.interf
   `]
 })
 export class StatusModalComponent implements OnInit {
+  #toastr= inject(ToastrService);
   selectOptions = input.required<Status[]>();
   isOpen = input(false);
   ordem = input.required<IOrders | null>();
@@ -216,7 +219,7 @@ export class StatusModalComponent implements OnInit {
 
   ngOnInit() {
     if (this.isOpen()) {
-      this.resetForm();
+      this.observacao = this.ordem()?.observacao || '';
     }
   }
 
@@ -240,22 +243,29 @@ export class StatusModalComponent implements OnInit {
 
   async confirmarAlteracao() {
     if (!this.podeConfirmar() || !this.ordem) return;
+    const statusKey =keyOfStatus(this.novoStatus)
+    if (this.ordem()?.status === statusKey){
+      this.#toastr.info(`${statusKey} já é o Status atual da Ordem de Serviço !`,'Status não foi Alterado')
+      return;
+    }
 
     this.isLoading = true;
     this.erro = '';
     try {
       const dados: AtualizarStatus = {
-        status: keyOfStatus(this.novoStatus),
+        status:statusKey,
         observacao: this.observacao.trim() || undefined
       };
 
       this.ordemService.update(this.ordem()?.id!, dados).subscribe((ordem) => {
         if (ordem) {
+          this.fecharModal();
+          this.#toastr.success('Status alterado com sucesso!');
           this.statusAlterado.emit(ordem);
         }
       });
 
-      this.fecharModal();
+
     } catch (error: any) {
       this.erro = error?.message || 'Erro ao alterar status. Tente novamente.';
     } finally {
@@ -265,15 +275,15 @@ export class StatusModalComponent implements OnInit {
 
   getStatusIcon(status?: string): string {
     switch (status) {
-      case Status.AGUARDANDO:
+      case 'AGUARDANDO':
         return 'heroClock';
-      case Status.AUTORIZADA:
+      case 'AUTORIZADA':
         return 'heroCheckCircle';
-      case Status.EXECUCAO:
+      case 'EXECUCAO':
         return 'heroArrowPath';
-      case Status.FINALIZADA:
+      case 'FINALIZADA':
         return 'heroCheckCircle';
-      case Status.CANCELADA:
+      case 'CANCELADA':
         return 'heroXCircle';
       default:
         return 'heroExclamationTriangle';
@@ -282,15 +292,15 @@ export class StatusModalComponent implements OnInit {
 
   getStatusIconClass(status?: string): string {
     switch (status) {
-      case Status.AGUARDANDO:
+      case 'AGUARDANDO':
         return 'text-yellow-600';
-      case Status.AUTORIZADA:
+      case 'AUTORIZADA':
         return 'text-blue-600';
-      case Status.EXECUCAO:
+      case 'EXECUCAO':
         return 'text-purple-600';
-      case Status.FINALIZADA:
+      case 'FINALIZADA':
         return 'text-green-600';
-      case Status.CANCELADA:
+      case 'CANCELADA':
         return 'text-red-600';
       default:
         return 'text-slate-600';
@@ -299,15 +309,15 @@ export class StatusModalComponent implements OnInit {
 
   getStatusClass(status?: string): string {
     switch (status) {
-      case Status.AGUARDANDO:
+      case 'AGUARDANDO':
         return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-      case Status.AUTORIZADA:
+      case 'AUTORIZADA':
         return 'bg-blue-100 text-blue-800 border border-blue-200';
-      case Status.EXECUCAO:
+      case 'EXECUCAO':
         return 'bg-purple-100 text-purple-800 border border-purple-200';
-      case Status.FINALIZADA:
+      case 'FINALIZADA':
         return 'bg-green-100 text-green-800 border border-green-200';
-      case Status.CANCELADA:
+      case 'CANCELADA':
         return 'bg-red-100 text-red-800 border border-red-200';
       default:
         return 'bg-slate-100 text-slate-800 border border-slate-200';
@@ -315,16 +325,17 @@ export class StatusModalComponent implements OnInit {
   }
 
   getStatusDescription(status: string): string {
-    switch (status) {
-      case Status.AGUARDANDO:
+    const statusKey =keyOfStatus(status)
+    switch (statusKey) {
+      case 'AGUARDANDO':
         return 'A ordem ficará pendente de autorização para prosseguir.';
-      case Status.AUTORIZADA:
+      case 'AUTORIZADA':
         return 'A ordem estará autorizada e pronta para execução.';
-      case Status.EXECUCAO:
+      case 'EXECUCAO':
         return 'A ordem entrará em processo de execução das análises.';
-      case Status.FINALIZADA:
+      case 'FINALIZADA':
         return 'A ordem será marcada como concluída.';
-      case Status.CANCELADA:
+      case 'CANCELADA':
         return 'A ordem será cancelada e não poderá ser processada.';
       default:
         return '';

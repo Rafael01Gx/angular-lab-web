@@ -128,6 +128,7 @@ export class OrdersCreateComponent implements OnInit {
             },500)
           }
           this.clearForm();
+          this.observacao.set('')
           this.amostras.set([])
         })
       }
@@ -138,7 +139,8 @@ export class OrdersCreateComponent implements OnInit {
     this.#confirm.confirmWarning("Limpar","Deseja limpar o formulário?").then((res)=>{
       if(res){
         this.clearForm();
-        this.amostras.set([])
+        this.observacao.set('');
+        this.amostras.set([]);
       }
     })
   }

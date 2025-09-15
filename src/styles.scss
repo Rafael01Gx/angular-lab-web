@@ -98,6 +98,12 @@ body {
   --gradient-background-main-from: var(--color-white);
   --gradient-background-main-to: var(--color-slate-50);
 }
+select{
+  @apply cursor-pointer;
+}
+button{ 
+  @apply cursor-pointer;
+}
 
 .button-gradient-orange {
   @apply bg-gradient-to-r from-red-400 to-orange-500 text-white font-semibold rounded-md hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 disabled:from-gray-400 disabled:to-gray-500 cursor-pointer disabled:cursor-not-allowed  transition-all duration-200 transform hover:scale-105 shadow-lg;

@@ -4,6 +4,15 @@ import html2canvas from 'html2canvas';
 import {ElementoQuimico, Remessa} from '../shared/interfaces/laboratorios-externos.interfaces';
 import {IOrders} from '../shared/interfaces/orders.interface';
 
+export interface PrintOptions {
+  filename?: string;
+  format?: 'a4' | 'a3' | 'letter';
+  orientation?: 'portrait' | 'landscape';
+  margin?: number;
+  scale?: number;
+  quality?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -607,7 +616,7 @@ export class EtiquetasService {
                 </div>
                 <div class="row">
                   <span>Ensaios:</span>
-                  <p>${ensaios.toString()}</p>
+                  <p>${ensaios.join(", ")}</p>
                 </div>
                 <div class="row">
                   <span>Observações:</span>
