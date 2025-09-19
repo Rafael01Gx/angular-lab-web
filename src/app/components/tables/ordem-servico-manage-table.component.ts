@@ -1,7 +1,7 @@
 import {Component, signal, computed, input, output, OutputEmitterRef} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {NgIconComponent, provideIcons} from '@ng-icons/core';
 import {
   heroChevronDown,
   heroChevronRight,
@@ -13,10 +13,20 @@ import {
   heroClipboardDocumentList,
   heroBeaker,
   heroTag,
-  heroInformationCircle
+  heroInformationCircle,
+  heroPrinter,
+  heroTrash,
+  heroClock
 } from '@ng-icons/heroicons/outline';
 import {IOrders} from '../../shared/interfaces/orders.interface';
 import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
+import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
+
+interface IButtonOption {
+  label: string,
+  icon: 'heroPrinter' | 'heroTag' | 'heroTrash' | 'heroDocumentArrowDown'| 'heroClock'
+  cssClass?:string
+}
 
 @Component({
   selector: 'app-ordem-servico-manager-table',
@@ -34,7 +44,10 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
       heroClipboardDocumentList,
       heroBeaker,
       heroTag,
-      heroInformationCircle
+      heroInformationCircle,
+      heroPrinter,
+      heroTrash,
+      heroClock
     })
   ],
   template: `
@@ -114,9 +127,15 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
                   Status
                 </div>
               </th>
-              <th class="text-center py-4 px-6 text-sm font-semibold text-slate-700 uppercase tracking-wider">
-                Ações
+              <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700 uppercase tracking-wider">
+                <div class="flex items-center gap-2">
+                  <ng-icon name="heroClock" class="w-4 h-4"></ng-icon>
+                  Periodo/Análise
+                </div>
               </th>
+              @if(actionButtonOption()){<th class="text-center py-4 px-6 text-sm font-semibold text-slate-700 uppercase tracking-wider">
+                Ações
+              </th>}
               <th class="w-16"></th>
             </tr>
             </thead>
@@ -161,14 +180,21 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
             {{ mapStatus(ordem.status!) || 'Sem Status' }}
             </span>
                     </td>
-                    <td class="py-4 px-6 text-center">
+                    <td class="py-4 px-6">
+                  <span [class]="'inline-flex px-3 py-1 rounded-md text-xs font-medium '+(ordem.prazoInicioFim!.length < 12 ? 'bg-gray-100 text-gray-800 border border-gray-200':'bg-green-100 text-green-800 border border-green-200')">
+            {{ getPrazoInicioFim(ordem.prazoInicioFim!)}}
+            </span>
+                    </td>
+                    @if(actionButtonOption()){<td class="py-4 px-6 text-center">
                       <button
                         (click)="alterarStatus(ordem); $event.stopPropagation()"
-                        class="inline-flex items-center px-3 py-1.5 text-xs cursor-pointer font-medium rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
-                        <ng-icon name="heroTag" class="w-3 h-3 mr-1"></ng-icon>
-                        Alterar Status
-                      </button>
-                    </td>
+                        [class]="(actionButtonOption()?.cssClass ? actionButtonOption()?.cssClass! : 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white' )"
+                        class="inline-flex items-center px-3 py-1.5 text-xs cursor-pointer font-medium rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+
+                        <ng-icon [name]="actionButtonOption()?.icon" class="w-3 h-3 mr-1"></ng-icon>
+                    {{ actionButtonOption()?.label }}
+                    </button>
+                  </td>}
                     <td class="py-4 px-6 text-center">
                       <button
                         (click)="toggleExpand(ordem.id!)"
@@ -194,72 +220,72 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
                               Informações Gerais
                             </h4>
 
-                           <div class="flex gap-2">
-                             <div class="bg-white flex-1 rounded-lg p-4 shadow-sm border border-slate-200/60">
-                               <div class="grid grid-cols-2 gap-4 text-sm">
-                                 <div>
-                                   <span class="font-medium text-slate-700">ID:</span>
-                                   <span class="ml-2 font-mono text-slate-900">{{ ordem.id }}</span>
-                                 </div>
-                                 <div>
-                                   <span class="font-medium text-slate-700">Status:</span>
-                                   <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
-                                         [ngClass]="getStatusClass(ordem.status)">
+                            <div class="flex gap-2">
+                              <div class="bg-white flex-1 rounded-lg p-4 shadow-sm border border-slate-200/60">
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                  <div>
+                                    <span class="font-medium text-slate-700">ID:</span>
+                                    <span class="ml-2 font-mono text-slate-900">{{ ordem.id }}</span>
+                                  </div>
+                                  <div>
+                                    <span class="font-medium text-slate-700">Status:</span>
+                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                                          [ngClass]="getStatusClass(ordem.status)">
               {{ ordem.status || 'Sem Status' }}
               </span>
-                                 </div>
-                                 <div>
-                                   <span class="font-medium text-slate-700">Criado em:</span>
-                                   <span
-                                     class="ml-2 text-slate-900">{{ ordem.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-                                 </div>
-                                 @if (ordem.updatedAt) {
-                                   <div>
-                                     <span class="font-medium text-slate-700">Atualizado em:</span>
-                                     <span
-                                       class="ml-2 text-slate-900">{{ ordem.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
-                                   </div>
-                                 }
-                               </div>
+                                  </div>
+                                  <div>
+                                    <span class="font-medium text-slate-700">Criado em:</span>
+                                    <span
+                                      class="ml-2 text-slate-900">{{ ordem.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                  </div>
+                                  @if (ordem.updatedAt) {
+                                    <div>
+                                      <span class="font-medium text-slate-700">Atualizado em:</span>
+                                      <span
+                                        class="ml-2 text-slate-900">{{ ordem.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                    </div>
+                                  }
+                                </div>
 
-                               @if (ordem.observacao) {
-                                 <div class="mt-4 pt-3 border-t border-slate-200">
-                                   <span class="font-medium text-slate-700 block mb-1">Observação:</span>
-                                   <p class="text-slate-600 text-sm leading-relaxed">{{ ordem.observacao }}</p>
-                                 </div>
-                               }
-                             </div>
+                                @if (ordem.observacao) {
+                                  <div class="mt-4 pt-3 border-t border-slate-200">
+                                    <span class="font-medium text-slate-700 block mb-1">Observação:</span>
+                                    <p class="text-slate-600 text-sm leading-relaxed">{{ ordem.observacao }}</p>
+                                  </div>
+                                }
+                              </div>
 
-                             <!-- Dados do solicitante -->
-                             @if (ordem.solicitante) {
-                               <div class="bg-white flex-1 rounded-lg p-4 shadow-sm border border-slate-200/60">
-                                 <h5 class="font-medium text-slate-900 mb-3 flex items-center gap-2">
-                                   <ng-icon name="heroUser" class="w-4 h-4 text-blue-500"></ng-icon>
-                                   Dados do Solicitante
-                                 </h5>
-                                 <div class="space-y-2 text-sm">
-                                   <div><span class="font-medium text-slate-700">Nome:</span> <span class="ml-2">{{
-                                       ordem.solicitante.name
-                                     }}</span></div>
-                                   <div><span class="font-medium text-slate-700">Email:</span> <span class="ml-2">{{
-                                       ordem.solicitante.email
-                                     }}</span></div>
-                                   @if (ordem.solicitante.phone) {
-                                     <div><span class="font-medium text-slate-700">Telefone:</span> <span class="ml-2">
+                              <!-- Dados do solicitante -->
+                              @if (ordem.solicitante) {
+                                <div class="bg-white flex-1 rounded-lg p-4 shadow-sm border border-slate-200/60">
+                                  <h5 class="font-medium text-slate-900 mb-3 flex items-center gap-2">
+                                    <ng-icon name="heroUser" class="w-4 h-4 text-blue-500"></ng-icon>
+                                    Dados do Solicitante
+                                  </h5>
+                                  <div class="space-y-2 text-sm">
+                                    <div><span class="font-medium text-slate-700">Nome:</span> <span class="ml-2">{{
+                                        ordem.solicitante.name
+                                      }}</span></div>
+                                    <div><span class="font-medium text-slate-700">Email:</span> <span class="ml-2">{{
+                                        ordem.solicitante.email
+                                      }}</span></div>
+                                    @if (ordem.solicitante.phone) {
+                                      <div><span class="font-medium text-slate-700">Telefone:</span> <span class="ml-2">
                           {{ ordem.solicitante.phone }}</span></div>
-                                   }
-                                   @if (ordem.solicitante.area) {
-                                     <div><span class="font-medium text-slate-700">Área:</span> <span class="ml-2">
+                                    }
+                                    @if (ordem.solicitante.area) {
+                                      <div><span class="font-medium text-slate-700">Área:</span> <span class="ml-2">
                           {{ ordem.solicitante.area }}</span></div>
-                                   }
-                                   @if (ordem.solicitante.funcao) {
-                                     <div><span class="font-medium text-slate-700">Função:</span> <span class="ml-2">
+                                    }
+                                    @if (ordem.solicitante.funcao) {
+                                      <div><span class="font-medium text-slate-700">Função:</span> <span class="ml-2">
                           {{ ordem.solicitante.funcao }}</span></div>
-                                   }
-                                 </div>
-                               </div>
-                             }
-                           </div>
+                                    }
+                                  </div>
+                                </div>
+                              }
+                            </div>
                           </div>
 
                           <!-- Amostras -->
@@ -271,7 +297,8 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
 
                             <div class="flex flex-wrap gap-2 max-h-96 overflow-y-auto custom-scrollbar">
                               @for (amostra of ordem.amostras; track amostra.id; let i = $index) {
-                                <div  [class]="(i == 0 || ordem.amostras.length == i + 1  ? 'basis-full': 'basis-[calc(50%-4px)]')"
+                                <div
+                                  [class]="(i == 0 || ordem.amostras.length == i + 1  ? 'basis-full': 'basis-[calc(50%-4px)]')"
                                   class="bg-white rounded-lg p-4 shadow-sm border border-slate-200/60 hover:shadow-md transition-shadow duration-200">
                                   <div class="flex items-start justify-between mb-3">
                                     <div>
@@ -356,12 +383,13 @@ import {keyOfStatus, mapStatus, Status} from '../../shared/enums/status.enum';
   `]
 })
 export class OrdemServicoManagerTable {
+  actionButtonOption = input<IButtonOption>()
   selectOptions = input.required<Status[]>();
   titulo = input.required<string>();
   searchTerm = signal('');
   statusFilter = signal('');
   expandedRows = signal(new Set<string>());
-  setStatus: OutputEmitterRef<IOrders> = output<IOrders>()
+  getOrder: OutputEmitterRef<IOrders> = output<IOrders>()
 
   ordens = input.required<IOrders[]>();
 
@@ -400,7 +428,7 @@ export class OrdemServicoManagerTable {
   }
 
   alterarStatus(ordem: IOrders) {
-    return this.setStatus.emit(ordem);
+    return this.getOrder.emit(ordem);
   }
 
   getInitials(name: string): string {
@@ -434,4 +462,5 @@ export class OrdemServicoManagerTable {
   }
 
   protected readonly mapStatus = mapStatus;
+  protected readonly getPrazoInicioFim = getPrazoInicioFim;
 }

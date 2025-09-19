@@ -21,7 +21,7 @@ interface ButtonAction {
 }
 
 @Component({
-  selector: 'app-ordem-servico',
+  selector: 'app-visualizar-ordem-servico',
   standalone: true,
   imports: [CommonModule, NgIconComponent, DatePipe],
   viewProviders: [
@@ -89,7 +89,7 @@ interface ButtonAction {
               }
 
               <!-- Botão Expandir/Recolher -->
-              <button (click)="toggleExpanded()"
+              <button (click)="toggleExpandedClose()"
                       class="p-1 text-gray-400 hover:text-gray-600 hover:scale-110  cursor-pointer transition-colors">
                 <ng-icon
                   [name]="isExpanded() ? 'heroChevronUpMini' : 'heroChevronDownMini'"
@@ -282,7 +282,7 @@ interface ButtonAction {
     }
   `]
 })
-export class OrdemServicoComponent {
+export class VisualizarOrdemServicoComponent {
   isVisible = model<boolean>(false);
   closeModal = output<void>();
   headerButton = model<ButtonAction>({label: '', action: () => null});
@@ -300,6 +300,13 @@ export class OrdemServicoComponent {
 
   toggleExpanded(): void {
     this._isExpanded.set(!this._isExpanded());
+  }
+
+  toggleExpandedClose(){
+    this._isExpanded.set(false);
+    setTimeout(()=>{
+      this.isVisible.set(false);
+    },500)
   }
 
   onBackdropClick(event: MouseEvent): void {

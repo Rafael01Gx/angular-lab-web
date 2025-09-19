@@ -1,4 +1,3 @@
-// status-modal.component.ts
 import {
   Component,
   OnInit,
@@ -23,7 +22,6 @@ import {OrderService} from '../../../services/order.service';
 import {AtualizarStatus, IOrders} from '../../../shared/interfaces/orders.interface';
 import {ToastrService} from '../../../services/toastr.service';
 
-
 @Component({
   selector: 'app-status-modal',
   standalone: true,
@@ -47,11 +45,11 @@ import {ToastrService} from '../../../services/toastr.service';
         (click)="fecharModal()">
 
         <!-- Modal -->
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-200"
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-full transform transition-all duration-200"
              (click)="$event.stopPropagation()">
 
           <!-- Header -->
-          <div class="flex items-center justify-between p-6 border-b border-slate-200">
+          <div class="flex items-center justify-between pb-2 pt-4 px-6 border-b border-slate-200">
             <div class="flex items-center gap-3">
               <div class="p-2 bg-blue-100 rounded-lg">
                 <ng-icon name="heroTag" class="w-5 h-5 text-blue-600"></ng-icon>
@@ -69,9 +67,9 @@ import {ToastrService} from '../../../services/toastr.service';
           </div>
 
           <!-- Content -->
-          <div class="p-6 space-y-6">
+          <div class="py-4 px-6 space-y-4">
             <!-- Status atual -->
-            <div class="bg-slate-50 flex justify-end items-center rounded-lg p-4">
+            <div class="bg-slate-100 flex justify-end items-center rounded-lg p-4" >
               <span class="text-sm font-medium text-slate-700 block mb-2 mr-auto">Status Atual</span>
               <div class="flex items-center gap-2">
     <span class="px-3 py-1 rounded-full text-sm font-medium"
@@ -125,19 +123,19 @@ import {ToastrService} from '../../../services/toastr.service';
 
             <!-- Preview do novo status -->
             @if (novoStatus) {
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div class="rounded-lg p-4"  [class]="(novoStatus == Status.CANCELADA ? 'bg-red-50 border border-red-200 text-red-700' :'bg-blue-50 border border-blue-200 text-blue-700')">
                 <div class="flex items-start gap-3">
-                  <ng-icon name="heroInformationCircle" class="w-5 h-5 text-blue-600 mt-0.5"></ng-icon>
+                  <ng-icon name="heroInformationCircle" [color]="(novoStatus == Status.CANCELADA ? 'red':'blue')" class="w-5 h-5 mt-0.5" ></ng-icon>
                   <div>
-                    <h4 class="text-sm font-medium text-blue-900 mb-1">Prévia da Alteração</h4>
-                    <p class="text-sm text-blue-700">
+                    <h4 class="text-sm font-medium mb-1" [class]="(novoStatus == Status.CANCELADA ? 'text-red-900' : 'text-blue-900')">Prévia da Alteração</h4>
+                    <p class="text-sm">
                       O status será alterado de
                       <strong>{{ ordem()?.status || 'Sem Status' }}</strong>
                       para
                       <strong>{{ novoStatus }}</strong>
                     </p>
                     @if (getStatusDescription(novoStatus)) {
-                      <p class="text-xs text-blue-600 mt-2">
+                      <p class="text-xs mt-2">
                         {{ getStatusDescription(novoStatus) }}
                       </p>
                     }
@@ -161,7 +159,7 @@ import {ToastrService} from '../../../services/toastr.service';
           </div>
 
           <!-- Footer -->
-          <div class="flex gap-3 p-6 border-t border-slate-200">
+          <div class="flex gap-3 px-6 pt-2 pb-6 border-t border-slate-200">
             <button
               (click)="fecharModal()"
               class="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 focus:ring-2 focus:ring-slate-500 transition-all duration-200">
@@ -341,4 +339,6 @@ export class StatusModalComponent implements OnInit {
         return '';
     }
   }
+
+  protected readonly Status = Status;
 }

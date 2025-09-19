@@ -15,7 +15,8 @@ const ORDERS_KEY = makeStateKey<IOrders[]>("orders-pending-table");
   template: `
     <app-ordem-servico-manager-table [titulo]="'Gerenciar OS'" [ordens]="ordens()"
                                      [selectOptions]="[Status.AGUARDANDO,Status.AUTORIZADA]"
-                                     (setStatus)="setSelectedOrder($event)"
+                                     (getOrder)="setSelectedOrder($event)"
+                                     [actionButtonOption]="{icon:'heroTag',label:'Alterar Status'}"
     />
     <app-status-modal [isOpen]="isOpened()" [ordem]="selectedOrder()" (modalFechado)="closeModal($event)"
                       [selectOptions]="[Status.AUTORIZADA,Status.CANCELADA]"

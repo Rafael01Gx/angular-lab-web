@@ -1,5 +1,5 @@
 import {ApplicationRef, ComponentRef, createComponent, EnvironmentInjector, inject, Injectable} from '@angular/core';
-import {OrdemServicoComponent} from '../components/orders/ordem-servico/ordem-servico.component';
+import {VisualizarOrdemServicoComponent} from '../components/orders/visualizar-ordem-servico/visualizar-ordem-servico.component';
 import {IOrders} from '../shared/interfaces/orders.interface';
 
 interface IOrderViewConfig {
@@ -18,7 +18,7 @@ interface IOrderViewConfig {
   providedIn: 'root',
 })
 export class OrderViewService {
-  #modalRef: ComponentRef<OrdemServicoComponent> | null = null;
+  #modalRef: ComponentRef<VisualizarOrdemServicoComponent> | null = null;
   #appRef = inject(ApplicationRef);
   #eInjector = inject(EnvironmentInjector);
 
@@ -28,7 +28,7 @@ export class OrderViewService {
         this.close(); // Garante que apenas uma instância exista
       }
 
-      this.#modalRef = createComponent(OrdemServicoComponent, {
+      this.#modalRef = createComponent(VisualizarOrdemServicoComponent, {
         environmentInjector: this.#eInjector,
       });
 

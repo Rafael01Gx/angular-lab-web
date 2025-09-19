@@ -97,7 +97,7 @@ export class OrdersPendingTableComponent implements OnInit {
 
   loadOrders() {
     const status = "status=CANCELADA&status=AGUARDANDO&status=AUTORIZADA";
-    this.#orderService.findAll({status}).subscribe((res) => {
+    this.#orderService.findAllByUser({status}).subscribe((res) => {
       if (res) {
         this.ordems.set(res);
         this.ordemsFiltradas.set(res);

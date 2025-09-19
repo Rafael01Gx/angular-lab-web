@@ -27,6 +27,11 @@ export class OrderService {
   }
 
   findAll(query?: Querys): Observable<IOrders[]> {
+    return this.#http.get<IOrders[]>(`${this.#apiUrl}?${query?.status}`, {
+      withCredentials: true,
+    }).pipe(tap((ordens) => this.#ordens.set(ordens)), catchError(this.handleGetError.bind(this)));
+  }
+  findAllByUser(query?: Querys): Observable<IOrders[]> {
     return this.#http.get<IOrders[]>(`${this.#apiUrl}/user?${query?.status}`, {
       withCredentials: true,
     }).pipe(tap((ordens) => this.#ordens.set(ordens)), catchError(this.handleGetError.bind(this)));
@@ -40,6 +45,12 @@ export class OrderService {
 
   update(id: number | string, body: Partial<IOrders>): Observable<IOrders> {
     return this.#http.patch<IOrders>(`${this.#apiUrl}/${id}`, body, {
+      withCredentials: true,
+    }).pipe(catchError(this.handleSetError.bind(this)));
+  }
+
+  updateRecepcaoAgendamento(id: number | string, body: Partial<IOrders>): Observable<IOrders> {
+    return this.#http.patch<IOrders>(`${this.#apiUrl}/agendar/${id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }

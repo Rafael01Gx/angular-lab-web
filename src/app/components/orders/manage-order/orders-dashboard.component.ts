@@ -320,7 +320,7 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
       },
       {
         titulo: 'Em Execução',
-        valor: stats.porStatus.find(item => item.status === Status.EXECUCAO)?.count || ordens.filter(o => o.status === Status.EXECUCAO).length,
+        valor: stats.porStatus.find(item => item.status === keyOfStatus(Status.EXECUCAO))?.count || ordens.filter(o => o.status === Status.EXECUCAO).length,
         icone: 'heroArrowPath',
         cor: 'bg-purple-100 text-purple-600',
         percentual: 8,
@@ -328,7 +328,7 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
       },
       {
         titulo: 'Finalizadas',
-        valor: stats.porStatus.find(item => item.status === Status.FINALIZADA)?.count || ordens.filter(o => o.status === Status.FINALIZADA).length,
+        valor: stats.porStatus.find(item => item.status === keyOfStatus(Status.FINALIZADA))?.count || ordens.filter(o => o.status === Status.FINALIZADA).length,
         icone: 'heroCheckCircle',
         cor: 'bg-green-100 text-green-600',
         percentual: 15,
@@ -336,7 +336,7 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
       },
       {
         titulo: 'Aguardando',
-        valor: stats.porStatus.find(item => item.status === Status.AGUARDANDO)?.count || ordens.filter(o => o.status === Status.AGUARDANDO).length,
+        valor: stats.porStatus.find(item => item.status === keyOfStatus(Status.AGUARDANDO))?.count || ordens.filter(o => o.status === Status.AGUARDANDO).length,
         icone: 'heroClock',
         cor: 'bg-yellow-100 text-yellow-600',
         percentual: 5,

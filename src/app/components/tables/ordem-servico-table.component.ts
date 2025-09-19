@@ -6,6 +6,7 @@ import {mapStatus, Status} from '../../shared/enums/status.enum';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroPrinter, heroXMark, heroExclamationCircle, heroCheckCircle,heroPencil} from '@ng-icons/heroicons/outline';
 import {EtiquetasService} from '../../services/impressao-de-etiquetas.service';
+import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
 
 
 @Component({
@@ -152,7 +153,7 @@ import {EtiquetasService} from '../../services/impressao-de-etiquetas.service';
                               </div>
                               <div class="flex justify-between">
                                 <span class="text-gray-500">Prazo:</span>
-                                <span class="text-gray-900">{{ ordem.prazoInicioFim }}</span>
+                                <span class="text-gray-900">{{ getPrazoInicioFim(ordem.prazoInicioFim) }}</span>
                               </div>
                               <div class="flex justify-between">
                                 <span class="text-gray-500">Atualizado:</span>
@@ -266,13 +267,13 @@ import {EtiquetasService} from '../../services/impressao-de-etiquetas.service';
                                   <div>
                                     <span class="text-gray-500">Prazo:</span>
                                     <div
-                                      class="text-gray-900 font-medium">{{ amostra.prazoInicioFim || "Aguardando prazo" }}
+                                      class="text-gray-900 font-medium">{{ getPrazoInicioFim(amostra.prazoInicioFim)}}
                                     </div>
                                   </div>
                                   <div>
                                     <span class="text-gray-500">Data Recepção:</span>
                                     <div
-                                      class="text-gray-900 font-medium">{{ amostra.dataRecepcao }}
+                                      class="text-gray-900 font-medium">{{ (amostra.dataRecepcao | date: 'mediumDate') || "Não Recepcionado!" }}
                                     </div>
                                   </div>
                                 </div>
@@ -436,4 +437,5 @@ export class OrdemServicoTableComponent {
   protected readonly Date = Date;
   protected readonly Status = Status;
   protected readonly mapStatus = mapStatus;
+  protected readonly getPrazoInicioFim = getPrazoInicioFim;
 }
