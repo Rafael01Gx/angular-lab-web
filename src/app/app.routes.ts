@@ -38,6 +38,9 @@ export const routes: Routes = [
       {
         path: 'manage-orders',
         loadChildren: () => import('./components/orders/manage-orders.routes').then(m => m.MANAGE_ORDERS_ROUTES),
+      },{
+      path:'analysis',
+        loadChildren: ()=> import('./components/analises/analises.routes').then(m => m.ANALISES_ROUTES),
       },
       {
         path: 'access-management',
