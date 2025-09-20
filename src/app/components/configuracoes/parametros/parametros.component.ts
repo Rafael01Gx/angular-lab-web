@@ -64,7 +64,7 @@ export class ParametrosComponent implements OnInit {
       Validators.required,
       Validators.minLength(2),
     ]),
-    unidadeMedida: new FormControl<string>(''),
+    subDescricao: new FormControl<string>(''),
     unidadeResultado: new FormControl<string>(''),
     casasDecimais: new FormControl<number>(0, Validators.nullValidator),
   });
@@ -154,7 +154,7 @@ export class ParametrosComponent implements OnInit {
       return;
     }
     const _params = {
-      unidadeMedida: this.materiaPrimaForm.value.unidadeMedida,
+      subDescricao: this.materiaPrimaForm.value.subDescricao,
       unidadeResultado: this.materiaPrimaForm.value.unidadeResultado,
       descricao: this.materiaPrimaForm.value.descricao,
       tipoAnaliseId: this.materiaPrimaForm.value.tipoAnaliseId,
@@ -184,7 +184,7 @@ export class ParametrosComponent implements OnInit {
 
     this.materiaPrimaForm.setValue({
       casasDecimais: 0,
-      unidadeMedida: '',
+      subDescricao: '',
       descricao: '',
       unidadeResultado: '',
       tipoAnaliseId: ''
@@ -202,7 +202,7 @@ export class ParametrosComponent implements OnInit {
     this.materiaPrimaForm.setValue({
       tipoAnaliseId: item.id ? item.id : null,
       descricao: item.descricao,
-      unidadeMedida: item.unidadeMedida,
+      subDescricao: item.subDescricao,
       unidadeResultado: item.unidadeResultado,
       casasDecimais: item.casasDecimais,
     });

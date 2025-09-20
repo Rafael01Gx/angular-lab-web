@@ -107,17 +107,21 @@
                   #
                 </div>
                 <div
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-1"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-2"
                 >
                   Descrição
                 </div>
                 <div
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  flex-1"
                 >
-                  Unidade
+                  Sub.Descrição
+                </div>   <div
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  flex-1"
+                >
+                Unidade.Resultado
                 </div>
                 <div
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider  flex-1"
                 >
                   Decimais
                 </div>
@@ -148,17 +152,21 @@
                   {{ $index + 1 }}
                 </div>
                 <div
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex-1"
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex-2"
                 >
                   {{ param.descricao }}
                 </div>
                 <div
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24"
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex-1"
                 >
-                  {{ param.unidadeMedida }}
+                  {{ param.subDescricao }}
                 </div>
                 <div
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 w-24"
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900  flex-1"
+                >
+                  {{ param.unidadeResultado || "" }}
+                </div>                <div
+                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900  flex-1"
                 >
                   {{ param.casasDecimais }}
                 </div>

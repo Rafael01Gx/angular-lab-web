@@ -58,16 +58,16 @@
       </div>
       <div class="flex-1">
         <label
-          for="unidadeMedida"
+          for="subDescricao"
           class="block text-sm font-medium text-slate-600 mb-1"
         >
           Sub. Descrição
         </label>
         <input
-          id="unidadeMedida"
+          id="subDescricao"
           type="text"
-          formControlName="unidadeMedida"
-          name="unidadeMedida"
+          formControlName="subDescricao"
+          name="subDescricao"
           class="w-full px-4 py-3 rounded-sm border border-slate-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 placeholder-slate-400 text-slate-700 transition-all duration-200"
           placeholder="Ex. mm"
         />
@@ -182,7 +182,7 @@
             <th
               class="text-left py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
             >
-              Unidade
+              Sub.Descrição
             </th>
             <th
               class="text-left py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-200/50"
@@ -230,7 +230,7 @@
               <span
                 class="inline-flex items-center px-3 py-1  text-xs font-medium text-gray-700 "
               >
-                {{ item.unidadeMedida }}
+                {{ item.subDescricao }}
               </span>
             </td>
             <td class="py-4 px-6">

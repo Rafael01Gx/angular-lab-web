@@ -144,7 +144,7 @@ export class AnaliseConfigComponent implements OnInit{
 
   paramMap(params: IParameters[]) {
     return params.map(
-      (param) => `${param.descricao} ${param.unidadeMedida || ''}`
+      (param) => `${param.descricao} ${param.subDescricao || ''}`
     );
   }
 
