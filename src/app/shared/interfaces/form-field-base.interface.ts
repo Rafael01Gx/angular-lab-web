@@ -5,8 +5,10 @@ export interface FormFieldBase {
   required?: boolean;
   disabled?: boolean;
   placeholder?: string;
-  errorMessages?: {[key: string]: string[]};
+  unidadeResultado:string;
+  errorMessages?: {[key: string]: string};
   validators?: any[];
   asyncValidators?: any[];
+  mask?: string;
   width?: string;
 }

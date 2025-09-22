@@ -17,7 +17,6 @@ import {NgIcon, provideIcons} from '@ng-icons/core';
 import {heroClock, heroMagnifyingGlass} from '@ng-icons/heroicons/outline';
 import {ReactiveFormsModule} from '@angular/forms';
 import {debouncedSignal} from '../../../shared/utils/debounced-signal';
-import {Status} from '../../../shared/enums/status.enum';
 
 const ORDERS_KEY = makeStateKey<IOrders[]>("orders-pending-table")
 

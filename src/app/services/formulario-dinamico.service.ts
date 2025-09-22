@@ -26,7 +26,6 @@ export class FormularioDinamicoService {
 
   createForm(config: FormConfig, formOptions?: AbstractControlOptions): FormGroup {
     const formControls:{ [key: string]: any} = {};
-
     config.fields.forEach(field => {
       formControls[field.formControlName] = ['', field.validators, field.asyncValidators]
     });

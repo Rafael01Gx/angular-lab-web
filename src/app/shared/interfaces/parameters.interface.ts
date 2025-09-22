@@ -3,7 +3,7 @@ import { ITipoAnalise } from './analysis-type.interface';
 export interface IParameters {
   id?: number;
   descricao: string;
-  unidadeMedida: string;
+  subDescricao: string;
   unidadeResultado: string;
   casasDecimais: number;
   tipoAnalise?: ITipoAnalise;

@@ -1,6 +1,7 @@
 import { ITipoAnalise } from './analysis-type.interface';
 import { IOrders } from './orders.interface';
 import { IUser } from './user.interface';
+import {Status} from '../enums/status.enum';
 
 export interface IAmostra {
   id: string;
@@ -14,7 +15,7 @@ export interface IAmostra {
   user: IUser;
   resultados: {};
   analistas: IUser[];
-  status: 'Create'| 'Em Analise'| 'Finalizado' ;
+  status: Status ;
   progresso: number;
   prazoInicioFim: string;
   dataRecepcao: Date;

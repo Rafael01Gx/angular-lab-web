@@ -361,7 +361,6 @@ import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
 })
 export class OrdemServicoTableComponent {
   #etiqueta = inject(EtiquetasService);
-
   impressao = input<boolean>(false);
   cancelarOs = input<boolean>(false);
   ordemSelecionada = output<IOrders|null>();

@@ -11,7 +11,7 @@ export interface IOrders {
   status?: string;
   dataRecepcao?: string;
   prazoInicioFim?: string;
-  progresso?: string;
+  progresso?: number;
   observacao?: string;
   revisorId?: string;
   createdAt?: Date;
