@@ -4,13 +4,13 @@ import {
   effect,
   inject,
   input,
-  output,
+  output, OutputEmitterRef,
   signal
 } from '@angular/core';
 import {FormConfig} from '../../../shared/interfaces/form-config.interface';
 import {FormularioDinamicoService} from '../../../services/formulario-dinamico.service';
-import {AnaliseForm} from '../../../shared/interfaces/form-analise.interface';
-import {formConfigAnalise} from '../../../core/config/form-config-analise.config';
+import {AnaliseForm, ParametrosForm} from '../../../shared/interfaces/form-analise.interface';
+import {formConfigAnalise, formConfigEditarResultado} from '../../../core/config/form-config-analise.config';
 import {FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {NgxMaskDirective} from 'ngx-mask';
 import {NgIconComponent, provideIcons} from '@ng-icons/core';
@@ -43,13 +43,13 @@ import {
       @if (resultadosForm() && formConfig().fields.length > 0) {
         <!-- Form Card -->
         <div class="flex-1 bg-white shadow-xl border border-slate-200 overflow-hidden flex flex-col">
-          <!-- Header -->
+          <!-- Header
           <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 flex-shrink-0">
             <h2 class="text-xl font-semibold text-white flex items-center">
               <ng-icon name="heroDocumentText" class="w-6 h-6 mr-3"></ng-icon>
               Dados de Análise
             </h2>
-          </div>
+          </div> -->
 
           <!-- Form Structure -->
           <form [formGroup]="resultadosForm()!" (ngSubmit)="onSubmit()" class="flex-1 flex flex-col min-h-0">
@@ -68,7 +68,6 @@ import {
                         <span class="text-red-500 ml-1">*</span>
                       }
                     </label>
-
                     <!-- Input Container -->
                     <div class="relative">
                       <input
@@ -85,7 +84,6 @@ import {
                         [class.focus:border-red-500]="hasFieldError(field.formControlName)"
                         [class.bg-red-50]="hasFieldError(field.formControlName)"
                       >
-
                       <!-- Success Icon -->
                       @if (isFieldValid(field.formControlName)) {
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -153,17 +151,13 @@ export class LancamentoResultadoFormComponent {
   #formDinamicoService = inject(FormularioDinamicoService);
   #cdr = inject(ChangeDetectorRef);
 
-  // Inputs e Outputs
-  parametrosConfig = input<AnaliseForm | null>(null);
-  formSaved = output<any>();
+  parametrosConfig = input<AnaliseForm| Record<string,ParametrosForm> | null>(null);
+  formSaved:OutputEmitterRef<any> = output<any>();
 
-
-  // Signals
   formConfig = signal<FormConfig>({title: '', description: '', fields: []});
   resultadosForm = signal<FormGroup | null>(null);
 
   constructor() {
-    // Effect para reagir a mudanças no parametrosConfig
     effect(() => {
       const config = this.parametrosConfig();
       if (config) {
@@ -172,13 +166,18 @@ export class LancamentoResultadoFormComponent {
     });
   }
 
-  private createForm(data: AnaliseForm) {
+  private createForm(data: AnaliseForm | Record<string,ParametrosForm>) {
     try {
       // Criar uma chave única baseada no ID ou nome da análise
+      const isAnaliseForm = !!(data.id && data.tipoAnalise && data.nomeDescricao);
       const formKey = `analise-${data.id || Date.now()}-form`;
 
       // Registrar a configuração do formulário
-      this.#formDinamicoService.registerFormConfig(formKey, formConfigAnalise);
+      if(isAnaliseForm){
+        this.#formDinamicoService.registerFormConfig(formKey, formConfigAnalise);
+      } else {
+        this.#formDinamicoService.registerFormConfig(formKey, formConfigEditarResultado);
+      }
 
       // Obter a configuração e criar o formulário
       const config = this.#formDinamicoService.getFormConfig(formKey, data);
@@ -197,7 +196,6 @@ export class LancamentoResultadoFormComponent {
     }
   }
 
-  // Métodos auxiliares para o template
   hasFieldError(fieldName: string): boolean {
     const field = this.resultadosForm()?.get(fieldName);
     return !!(field?.invalid && field?.touched);
@@ -232,8 +230,28 @@ export class LancamentoResultadoFormComponent {
 
   onSubmit() {
     if (this.resultadosForm()?.valid) {
-      const formData = this.resultadosForm()!.value;
-      this.formSaved.emit(formData);
+      const formData = this.resultadosForm()!.value ;
+      let dadosFormatados = null;
+      if(this.parametrosConfig()?.parametros && this.parametrosConfig()?.id){
+        const paramConfig = this.parametrosConfig() as AnaliseForm;
+        dadosFormatados = paramConfig.parametros.map((p)=> {
+          const valor = formData[`id${p.id}`];
+          return {
+            valor: valor,
+            ...p
+          }
+        })
+      } else {
+        const paramConfig = Object.values(this.parametrosConfig() as Record<string,ParametrosForm>);
+        dadosFormatados = paramConfig.map((p)=> {
+          const valor = formData[`id${p.id}`];
+          return {
+            ...p,
+            valor: valor,
+          }
+        })
+      }
+    this.formSaved.emit(dadosFormatados);
     }
   }
 

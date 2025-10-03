@@ -1,4 +1,4 @@
-import {Component, input, OnChanges, OnInit, output, OutputEmitterRef} from '@angular/core';
+import {Component, inject, input, OnChanges, OnInit, output, OutputEmitterRef} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {NgIconComponent, provideIcons} from '@ng-icons/core';
@@ -18,7 +18,6 @@ import {IAmostra} from '../../shared/interfaces/amostra.interface';
 import {ITipoAnalise} from '../../shared/interfaces/analysis-type.interface';
 import {mapStatus, Status} from '../../shared/enums/status.enum';
 import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
-
 @Component({
   selector: 'app-tabela-analise-amostras',
   imports: [CommonModule, FormsModule, NgIconComponent],
@@ -113,7 +112,7 @@ import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm font-medium text-gray-900">{{amostra.nomeAmostra}}</div>
-                  <div class="text-sm text-gray-500">{{amostra.amostraTipo}}</div>
+
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
@@ -157,7 +156,7 @@ import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
                         <div class="space-y-2 text-sm">
                           <div class="flex justify-between">
                             <span class="text-gray-600">Data Amostra:</span>
-                            <span class="font-medium">{{amostra.dataAmostra}}</span>
+                            <span class="font-medium">{{amostra.dataAmostra | date:'dd/MM/yyyy'}}</span>
                           </div>
                           <div class="flex justify-between">
                             <span class="text-gray-600">Recepção:</span>
@@ -263,7 +262,7 @@ import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
   `,
 })
 export class TabelaAnaliseAmostrasComponent implements OnInit, OnChanges {
-   amostras= input<IAmostra[]>([]);
+  amostras= input<IAmostra[]>([]);
   incluirAnalise:OutputEmitterRef<{amostra: IAmostra, ensaio: ITipoAnalise}> = output<{amostra: IAmostra, ensaio: ITipoAnalise}>();
   editarAnalise:OutputEmitterRef<{amostra: IAmostra, ensaio: ITipoAnalise}> = output<{amostra: IAmostra, ensaio: ITipoAnalise}>();
 
@@ -279,7 +278,6 @@ export class TabelaAnaliseAmostrasComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     this.filterAmostras();
-    console.log(this.amostras())
   }
 
   toggleExpansion(id: string) {

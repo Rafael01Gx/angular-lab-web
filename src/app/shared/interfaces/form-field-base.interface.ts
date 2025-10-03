@@ -6,6 +6,7 @@ export interface FormFieldBase {
   disabled?: boolean;
   placeholder?: string;
   unidadeResultado:string;
+  value?:string;
   errorMessages?: {[key: string]: string};
   validators?: any[];
   asyncValidators?: any[];

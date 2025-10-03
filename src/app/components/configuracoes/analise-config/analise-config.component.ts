@@ -45,7 +45,7 @@ export class AnaliseConfigComponent implements OnInit{
   editItemIndex= signal<number | null>(null);
 
   paginaAtual = 1;
-  itensPorPagina = 5;
+  itensPorPagina = 10;
 
   // Propriedades calculadas
   get totalPaginas(): number {

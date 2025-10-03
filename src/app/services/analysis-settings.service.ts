@@ -29,6 +29,11 @@ export class AnalysisSettingsService {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
+  findByAnalisysId(id:string|number): Observable<IAnalysisSettings[]> {
+    return this.#http.get<IAnalysisSettings[]>(`${this.#apiUrl}/analise/${id}`, {
+      withCredentials: true,
+    }).pipe(catchError(this.handleGetError.bind(this)));
+  }
 
   create(body: IAnalysisSettings): Observable<IAnalysisSettings> {
     const {parametros, ...data} = body;

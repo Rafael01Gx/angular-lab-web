@@ -31,6 +31,13 @@ export class AmostrasService {
       withCredentials: true,
     }).pipe( catchError(this.handleGetError.bind(this)));
   }
+
+  findById(id: string|number): Observable<IAmostra> {
+    return this.#http.get<IAmostra>(`${this.#apiUrl}/${id}`, {
+      withCredentials: true,
+    }).pipe( catchError(this.handleGetError.bind(this)));
+  }
+
   findAllByUser(query?: Querys): Observable<IAmostra[]> {
     return this.#http.get<IAmostra[]>(`${this.#apiUrl}/user?${query?.status}`, {
       withCredentials: true,

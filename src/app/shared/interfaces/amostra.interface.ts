@@ -13,7 +13,7 @@ export interface IAmostra {
   amostraTipo?: string;
   userId: string;
   user: IUser;
-  resultados: {};
+  resultados:{[key:string]:{}};
   analistas: IUser[];
   status: Status ;
   progresso: number;

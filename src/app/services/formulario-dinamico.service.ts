@@ -27,7 +27,7 @@ export class FormularioDinamicoService {
   createForm(config: FormConfig, formOptions?: AbstractControlOptions): FormGroup {
     const formControls:{ [key: string]: any} = {};
     config.fields.forEach(field => {
-      formControls[field.formControlName] = ['', field.validators, field.asyncValidators]
+      formControls[field.formControlName] = [field.value || '', field.validators, field.asyncValidators]
     });
     return this.#fb.group(formControls, formOptions);
   }

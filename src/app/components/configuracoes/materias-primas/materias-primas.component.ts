@@ -75,11 +75,11 @@ export class MateriasPrimasComponent implements OnInit {
 
   // Paginação
   paginaAtual = 1;
-  itensPorPagina = 5;
+  itensPorPagina = 10;
 
   // Propriedades calculadas
   get totalPaginas(): number {
-    return Math.ceil(this.materiasPrimasFiltro.length / this.itensPorPagina);
+    return Math.ceil(this.materiasPrimasFiltro().length / this.itensPorPagina);
   }
 
   get itensPaginados(): IMateriaPrima[] {

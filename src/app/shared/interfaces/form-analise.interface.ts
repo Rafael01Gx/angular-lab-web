@@ -7,12 +7,14 @@ export interface AnaliseForm {
     tipo: string;
     classe: string;
   },
-  parametros:
-    {
-      "id": 4,
-      "descricao": string;
-      "subDescricao": string;
-      "unidadeResultado": string;
-      "casasDecimais": number;
-    }[];
+  parametros:ParametrosForm[];
+}
+
+export interface ParametrosForm {
+  id: number,
+  descricao: string;
+  subDescricao: string;
+  unidadeResultado: string;
+  casasDecimais: number;
+  valor?: string;
 }

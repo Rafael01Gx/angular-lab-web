@@ -4,6 +4,8 @@ import {Querys} from '../../../shared/interfaces/querys.interface';
 import {isPlatformBrowser, isPlatformServer} from '@angular/common';
 import {IAmostra} from '../../../shared/interfaces/amostra.interface';
 import {AmostrasService} from '../../../services/amostras.service';
+import {Router} from '@angular/router';
+import {ITipoAnalise} from '../../../shared/interfaces/analysis-type.interface';
 
 
 const AMOSTRAS_KEY = makeStateKey<IAmostra[]>("analise-em-andamento-amostras");
@@ -13,10 +15,12 @@ const AMOSTRAS_KEY = makeStateKey<IAmostra[]>("analise-em-andamento-amostras");
   imports: [
     TabelaAnaliseAmostrasComponent
   ],
-  template:`
-  <app-tabela-analise-amostras class="w-full h-full" [amostras]="amostras()" />`
+  template: `
+    <app-tabela-analise-amostras class="w-full h-full" [amostras]="amostras()" (editarAnalise)="editarAnalise($event)"
+                                 (incluirAnalise)="incluirAnalise($event)"/>`
 })
 export class AnaliseEmAndamentoComponent implements OnInit {
+  #router = inject(Router);
   #platFormId = inject(PLATFORM_ID);
   #transferState = inject(TransferState);
   #amostraService = inject(AmostrasService);
@@ -33,7 +37,7 @@ export class AnaliseEmAndamentoComponent implements OnInit {
   }
 
   private carregarAmostras() {
-    const query: Querys = {status: "status=AGUARDANDO&status=AUTORIZADA"}
+    const query: Querys = {status: "status=AUTORIZADA&status=EXECUCAO"}
     this.#amostraService.findAll(query).subscribe(amostras => {
       if (amostras) {
         this.amostras.set(amostras)
@@ -43,4 +47,23 @@ export class AnaliseEmAndamentoComponent implements OnInit {
       }
     })
   }
+
+  incluirAnalise(data: { amostra: IAmostra, ensaio: ITipoAnalise }) {
+    this.#router.navigate([`analysis/include-results`], {
+      queryParams: {
+        amostra: data.amostra.id,
+        config: data.ensaio.id
+      }
+    });
+  }
+
+  editarAnalise(data: { amostra: IAmostra, ensaio: ITipoAnalise }) {
+    this.#router.navigate([`analysis/include-results`], {
+      queryParams: {
+        amostra: data.amostra.id,
+        config: data.ensaio.id
+      }
+    });
+  }
 }
+

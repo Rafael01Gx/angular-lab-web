@@ -88,7 +88,7 @@ export class TipoAnaliseComponent implements OnInit {
   // Paginação
   paginaAtual = 1;
 
-  itensPorPagina = 5;
+  itensPorPagina = 10;
   // Propriedades
 
   get totalPaginas(): number {
