@@ -62,7 +62,7 @@ import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
             </div>
 
             <!-- Filtro de Status -->
-            <div class="relative">
+            @if(selectFilter()){<div class="relative">
               <ng-icon name="heroFunnel" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></ng-icon>
               <select
                 [(ngModel)]="statusFilter"
@@ -76,7 +76,7 @@ import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
                 <option value="{{Status.FINALIZADA}}">{{Status.FINALIZADA}}</option>
                 <option value="{{Status.CANCELADA}}">{{Status.CANCELADA}}</option>
               </select>
-            </div>
+            </div>}
           </div>
         </div>
       </div>
@@ -263,6 +263,7 @@ import {getPrazoInicioFim} from '../../shared/utils/get-prazo-inicio-fim';
 })
 export class TabelaAnaliseAmostrasComponent implements OnInit, OnChanges {
   amostras= input<IAmostra[]>([]);
+  selectFilter= input<boolean>(true);
   incluirAnalise:OutputEmitterRef<{amostra: IAmostra, ensaio: ITipoAnalise}> = output<{amostra: IAmostra, ensaio: ITipoAnalise}>();
   editarAnalise:OutputEmitterRef<{amostra: IAmostra, ensaio: ITipoAnalise}> = output<{amostra: IAmostra, ensaio: ITipoAnalise}>();
 

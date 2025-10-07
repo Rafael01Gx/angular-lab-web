@@ -15,6 +15,7 @@ export interface IAmostra {
   user: IUser;
   resultados:{[key:string]:{}};
   analistas: IUser[];
+  revisor: IUser;
   status: Status ;
   progresso: number;
   prazoInicioFim: string;

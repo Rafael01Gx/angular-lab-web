@@ -26,5 +26,5 @@ export const ANALISES_ROUTES:Routes= [{
   {
     path: 'completed',
     pathMatch: 'full',
-    loadComponent: ()=> import('./lancamento-resultado/lancamento-resultado.component').then((c)=> c.LancamentoResultadoComponent)
+    loadComponent: ()=> import('./analise-finalizada/analise-finalizada.component').then((c)=> c.AnaliseFinalizadaComponent)
   },];

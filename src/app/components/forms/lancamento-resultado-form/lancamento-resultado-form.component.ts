@@ -113,7 +113,7 @@ import {
                 <button
                   type="button"
                   (click)="onReset()"
-                  class="px-6 py-3 text-slate-600 bg-white border-2 border-slate-300 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-slate-500/20"
+                  class="px-4 py-2 button-gradient-orange"
                 >
                     <span class="flex items-center justify-center">
                       <ng-icon name="heroArrowPath" class="w-5 h-5 mr-2"></ng-icon>
@@ -124,11 +124,11 @@ import {
                 <button
                   type="submit"
                   [disabled]="!resultadosForm()!.valid"
-                  class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/30"
+                  class="px-4 py-2 button-gradient-blue"
                 >
                     <span class="flex items-center justify-center">
                       <ng-icon name="heroCheck" class="w-5 h-5 mr-2"></ng-icon>
-                      Salvar Resultados
+                      {{ editar() ? "Salvar Alterações" : "Salvar" }}
                     </span>
                 </button>
               </div>
@@ -150,7 +150,7 @@ import {
 export class LancamentoResultadoFormComponent {
   #formDinamicoService = inject(FormularioDinamicoService);
   #cdr = inject(ChangeDetectorRef);
-
+  editar = input<boolean>(false);
   parametrosConfig = input<AnaliseForm| Record<string,ParametrosForm> | null>(null);
   formSaved:OutputEmitterRef<any> = output<any>();
 

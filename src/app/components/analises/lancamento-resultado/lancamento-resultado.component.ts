@@ -33,10 +33,10 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
         <!-- Coluna Esquerda: Informações e Seleção -->
         <div class="w-80 flex flex-col gap-4">
 
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
+          <div class="bg-white rounded-md shadow-sm border border-gray-200 p-2">
             <button
               (click)="voltar()"
-              class="inline-flex items-center gap-2 px-4 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-sm"
+              class="inline-flex items-center gap-2 px-4 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all shadow-sm"
             >
               <ng-icon name="heroArrowSmallLeft" size="18" class="mr-2"/>
               Voltar
@@ -44,10 +44,10 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
           </div>
 
           <!-- Card: Informações da Amostra -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <div class="bg-white rounded-md shadow-sm border border-gray-200 p-5">
 
             <div class="flex items-center gap-3 mb-4">
-              <div class="p-2 bg-blue-50 rounded-lg">
+              <div class="p-2 bg-blue-50 rounded-md">
                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -75,9 +75,9 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
 
           <!-- Card: Status do Resultado -->
           @if (resultadoExiste()) {
-            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-5">
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-md border border-amber-200 p-5">
               <div class="flex items-start gap-3 mb-4">
-                <div class="p-2 bg-white rounded-lg shadow-sm">
+                <div class="p-2 bg-white rounded-md shadow-sm">
                   <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -94,7 +94,7 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
 
               <button
                 (click)="excluirResultado()"
-                class="w-full px-4 py-2.5 bg-white hover:bg-red-50 text-red-600 font-medium text-sm rounded-lg border border-red-200 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-sm"
+                class="w-full px-4 py-2.5 bg-white hover:bg-red-50 text-red-600 font-medium text-sm rounded-md border border-red-200 hover:border-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -105,9 +105,9 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
             </div>
           } @else {
             <!-- Card: Seleção de Análise -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div class="bg-white rounded-md shadow-sm border border-gray-200 p-5">
               <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 bg-purple-50 rounded-lg">
+                <div class="p-2 bg-purple-50 rounded-md">
                   <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
@@ -125,7 +125,7 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
                     #selectedConfigId
                     (change)="onConfigChange(selectedConfigId.value)"
                     [disabled]="resultadoExiste()"
-                    class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
+                    class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed transition-all"
                   >
                     <option [value]="null">Selecione...</option>
                     @for (config of configuracoes(); track config.id) {
@@ -161,16 +161,16 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
         <div class="flex-1 flex flex-col">
           @if (currentAnalise()) {
             <!-- Modo Inclusão -->
-            <div class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="flex-1 flex flex-col bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden">
               <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                 <div class="flex items-center gap-3">
-                  <div class="p-2 bg-blue-50 rounded-lg">
+                  <div class="p-2 bg-blue-50 rounded-md">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                   </div>
                   <div>
-                    <h2 class="text-lg font-semibold text-gray-900">Novo Resultado</h2>
+                    <h2 class="text-lg font-semibold text-gray-900">{{resultadoExiste() ? "Editar Resultado" :"Incluir Resultado" }}</h2>
                     <p class="text-sm text-gray-600">{{ currentAnalise()?.nomeDescricao }}</p>
                   </div>
                 </div>
@@ -180,13 +180,14 @@ import {ConfirmationModalService} from '../../../services/confirmation-modal.ser
                 <app-lancamento-resultado-form
                   [parametrosConfig]="currentAnalise()"
                   (formSaved)="onFormSaved($event)"
+                  [editar]="resultadoExiste()"
                 />
               </div>
             </div>
           } @else {
             <!-- Estado Vazio -->
             <div
-              class="flex-1 flex items-center justify-center bg-white rounded-xl border-2 border-dashed border-gray-300">
+              class="flex-1 flex items-center justify-center bg-white rounded-md border-2 border-dashed border-gray-300">
               <div class="text-center p-12">
                 <div class="inline-flex p-4 bg-gray-50 rounded-full mb-4">
                   <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,7 +245,7 @@ export class LancamentoResultadoComponent {
   resultadoExiste = computed(() => {
     const tipo = this.analiseTipo();
     const amostra = this.amostra();
-    return tipo && amostra?.resultados && amostra.resultados.hasOwnProperty(tipo);
+    return !!(tipo && amostra?.resultados && amostra.resultados.hasOwnProperty(tipo));
   });
 
   constructor() {
