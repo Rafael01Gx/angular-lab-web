@@ -1,23 +1,23 @@
+FROM node:22-slim  AS builder
 
-FROM node:22-alpine AS builder
-
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
-
-RUN npm ci
+RUN npm install --quiet --no-fund --log-level=error
 
 COPY . .
+RUN npm run build:ssr
 
-RUN npm run build
+FROM node:22-alpine AS production
 
-FROM node:22-alpine
+WORKDIR /usr/src/app
 
-WORKDIR /app
+COPY --from=builder /usr/src/app/dist/angular-lab-web /usr/src/app/dist/angular-lab-web
 
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /usr/src/app/package*.json ./
 
-RUN npm ci --only=production
+RUN npm install --omit=dev --no-fund --log-level=error
 
 EXPOSE 4000
+
+CMD ["npm", "run", "serve:ssr:angular-lab-web"]
