@@ -16,6 +16,8 @@ export function mapStatus(status: string): Status {
       return Status.AUTORIZADA;
     case 'EXECUCAO':
       return Status.EXECUCAO;
+    case 'FINALIZADA':
+      return Status.FINALIZADA;
     case 'CANCELADA':
       return Status.CANCELADA;
     default:
@@ -23,7 +25,7 @@ export function mapStatus(status: string): Status {
   }
 }
 
-export function keyOfStatus(status: string): string{
+export function keyOfStatus(status: string): string {
   switch (status) {
     case Status.AGUARDANDO:
       return 'AGUARDANDO';
@@ -31,6 +33,8 @@ export function keyOfStatus(status: string): string{
       return 'AUTORIZADA';
     case Status.EXECUCAO:
       return 'EXECUCAO';
+    case Status.FINALIZADA:
+      return 'FINALIZADA';
     case Status.CANCELADA:
       return 'CANCELADA';
     default:

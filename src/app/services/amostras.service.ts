@@ -1,10 +1,10 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, tap, throwError} from 'rxjs';
 import {IAmostra} from '../shared/interfaces/amostra.interface';
-import {Querys} from '../shared/interfaces/querys.interface';
+import {PaginatedResponse, Querys} from '../shared/interfaces/querys.interface';
 
 
 
@@ -31,6 +31,24 @@ export class AmostrasService {
       withCredentials: true,
     }).pipe( catchError(this.handleGetError.bind(this)));
   }
+
+findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
+  let params = new HttpParams();
+
+  if (query) {
+    if (query.status) params = params.append('status', query.status.toString());
+    if (query.limit) params = params.append('limit', query.limit.toString());
+    if (query.page) params = params.append('page', query.page.toString());
+  }
+
+  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/concluidas`, {
+    params,
+    withCredentials: true,
+  }).pipe(
+    catchError(this.handleGetError.bind(this))
+  );
+}
+
 
   findById(id: string|number): Observable<IAmostra> {
     return this.#http.get<IAmostra>(`${this.#apiUrl}/${id}`, {
