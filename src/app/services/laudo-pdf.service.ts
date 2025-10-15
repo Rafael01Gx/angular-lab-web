@@ -520,10 +520,12 @@ justify-content: space-around;
     border: 1px solid grey;
     border-radius: 4px;
     text-align: center;
+    padding: 4px;
 div{
   margin: 0 10px;}
 .analista-funcao{
   background-color: rgb(221, 221, 221);
+  text-align: center;
 }
   }
 }

@@ -4,6 +4,10 @@ export interface Querys {
   page?: number;
   limit?: number;
   status?: string;
+  dataInicio?: string;
+  dataFim?: string;
+  tipoAnalise?: string;
+  userName?:string;
 }
 
 export interface PaginatedResponse<T> {
