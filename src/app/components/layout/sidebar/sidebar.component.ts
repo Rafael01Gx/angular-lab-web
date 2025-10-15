@@ -22,7 +22,8 @@ import {
   heroAdjustmentsHorizontal,
   heroTag,
   heroCube,
-  heroBriefcase,heroListBullet,heroArchiveBox,heroSquare2Stack,heroGlobeAmericas,heroPresentationChartBar
+  heroBriefcase,heroListBullet,heroArchiveBox,heroSquare2Stack,heroGlobeAmericas,heroPresentationChartBar,
+  heroInformationCircle
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
 import { IMenuItem } from '../../../shared/interfaces/layout.interface';
@@ -57,7 +58,8 @@ import { IMenuItem } from '../../../shared/interfaces/layout.interface';
       heroArchiveBox,
       heroSquare2Stack,
       heroGlobeAmericas,
-      heroPresentationChartBar
+      heroPresentationChartBar,
+      heroInformationCircle
     })
   ],
   host: { class: 'block max-h-full'
@@ -94,10 +96,10 @@ router = inject(Router);
 
   menuItems: IMenuItem[] = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: 'heroChartBarSquare',
-      route: '/dashboard'
+      id: 'info',
+      label: 'Info',
+      icon: 'heroInformationCircle',
+      route: '/'
     },
     {
       id: 'orders',
