@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - development
-      - docker-build
+      - master
 
 jobs:
   build-and-push:
@@ -29,8 +29,8 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/angular-lab-web
           tags: |
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' }}
+            type=raw,value=development,enable=${{ github.ref_name == 'development' }}
 
       - name: Cria e envia a imagem do Docker
         uses: docker/build-push-action@v5
