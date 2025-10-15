@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - development
-      - docker-build
+      - master
 
 jobs:
   build-and-push:
@@ -29,8 +29,8 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/angular-lab-web
           tags: |
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' }}
+            type=raw,value=development,enable=${{ github.ref_name == 'development' }}
 
       - name: Cria e envia a imagem do Docker
         uses: docker/build-push-action@v5
@@ -40,5 +40,28 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          #cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/angular-lab-web:buildcache
-          #cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/angular-lab-web:buildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/angular-lab-web:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/angular-lab-web:buildcache,mode=max
+
+      - name: Deploy no EC2 via Docker Compose
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ec2-52-67-220-103.sa-east-1.compute.amazonaws.com
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/lab-web-infraestrutura
+            
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/angular-lab-web:latest
+            
+            docker compose up -d --no-deps --force-recreate frontend
+            
+            echo "Aguardando o frontend ficar saudável..."
+            timeout 60 bash -c 'until docker compose ps frontend | grep -q "healthy"; do sleep 2; done' || echo "Timeout esperando healthcheck"
+            
+            docker compose restart nginx
+            
+            docker image prune -af
+            
+            echo "=== Status dos containers ==="
+            docker compose ps
