@@ -6,8 +6,8 @@ export interface Querys {
   status?: string;
   dataInicio?: string;
   dataFim?: string;
-  tipoAnalise?: string;
-  userName?:string;
+  // tipoAnalise?: string;
+  // userName?:string;
 }
 
 export interface PaginatedResponse<T> {

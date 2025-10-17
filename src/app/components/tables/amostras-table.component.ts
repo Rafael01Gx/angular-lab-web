@@ -1,5 +1,6 @@
+import { keyOfStatus, Status } from './../../shared/enums/status.enum';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { 
@@ -9,18 +10,19 @@ import {
   heroXMark,
   heroMagnifyingGlass,
   heroChevronDown,
-  heroChevronUp
+  heroChevronUp,
+  heroPrinter
 } from '@ng-icons/heroicons/outline';
 import { PaginatedResponse, Querys } from '../../shared/interfaces/querys.interface';
 import { IAmostra } from '../../shared/interfaces/amostra.interface';
 import { AmostrasService } from '../../services/amostras.service';
-import { Status } from '../../shared/enums/status.enum';
+import { LaudoAmostraService } from '../../services/laudo-pdf.service';
 
 
 @Component({
   selector: 'app-amostras-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent,DatePipe],
   providers: [
     provideIcons({ 
       heroChevronLeft, 
@@ -29,7 +31,8 @@ import { Status } from '../../shared/enums/status.enum';
       heroXMark,
       heroMagnifyingGlass,
       heroChevronDown,
-      heroChevronUp
+      heroChevronUp,
+      heroPrinter
     })
   ],
   template: `
@@ -104,7 +107,7 @@ import { Status } from '../../shared/enums/status.enum';
               />
             </div>
 
-            <!-- Tipo de Análise -->
+            <!-- Tipo de Análise
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Análise</label>
               <input
@@ -114,8 +117,8 @@ import { Status } from '../../shared/enums/status.enum';
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
-            <!-- Nome do Usuário -->
+                 -->
+            <!-- Nome do Usuário 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Solicitante</label>
               <input
@@ -125,7 +128,8 @@ import { Status } from '../../shared/enums/status.enum';
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
-          </div>
+            -->
+          </div> 
 
           <!-- Botões de ação dos filtros -->
           <div class="flex gap-3 mt-4">
@@ -176,17 +180,19 @@ import { Status } from '../../shared/enums/status.enum';
             <thead class="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Número OS</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Data OS</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Nome da Amostra</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Data Amostra</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Progresso</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Analistas</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Laudo</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
               @for (amostra of amostras(); track amostra.id) {
                 <tr class="hover:bg-gray-50 transition-colors">
                   <td class="px-4 py-3 text-sm text-gray-900">{{ amostra.numeroOs }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ amostra.createdAt | date: 'dd/MM/yyyy' }}</td>
                   <td class="px-4 py-3 text-sm text-gray-900">{{ amostra.nomeAmostra }}</td>
                   <td class="px-4 py-3 text-sm text-gray-600">{{ formatDate(amostra.dataAmostra) }}</td>
                   <td class="px-4 py-3">
@@ -206,7 +212,13 @@ import { Status } from '../../shared/enums/status.enum';
                     </div>
                   </td>
                   <td class="px-4 py-3 text-sm text-gray-600">
-                     'amostra.analistas.map(a => a.name).join(', ')' 
+                      <button
+                    (click)="imprimirLaudo(amostra, $event)"
+                    class="inline-flex items-center px-3 py-1.5 button-gradient-blue"
+                    [disabled]="amostra.progresso < 100 || amostra.revisor === null || amostra.revisor === undefined"
+                  > 
+                    <ng-icon name="heroPrinter"/>
+                  </button> 
                   </td>
                 </tr>
               }
@@ -278,7 +290,7 @@ import { Status } from '../../shared/enums/status.enum';
 
       <!-- Estado Vazio -->
       @if (!isLoading() && amostras().length === 0) {
-        <div class="text-center py-12">
+        <div class="text-center py-12  bg-white min-h-0 h-full ">
           <ng-icon name="heroMagnifyingGlass" size="48" class="text-gray-400 mb-4"></ng-icon>
           <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma amostra encontrada</h3>
           <p class="text-gray-600">Tente ajustar os filtros de busca</p>
@@ -290,7 +302,7 @@ import { Status } from '../../shared/enums/status.enum';
 })
 export class AmostrasTableComponent {
   private amostraService = inject(AmostrasService);
-
+  #laudoAmostraService = inject(LaudoAmostraService);
   // Signals para gerenciar o estado
   amostras = signal<IAmostra[]>([]);
   isLoading = signal(false);
@@ -306,11 +318,11 @@ export class AmostrasTableComponent {
 
   // Status disponíveis
   statusOptions = [
-    { value: Status.AGUARDANDO, label: 'Aguardando Autorização' },
-    { value: Status.AUTORIZADA, label: 'Autorizada' },
-    { value: Status.EXECUCAO, label: 'Em Execução' },
-    { value: Status.FINALIZADA, label: 'Finalizada' },
-    { value: Status.CANCELADA, label: 'Cancelada' }
+    { value: keyOfStatus(Status.AGUARDANDO), label: 'Aguardando Autorização' },
+    { value: keyOfStatus(Status.AUTORIZADA), label: 'Autorizada' },
+    { value: keyOfStatus(Status.EXECUCAO), label: 'Em Execução' },
+    { value: keyOfStatus(Status.FINALIZADA), label: 'Finalizada' },
+    { value: keyOfStatus(Status.CANCELADA), label: 'Cancelada' }
   ];
 
   // Computed signals
@@ -357,8 +369,8 @@ export class AmostrasTableComponent {
     if (filters.status) count++;
     if (filters.dataInicio) count++;
     if (filters.dataFim) count++;
-    if (filters.tipoAnalise) count++;
-    if (filters.userName) count++;
+    // if (filters.tipoAnalise) count++;
+    // if (filters.userName) count++;
     return count;
   });
 
@@ -375,12 +387,12 @@ export class AmostrasTableComponent {
     if (filters.dataFim) {
       list.push({ key: 'dataFim', label: 'Data Fim', value: filters.dataFim });
     }
-    if (filters.tipoAnalise) {
-      list.push({ key: 'tipoAnalise', label: 'Tipo Análise', value: filters.tipoAnalise });
-    }
-    if (filters.userName) {
-      list.push({ key: 'userName', label: 'solicitante', value: filters.userName });
-    }
+    // if (filters.tipoAnalise) {
+    //   list.push({ key: 'tipoAnalise', label: 'Tipo Análise', value: filters.tipoAnalise });
+    // }
+    // if (filters.userName) {
+    //   list.push({ key: 'userName', label: 'solicitante', value: filters.userName });
+    // }
     
     return list;
   });
@@ -487,5 +499,10 @@ export class AmostrasTableComponent {
       default:
         return baseClasses + 'bg-gray-100 text-gray-800';
     }
+  }
+  imprimirLaudo(amostra: IAmostra, event: Event) {
+    event.stopPropagation();
+    if (!amostra) return;
+    this.#laudoAmostraService.generateLaudoPdf(amostra);
   }
 }

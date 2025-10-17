@@ -33,7 +33,7 @@
     </div>
 
     <nav class="flex-1 p-2 space-y-1 overflow-y-auto custom-scrollbar">
-      @for(item of menuItems; track item){
+      @for(item of menuItemsFiltered(); track item){
       <div class="space-y-1">
         <button
           (click)="handleMenuClick(item)"

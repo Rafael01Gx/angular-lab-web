@@ -52,7 +52,6 @@ const ORDERS_KEY = makeStateKey<IOrders[]>("orders-pending-table")
         </div>
       </div>
 
-      <!-- Table Container com altura mínima definida -->
       <div class="flex-1 min-h-0">
         <app-ordem-servico-table
           [impressao]="true"
@@ -95,9 +94,10 @@ export class OrdersPendingTableComponent implements OnInit {
   }
 
   loadOrders() {
-    const status = "status=CANCELADA&status=AGUARDANDO&status=AUTORIZADA";
+    const status = "status=EXECUCAO&status=AGUARDANDO&status=AUTORIZADA";
     this.#orderService.findAllByUser({status}).subscribe((res) => {
       if (res) {
+        res = this.calcularProgresso(res);
         this.ordems.set(res);
         this.ordemsFiltradas.set(res);
         if (isPlatformServer(this.#platFormId)) {
@@ -111,4 +111,15 @@ export class OrdersPendingTableComponent implements OnInit {
     return []
 
   }
+
+  calcularProgresso(data: IOrders[]): IOrders[] {
+      return data.map((ordem) => {
+        const totalAmostras = ordem.amostras.length;
+        const mediaProgressoAmostras = Math.round(
+                ordem.amostras.reduce((acc, amostra) => acc + (amostra.progresso || 0), 0) /
+                  totalAmostras
+              );
+        return { ...ordem, progresso: mediaProgressoAmostras };
+      });
+    }
 }

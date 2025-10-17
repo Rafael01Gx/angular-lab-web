@@ -15,8 +15,6 @@ import {
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { IAmostra } from '../../../shared/interfaces/amostra.interface';
 import { AmostrasService } from '../../../services/amostras.service';
-import { Router } from '@angular/router';
-import { ITipoAnalise } from '../../../shared/interfaces/analysis-type.interface';
 import { LaudoAmostraService } from '../../../services/laudo-pdf.service';
 
 const AMOSTRAS_FINALIZADAS_KEY = makeStateKey<IAmostra[]>(

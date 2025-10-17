@@ -41,7 +41,7 @@ findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IA
     if (query.page) params = params.append('page', query.page.toString());
     if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
     if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
-    if (query.tipoAnalise) params = params.append('tipoAnalise', query.tipoAnalise.toString());
+    // if (query.tipoAnalise) params = params.append('tipoAnalise', query.tipoAnalise.toString());
   }
 
   return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/concluidas`, {
