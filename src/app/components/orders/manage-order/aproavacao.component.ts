@@ -17,15 +17,12 @@ import { IAmostra } from '../../../shared/interfaces/amostra.interface';
 import { AmostrasService } from '../../../services/amostras.service';
 import { LaudoAmostraService } from '../../../services/laudo-pdf.service';
 
-const AMOSTRAS_FINALIZADAS_KEY = makeStateKey<IAmostra[]>(
-  'analises-finalizadas'
-);
-const PAGINATED_META_KEY = makeStateKey<PaginatedMeta>(
-  'analises-finalizadas-meta'
+const AMOSTRAS_KEY = makeStateKey<IAmostra[]>(
+  'amostras-aproavacao'
 );
 
 @Component({
-  selector: 'app-analise-finalizada',
+  selector: 'app-aproavacao',
   imports: [TabelaAnaliseAmostrasComponent],
   template: ` <app-tabela-analise-amostras
     class="w-full h-full"
@@ -37,7 +34,7 @@ const PAGINATED_META_KEY = makeStateKey<PaginatedMeta>(
     (pageChange)="onPageChange($event)"
   />`,
 })
-export class AnaliseFinalizadaComponent implements OnInit {
+export class AproavacaoComponent implements OnInit {
   #laudoAmostraService = inject(LaudoAmostraService);
   #platFormId = inject(PLATFORM_ID);
   #transferState = inject(TransferState);
@@ -46,19 +43,17 @@ export class AnaliseFinalizadaComponent implements OnInit {
   paginatedMeta = signal<PaginatedMeta | null>(null);
 
   ngOnInit() {
-    const amostras = this.#transferState.get(AMOSTRAS_FINALIZADAS_KEY, []);
-    const paginatedMeta = this.#transferState.get(PAGINATED_META_KEY, null);
+    const amostras = this.#transferState.get(AMOSTRAS_KEY, []);
     if (amostras.length > 0 && isPlatformBrowser(this.#platFormId)) {
       this.amostras.set(amostras);
-      this.paginatedMeta.set(paginatedMeta);
-      this.#transferState.remove(AMOSTRAS_FINALIZADAS_KEY);
+      this.#transferState.remove(AMOSTRAS_KEY);
       return;
     }
     this.carregarAmostras();
   }
 
-  private carregarAmostras(limit: number = 20, page: number = 1 ,concluidas: boolean = true) {
-    const query: Querys = { limit, page , concluidas};
+  private carregarAmostras(limit: number = 20, page: number = 1) {
+    const query: Querys = { limit, page };
     this.#amostraService
       .findAllWithAnalystsAndCompleted(query)
       .subscribe((res) => {
@@ -68,7 +63,7 @@ export class AnaliseFinalizadaComponent implements OnInit {
           console.log(res.meta);
           if (isPlatformServer(this.#platFormId)) {
             this.paginatedMeta.set(res.meta);
-            this.#transferState.set(AMOSTRAS_FINALIZADAS_KEY, res.data);
+            this.#transferState.set(AMOSTRAS_KEY, res.data);
           }
         }
       });

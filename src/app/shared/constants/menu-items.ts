@@ -49,7 +49,7 @@ export const menuItems: IMenuItem[] = [
         { id: 'manage-dashboard', label: 'Dashboard', icon: 'heroPresentationChartBar', route: '/manage-orders/dashboard' },
         { id: 'manage-waiting', label: 'Aguardando', icon: 'heroClock', route: '/manage-orders/waiting' },
        // { id: 'manage-authorized', label: 'Autorizada', icon: 'heroCheckCircle', route: '/manage-orders/authorized' },
-        { id: 'manage-executing', label: 'Em Execução', icon: 'heroPlay', route: '/manage-orders/executing' },
+        { id: 'manage-executing', label: 'Aprovação', icon: 'heroPlay', route: '/manage-orders/executing' },
         { id: 'manage-completed', label: 'Finalizadas', icon: 'heroCheckCircle', route: '/manage-orders/completed' }
       ],
       rolesAllowed:[EMenuRoles.ADMIN],

@@ -265,11 +265,8 @@ export class AgendamentoModalComponent implements OnInit, AfterViewInit {
     this.onPrazoChange();
   }
 
-  extractDataInicio(prazoInicioFim ?: string)
-    :
-    string {
+  extractDataInicio(prazoInicioFim ?: string):string {
     if (!prazoInicioFim) return '';
-    // Assume formato "YYYY-MM-DD - YYYY-MM-DD" ou similar
     const parts = prazoInicioFim.split(' - ');
     return parts[0] || '';
   }
@@ -283,12 +280,9 @@ export class AgendamentoModalComponent implements OnInit, AfterViewInit {
   }
 
   onPrazoChange() {
-    // Validar cada amostra
     this.amostrasPrazos.forEach(amostra => {
       amostra.valid = this.isAmostraValid(amostra);
     });
-
-    // Calcular prazo da OS
     this.calculatePrazoOS();
   }
 
@@ -337,10 +331,7 @@ export class AgendamentoModalComponent implements OnInit, AfterViewInit {
     return this.amostrasPrazos.filter(a => !a.valid).length;
   }
 
-  onBackdropClick(event
-                  :
-                  MouseEvent
-  ) {
+  onBackdropClick(event: MouseEvent) {
     this.closeModal();
   }
 

@@ -14,6 +14,7 @@ import {heroArrowSmallLeft} from '@ng-icons/heroicons/outline';
 import {AmostrasService} from '../../../services/amostras.service';
 import {ToastrService} from '../../../services/toastr.service';
 import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
+import { keyOfStatus, Status } from '../../../shared/enums/status.enum';
 
 @Component({
   selector: 'app-lancamento-resultado',
@@ -281,6 +282,7 @@ export class LancamentoResultadoComponent {
     }
 
     const updateAmostra = this.amostra();
+    updateAmostra.status = keyOfStatus(Status.EXECUCAO) as Status;
     if (!updateAmostra.resultados) {
       updateAmostra.resultados = {};
     }

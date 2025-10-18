@@ -249,17 +249,15 @@ import { PaginatedMeta } from '../../shared/interfaces/querys.interface';
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center justify-end">
-                      <button
-                        (click)="
-                          $event.stopPropagation(); amostraEmmit(amostra)
-                        "
-                        class="px-4 py-2 max-h-[40px] text-sm bg-gradient-to-r from-blue-500/80 to-blue-600/80 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                      >
-                        <ng-icon name="heroPrinter" class="text-sm"></ng-icon>
-                        Laudo de Análise
+                      <button 
+                        [disabled]="!amostra.revisor"
+                        (click)="$event.stopPropagation(); amostraEmmit(amostra)"
+                        class="px-4 py-2 max-h-[40px] text-sm bg-gradient-to-r from-blue-500/80 to-blue-600/80 text-white rounded-md hover:bg-blue-700 disabled:from-gray-500 disabled:to-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                        <ng-icon [name]="amostra.revisor ? 'heroPrinter': 'heroClock'" class="text-sm"/>
+                        {{amostra.revisor && "Laudo de Análise" || "Aguardando revisão."}}
                       </button>
                     </div>
-                  </td>
+                  </td> 
                   }
                 </tr>
 

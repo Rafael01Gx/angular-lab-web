@@ -6,7 +6,7 @@ export interface Querys {
   status?: string;
   dataInicio?: string;
   dataFim?: string;
-  // tipoAnalise?: string;
+  concluidas?: boolean;
   // userName?:string;
 }
 
