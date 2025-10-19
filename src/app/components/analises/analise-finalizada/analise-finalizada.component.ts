@@ -57,8 +57,8 @@ export class AnaliseFinalizadaComponent implements OnInit {
     this.carregarAmostras();
   }
 
-  private carregarAmostras(limit: number = 20, page: number = 1 ,concluidas: boolean = true) {
-    const query: Querys = { limit, page , concluidas};
+  private carregarAmostras(limit: number = 20, page: number = 1 ,progresso: number = 100) {
+    const query: Querys = { limit, page , progresso};
     this.#amostraService
       .findAllWithAnalystsAndCompleted(query)
       .subscribe((res) => {

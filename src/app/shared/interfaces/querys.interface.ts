@@ -6,6 +6,7 @@ export interface Querys {
   status?: string;
   dataInicio?: string;
   dataFim?: string;
+  progresso?:number;
   concluidas?: boolean;
   // userName?:string;
 }

@@ -42,6 +42,7 @@ findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IA
     if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
     if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
     if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
+    if (query.progresso) params = params.append('progresso', query.progresso.toString());
   }
 
   return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/amostras`, {
@@ -73,6 +74,12 @@ findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IA
 
   update(id: number | string, body: Partial<IAmostra>): Observable<IAmostra> {
     return this.#http.patch<IAmostra>(`${this.#apiUrl}/${id}`, body, {
+      withCredentials: true,
+    }).pipe(catchError(this.handleSetError.bind(this)));
+  }
+
+  assinar(id: number | string, body: Partial<IAmostra>): Observable<IAmostra> {
+    return this.#http.patch<IAmostra>(`${this.#apiUrl}/assinar/${id}`,{body}, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }

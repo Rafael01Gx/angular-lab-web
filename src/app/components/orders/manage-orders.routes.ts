@@ -18,5 +18,13 @@ export const MANAGE_ORDERS_ROUTES: Routes = [
         (m) => m.ManagePendingOrdersComponent
       ),
   },
+  {
+    path: 'executing',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./manage-order/aproavacao.component').then(
+        (m) => m.AproavacaoComponent
+      ),
+  },
 
 ]
