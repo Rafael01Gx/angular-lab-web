@@ -66,8 +66,8 @@ export class AproavacaoComponent implements OnInit {
     this.carregarAmostras();
   }
 
-  private carregarAmostras(limit: number = 20, page: number = 1,progresso:number=100) {
-    const query: Querys = { limit, page ,progresso};
+  private carregarAmostras(limit: number = 20, page: number = 1,status:string='EXECUCAO',progresso:number=100) {
+    const query: Querys = { limit, page ,progresso,status};
     this.#amostraService
       .findAllWithAnalystsAndCompleted(query)
       .subscribe((res) => {

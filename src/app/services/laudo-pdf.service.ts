@@ -223,11 +223,13 @@ async generatePdfFromElement(
 
               ${this.renderResultados(amostra.resultados)}
 
-                    <fieldset class="ensaios elaboracao">
+                    <fieldset class="ensaios">
         <div class="title">
           <h2>Elaboração & aprovação</h2>
         </div>
+        <div class="signatures-section">
         ${this.renderAnalistas(amostra.analistas,amostra)}
+        </div>
       </fieldset>
             </div>
           </div>
@@ -508,16 +510,17 @@ margin: 0;
 
  /* Signatures Section */
       .signatures-section {
-        margin-top: 30px;
-        border: 2px solid #005cbb;
-        border-radius: 8px;
-        overflow: hidden;
+      display:flex;
+      flex-grow:1;
+      align-itens:center;
+      justify-content: space-around;
+      width:100%;
       }
-
       .signatures-grid {
+        flex-grow: 1;
         display: flex;
         gap: 5px;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items:center;
         padding: 15px;
       }
