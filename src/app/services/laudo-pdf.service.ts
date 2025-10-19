@@ -140,7 +140,7 @@ async generatePdfFromElement(
                 <div>
                   <div>
                     <span>Área Solicitante:</span>
-                    <fieldset><p>GAPSI</p></fieldset>
+                    <fieldset><p>${amostra.user?.area || 'N/A'}</p></fieldset>
                   </div>
                   <div>
                     <span>Data de Início:</span>
@@ -252,34 +252,34 @@ async generatePdfFromElement(
   }
 
   private renderAnalistas(analistas: IUser[], amostra: IAmostra): string {
-    return analistas
-      .map(
-        (analista) => `
-        <div class="container-assinatura">
-          ${analista ? `
-          <div class="analista-aprovador">
-            <div>${analista.name?.toUpperCase()}</div>
-            <div><small class="analista-funcao">${analista.funcao || ""}</small></div>
-            <div><em><strong>${analista.area }</strong></em></div>
-          </div>` : ''}
-          <div class="analista-aprovador">
-            <div>${amostra.revisor.name?.toUpperCase()}</div>
-            <div><small class="analista-funcao">${amostra.revisor.funcao || ""}</small></div>
-            <div><em><strong>${amostra.revisor.area || ""}</strong></em></div>
+    return `
+      <div class="signatures-grid">
+        ${analistas.map(analista => `
+          <div class="signature-card">
+            <div class="signature-line"></div>
+            <div class="signature-name">${analista.name?.toUpperCase()}</div>
+            <div class="signature-role">${analista.funcao || ""}</div>
+            <div class="signature-area">${analista.area || ""}</div>
+            <div class="signature-label">Analista Responsável</div>
           </div>
-        </div>`
-      )
-      .join('');
+        `).join('')}
+        <div class="signature-card">
+          <div class="signature-line"></div>
+          <div class="signature-name">${amostra.revisor.name?.toUpperCase()}</div>
+          <div class="signature-role">${amostra.revisor.funcao || ""}</div>
+          <div class="signature-area">${amostra.revisor.area || ""}</div>
+          <div class="signature-label">Revisor Técnico</div>
+        </div>
+      </div>
+    `;
   }
 
   private renderResultadosTable(key: string, value: ParametrosForm[]): string {
-    const isSpecialCase = ['RDI', 'GRANULOMETRIA'].includes(
-      key.trim().toUpperCase()
-    );
-    const entries = Object.entries(value).map((entry) => entry[1]) as ParametrosForm[];
 
+    const entries = Object.entries(value).map((entry) => entry[1]) as ParametrosForm[];
+    const isSpecialCase = entries.length > 10
     const tableStyle = isSpecialCase
-      ? 'style="display: flex;flex-direction: column; flex-wrap: wrap;"'
+      ? 'style="display: flex;flex-direction: column; gap:1mm;"'
       : '';
 
     const rowStyle = isSpecialCase
@@ -505,30 +505,73 @@ margin: 0;
   flex-direction: column;
   
 }
-  .container-assinatura{
-  padding: 5px;
-width: 100%;
-display: flex;
-flex-direction: row-reverse;
-align-items:center ;
-justify-content: space-around;
 
-  .analista-aprovador{
-    font-size: small;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid grey;
-    border-radius: 4px;
-    text-align: center;
-    padding: 4px;
-div{
-  margin: 0 10px;}
-.analista-funcao{
-  background-color: rgb(221, 221, 221);
-  text-align: center;
-}
-  }
-}
+ /* Signatures Section */
+      .signatures-section {
+        margin-top: 30px;
+        border: 2px solid #005cbb;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .signatures-grid {
+        display: flex;
+        gap: 5px;
+        justify-content: space-around;
+        align-items:center;
+        padding: 15px;
+      }
+
+      .signature-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+        padding: 6px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+
+      .signature-line {
+        height: 5px;
+        border-bottom: 2px solid #005cbb;
+        margin-bottom: 10px;
+      }
+
+      .signature-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: #005cbb;
+        margin-bottom: 6px;
+      }
+
+      .signature-role {
+        font-size: 10px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+
+      .signature-area {
+        font-size: 11px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .signature-label {
+        font-size: 10px;
+        text-align: center;
+        color: white;
+        background: #538dd5;
+        padding: 4px 8px;
+        border-radius: 4px;
+        border-top-left-radius: 0px; 
+        border-top-right-radius: 0px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: inline-block;
+        margin-top: 8px;
+      }
+
   .p-bottom-4{
     padding-bottom: 4px;
   }
