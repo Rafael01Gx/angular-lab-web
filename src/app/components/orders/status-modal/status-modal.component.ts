@@ -26,7 +26,7 @@ import {ToastrService} from '../../../services/toastr.service';
   selector: 'app-status-modal',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIconComponent],
-  providers: [
+  viewProviders: [
     provideIcons({
       heroXMark,
       heroTag,
@@ -241,7 +241,7 @@ export class StatusModalComponent implements OnInit {
 
   async confirmarAlteracao() {
     if (!this.podeConfirmar() || !this.ordem) return;
-    const statusKey =keyOfStatus(this.novoStatus)
+    const statusKey = keyOfStatus(this.novoStatus) as Status
     if (this.ordem()?.status === statusKey){
       this.#toastr.info(`${statusKey} já é o Status atual da Ordem de Serviço !`,'Status não foi Alterado')
       return;

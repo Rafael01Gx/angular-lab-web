@@ -57,7 +57,7 @@ const ORDERS_KEY = makeStateKey<IOrders[]>("orders-pending-table")
           [impressao]="true"
           [cancelarOs]="true"
           class="h-full block"
-          [ordensServico]="ordemsFiltradas()"/>
+          [ordensServico]="ordensFiltradas()"/>
       </div>
     </div>
   `,
@@ -68,8 +68,8 @@ export class OrdersPendingTableComponent implements OnInit {
   #platFormId = inject(PLATFORM_ID);
 
 
-  ordems = signal<IOrders[]>([]);
-  ordemsFiltradas = signal<IOrders[]>([]);
+  ordens = signal<IOrders[]>([]);
+  ordensFiltradas = signal<IOrders[]>([]);
 
   busca = signal('');
   buscaDebounced = debouncedSignal(this.busca, 400);
@@ -77,16 +77,16 @@ export class OrdersPendingTableComponent implements OnInit {
   constructor() {
     effect(() => {
       const valor = this.buscaDebounced().toLowerCase();
-      const filtro = this.ordems().filter((o) => o.id?.toLowerCase().includes(valor) || o.numeroOs?.toLowerCase().includes(valor))
-      valor.length > 0 ? this.ordemsFiltradas.set(filtro) : this.ordemsFiltradas.set(this.ordems());
+      const filtro = this.ordens().filter((o) => o.id?.toLowerCase().includes(valor) || o.numeroOs?.toLowerCase().includes(valor))
+      valor.length > 0 ? this.ordensFiltradas.set(filtro) : this.ordensFiltradas.set(this.ordens());
     });
   }
 
   ngOnInit() {
     const orders = this.#transferState.get(ORDERS_KEY, [])
     if (orders.length > 0 && isPlatformBrowser(this.#platFormId)) {
-      this.ordems.set(orders)
-      this.ordemsFiltradas.set(orders)
+      this.ordens.set(orders)
+      this.ordensFiltradas.set(orders)
       this.#transferState.remove(ORDERS_KEY)
       return;
     }
@@ -98,8 +98,8 @@ export class OrdersPendingTableComponent implements OnInit {
     this.#orderService.findAllByUser({status}).subscribe((res) => {
       if (res) {
         res = this.calcularProgresso(res);
-        this.ordems.set(res);
-        this.ordemsFiltradas.set(res);
+        this.ordens.set(res);
+        this.ordensFiltradas.set(res);
         if (isPlatformServer(this.#platFormId)) {
           this.#transferState.set(ORDERS_KEY, res)
         }
@@ -113,13 +113,13 @@ export class OrdersPendingTableComponent implements OnInit {
   }
 
   calcularProgresso(data: IOrders[]): IOrders[] {
-      return data.map((ordem) => {
-        const totalAmostras = ordem.amostras.length;
+      return data.map((orden) => {
+        const totalAmostras = orden.amostras.length;
         const mediaProgressoAmostras = Math.round(
-                ordem.amostras.reduce((acc, amostra) => acc + (amostra.progresso || 0), 0) /
+                orden.amostras.reduce((acc, amostra) => acc + (amostra.progresso || 0), 0) /
                   totalAmostras
               );
-        return { ...ordem, progresso: mediaProgressoAmostras };
+        return { ...orden, progresso: mediaProgressoAmostras };
       });
     }
 }

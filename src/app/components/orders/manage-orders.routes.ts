@@ -26,5 +26,13 @@ export const MANAGE_ORDERS_ROUTES: Routes = [
         (m) => m.AproavacaoComponent
       ),
   },
+  {
+    path: 'search',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./manage-order/search-orders.component').then(
+        (m) => m.SearchOrdersComponent
+      ),
+  },
 
 ]

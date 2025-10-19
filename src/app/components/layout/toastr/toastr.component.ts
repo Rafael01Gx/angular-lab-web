@@ -14,7 +14,7 @@ import {
 @Component({
   selector: 'app-toastr',
   imports: [NgIconComponent],
-  providers: [
+  viewProviders: [
     provideIcons({
       heroCheckCircle,
       heroExclamationTriangle,

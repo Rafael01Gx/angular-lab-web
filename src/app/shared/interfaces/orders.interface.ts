@@ -8,17 +8,18 @@ export interface IOrders {
   solicitanteId?: string;
   solicitante?: IUser;
   amostras: IAmostra[];
-  status?: string;
+  status?: Status;
   dataRecepcao?: string;
   prazoInicioFim?: string;
   progresso?: number;
   observacao?: string;
   revisorId?: string;
+  revisor?:IUser;
   createdAt?: Date;
   updatedAt?: Date;
 }
 export interface AtualizarStatus{
-  status: string;
+  status: Status;
   observacao?: string;
 }
 export interface IOrderStatistics {

@@ -50,7 +50,7 @@ export const menuItems: IMenuItem[] = [
         { id: 'manage-waiting', label: 'Aguardando', icon: 'heroClock', route: '/manage-orders/waiting' },
        // { id: 'manage-authorized', label: 'Autorizada', icon: 'heroCheckCircle', route: '/manage-orders/authorized' },
         { id: 'manage-executing', label: 'Aprovação', icon: 'heroPlay', route: '/manage-orders/executing' },
-        { id: 'manage-completed', label: 'Finalizadas', icon: 'heroCheckCircle', route: '/manage-orders/completed' }
+        { id: 'manage-filter', label: 'Buscar', icon: 'heroMagnifyingGlass', route: '/manage-orders/search' }
       ],
       rolesAllowed:[EMenuRoles.ADMIN],
     },

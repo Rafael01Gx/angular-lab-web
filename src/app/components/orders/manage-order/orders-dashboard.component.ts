@@ -49,7 +49,7 @@ interface EstatisticasCard {
   selector: 'app-orders-dashboard',
   standalone: true,
   imports: [CommonModule, NgIconComponent, RouterLink, StatusModalComponent],
-  providers: [
+  viewProviders: [
     provideIcons({
       heroClipboardDocumentList,
       heroClock,

@@ -18,7 +18,7 @@ import { getPrazoInicioFim } from '../../../shared/utils/get-prazo-inicio-fim';
     selector: 'app-amostra-details-modal',
     standalone: true,
     imports: [CommonModule, NgIconComponent],
-    providers: [
+    viewProviders: [
         provideIcons({
             heroXMark,
             heroBeaker,

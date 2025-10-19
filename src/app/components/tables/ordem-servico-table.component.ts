@@ -502,7 +502,7 @@ export class OrdemServicoTableComponent {
   #etiqueta = inject(EtiquetasService);
   impressao = input<boolean>(false);
   cancelarOs = input<boolean>(false);
-  ordemSelecionada = output<IOrders | null>();
+  ordenselecionada = output<IOrders | null>();
   ordensServico = input<IOrders[]>([]);
   cancelarOrdemEvent: OutputEmitterRef<string> = output<string>();
 

@@ -1,5 +1,5 @@
-import { keyOfStatus, mapStatus, Status } from './../../shared/enums/status.enum';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { keyOfStatus, mapStatus, Status } from '../../shared/enums/status.enum';
+import { Component, computed, effect, inject, input, model, output, OutputEmitterRef, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
@@ -14,13 +14,14 @@ import {
   heroPrinter
 } from '@ng-icons/heroicons/outline';
 import { PaginatedResponse, Querys } from '../../shared/interfaces/querys.interface';
+import { IOrders } from '../../shared/interfaces/orders.interface';
+import { OrderService } from '../../services/order.service';
+import { debouncedSignal } from '../../shared/utils/debounced-signal';
 import { IAmostra } from '../../shared/interfaces/amostra.interface';
-import { AmostrasService } from '../../services/amostras.service';
-import { LaudoAmostraService } from '../../services/laudo-pdf.service';
 
 
 @Component({
-  selector: 'app-amostras-table',
+  selector: 'app-filter-orders-table',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIconComponent,DatePipe],
   viewProviders: [
@@ -41,7 +42,7 @@ import { LaudoAmostraService } from '../../services/laudo-pdf.service';
        <div class="flex-1 flex flex-col min-h-0">
       <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-gray-900">Amostras</h2>
+          <h2 class="text-xl font-semibold text-gray-900">Ordens de Serviço</h2>
           <button
             (click)="toggleAdvancedFilters()"
             class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -63,7 +64,7 @@ import { LaudoAmostraService } from '../../services/laudo-pdf.service';
             type="text"
             [(ngModel)]="basicSearch"
             (ngModelChange)="onBasicSearchChange()"
-            placeholder="Buscar por nome da amostra, número OS..."
+            placeholder="Buscar por número OS, solicitante..."
             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -118,17 +119,17 @@ import { LaudoAmostraService } from '../../services/laudo-pdf.service';
               />
             </div>
                  -->
-            <!-- Nome do Usuário 
+            <!-- Nome do Usuário  -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Solicitante</label>
               <input
                 type="text"
-                [(ngModel)]="advancedFilters().userName"
+                [(ngModel)]="advancedFilters().solicitante"
                 placeholder="Nome do solicitante"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            -->
+           
           </div> 
 
           <!-- Botões de ação dos filtros -->
@@ -174,30 +175,32 @@ import { LaudoAmostraService } from '../../services/laudo-pdf.service';
       }
 
       <!-- Tabela -->
-      @if (!isLoading() && amostras().length > 0) {
+      @if (!isLoading() && ordensFiltradas().length > 0) {
         <div class="flex-1 overflow-auto bg-white">
           <table class="w-full">
             <thead class="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Número OS</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Data OS</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Nome da Amostra</th>
-                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Data Amostra</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Data Recepção</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Solicitante</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Amostras</th> 
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Progresso</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Laudo</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-              @for (amostra of amostras(); track amostra.id) {
+              @for (ordem of ordensFiltradas(); track ordem.id) {
                 <tr class="hover:bg-gray-50 transition-colors">
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ amostra.numeroOs }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ amostra.createdAt | date: 'dd/MM/yyyy' }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ amostra.nomeAmostra }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-600">{{ formatDate(amostra.dataAmostra) }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ ordem.id }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ ordem.createdAt | date: 'dd/MM/yyyy' }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ ordem.dataRecepcao && (ordem.dataRecepcao | date: 'dd/MM/yyyy')|| "Não Recepcionado" }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-600">{{ ordem.solicitante?.name }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ getAmostrasName(ordem.amostras) }}</td>
                   <td class="px-4 py-3">
-                    <span [class]="getStatusClass(amostra.status)">
-                      {{ amostra.status }}
+                    <span [class]="getStatusClass(ordem.status!)">
+                      {{ ordem.status }}
                     </span>
                   </td>
                   <td class="px-4 py-3">
@@ -205,17 +208,17 @@ import { LaudoAmostraService } from '../../services/laudo-pdf.service';
                       <div class="flex-1 bg-gray-200 rounded-full h-2">
                         <div 
                           class="bg-blue-600 h-2 rounded-full transition-all"
-                          [style.width.%]="amostra.progresso"
+                          [style.width.%]="ordem.progresso"
                         ></div>
                       </div>
-                      <span class="text-sm text-gray-600">{{ amostra.progresso }}%</span>
+                      <span class="text-sm text-gray-600">{{ ordem.progresso }}%</span>
                     </div>
                   </td>
                   <td class="px-4 py-3 text-sm text-gray-600">
                       <button
-                    (click)="imprimirLaudo(amostra, $event)"
+                    (click)="imprimirLaudo(ordem, $event)"
                     class="inline-flex items-center px-3 py-1.5 button-gradient-blue"
-                    [disabled]="amostra.progresso < 100 || amostra.revisor === null || amostra.revisor === undefined"
+                    [disabled]="ordem.progresso! < 100 || ordem.revisor === null || ordem.revisor === undefined"
                   > 
                     <ng-icon name="heroPrinter"/>
                   </button> 
@@ -289,34 +292,43 @@ import { LaudoAmostraService } from '../../services/laudo-pdf.service';
       }
 
       <!-- Estado Vazio -->
-      @if (!isLoading() && amostras().length === 0) {
-        <div class="text-center py-12  bg-white min-h-0 h-full ">
+      @if (!isLoading() && ordensFiltradas().length === 0) {
+        <div class="text-center py-12  bg-white min-h-0 flex-1 ">
           <ng-icon name="heroMagnifyingGlass" size="48" class="text-gray-400 mb-4"></ng-icon>
           <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma amostra encontrada</h3>
-          <p class="text-gray-600">Tente ajustar os filtros de busca</p>
+          <p class="text-gray-600">Tente ajustar os filtros de busca ou ultilize o filtro avançado.</p>
         </div>
       }</div>
     </div>
   `,
   styles: []
 })
-export class AmostrasTableComponent {
-  private amostraService = inject(AmostrasService);
-  #laudoAmostraService = inject(LaudoAmostraService);
+export class FilterOrdersTableComponent {
+  private ordemService = inject(OrderService);
   // Signals para gerenciar o estado
-  amostras = signal<IAmostra[]>([]);
-  isLoading = signal(false);
-  currentPage = signal(1);
-  itemsPerPage = signal(10);
-  totalItems = signal(0);
-  totalPages = signal(0);
+  applyFilter: OutputEmitterRef<void> = output<void>();
+  ordens = input<IOrders[]>([]);
+  ordensFiltradas = signal<IOrders[]>([]);
+  isLoading = input<boolean>(false);
+  currentPage = signal<number>(1);
+  itemsPerPage = signal<number>(10);
+  totalItems = signal<number>(0);
+  totalPages = signal<number>(0);
   showAdvancedFilters = signal(false);
   basicSearch = signal('');
+  buscaDebounced = debouncedSignal(this.basicSearch, 400);
+  
 
-  // Filtros avançados
+  constructor() {
+    effect(() => {
+      const valor = this.buscaDebounced().toLowerCase();
+      const filtro = this.ordens().filter((o) => o.numeroOs?.toLowerCase().includes(valor) || o.solicitante?.name?.toLowerCase().includes(valor))
+      valor.length > 0 ? this.ordensFiltradas.set(filtro) : this.ordensFiltradas.set(this.ordens());
+    });
+  }
+
   advancedFilters = signal<Querys>({});
 
-  // Status disponíveis
   statusOptions = [
     { value: keyOfStatus(Status.AGUARDANDO), label: 'Aguardando Autorização' },
     { value: keyOfStatus(Status.AUTORIZADA), label: 'Autorizada' },
@@ -325,7 +337,6 @@ export class AmostrasTableComponent {
     { value: keyOfStatus(Status.CANCELADA), label: 'Cancelada' }
   ];
 
-  // Computed signals
   startItem = computed(() => {
     return (this.currentPage() - 1) * this.itemsPerPage() + 1;
   });
@@ -369,7 +380,7 @@ export class AmostrasTableComponent {
     if (filters.status) count++;
     if (filters.dataInicio) count++;
     if (filters.dataFim) count++;
-    // if (filters.tipoAnalise) count++;
+    if (filters.solicitante) count++;
     // if (filters.userName) count++;
     return count;
   });
@@ -387,45 +398,15 @@ export class AmostrasTableComponent {
     if (filters.dataFim) {
       list.push({ key: 'dataFim', label: 'Data Fim', value: filters.dataFim });
     }
-    // if (filters.tipoAnalise) {
-    //   list.push({ key: 'tipoAnalise', label: 'Tipo Análise', value: filters.tipoAnalise });
-    // }
+    if (filters.solicitante) {
+      list.push({ key: 'solicitante', label: 'Solicitante', value: filters.solicitante });
+     }
     // if (filters.userName) {
     //   list.push({ key: 'userName', label: 'solicitante', value: filters.userName });
     // }
     
     return list;
   });
-
-  // Effect para carregar dados quando parâmetros mudarem
-  constructor() {
-    effect(() => {
-      this.loadAmostras();
-    });
-  }
-
-  private loadAmostras() {
-    this.isLoading.set(true);
-    
-    const query: Querys = {
-      page: this.currentPage(),
-      limit: this.itemsPerPage(),
-      ...this.advancedFilters()
-    };
-
-    this.amostraService.findAllWithAnalystsAndCompleted(query).subscribe({
-      next: (response: PaginatedResponse<IAmostra[]>) => {
-        this.amostras.set(response.data);
-        this.totalItems.set(response.meta.total);
-        this.totalPages.set(response.meta.totalPages);
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        console.error('Erro ao carregar amostras:', error);
-        this.isLoading.set(false);
-      }
-    });
-  }
 
   toggleAdvancedFilters() {
     this.showAdvancedFilters.update(v => !v);
@@ -437,13 +418,13 @@ export class AmostrasTableComponent {
 
   applyAdvancedFilters() {
     this.currentPage.set(1);
-    this.loadAmostras();
+    this.applyFilter.emit();
   }
 
   clearAdvancedFilters() {
     this.advancedFilters.set({});
     this.currentPage.set(1);
-    this.loadAmostras();
+    this.applyFilter.emit();
   }
 
   removeFilter(key: string) {
@@ -451,7 +432,7 @@ export class AmostrasTableComponent {
     delete filters[key as keyof Querys];
     this.advancedFilters.set(filters);
     this.currentPage.set(1);
-    this.loadAmostras();
+    this.applyFilter.emit();
   }
 
   previousPage() {
@@ -474,7 +455,7 @@ export class AmostrasTableComponent {
 
   onItemsPerPageChange() {
     this.currentPage.set(1);
-    this.loadAmostras();
+    this.applyFilter.emit();
   }
 
   formatDate(dateString: string): string {
@@ -500,9 +481,13 @@ export class AmostrasTableComponent {
         return baseClasses + 'bg-gray-100 text-gray-800';
     }
   }
-  imprimirLaudo(amostra: IAmostra, event: Event) {
+
+  imprimirLaudo(ordem: IOrders, event: Event) {
     event.stopPropagation();
-    if (!amostra) return;
-    this.#laudoAmostraService.generateLaudoPdf(amostra);
+    if (!ordem) return;
+   // this.#laudoAmostraService.generateLaudoPdf(amostra);
+  }
+  getAmostrasName(amostras:IAmostra[]):string{
+    return amostras.flatMap(a=> a.nomeAmostra).toString()
   }
 }
