@@ -18,7 +18,6 @@ export class UserService {
 
 
   update(user: UpdateUserData): Observable<IUserResponse> {
-    console.log(user);
     const id = this.#authService.currentUser()?.id;
     return this.#http
       .patch<IUserResponse>(`${this.#apiUrl}/${id}`, user, {

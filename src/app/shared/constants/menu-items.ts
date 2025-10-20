@@ -50,7 +50,8 @@ export const menuItems: IMenuItem[] = [
         { id: 'manage-waiting', label: 'Aguardando', icon: 'heroClock', route: '/manage-orders/waiting' },
        // { id: 'manage-authorized', label: 'Autorizada', icon: 'heroCheckCircle', route: '/manage-orders/authorized' },
         { id: 'manage-executing', label: 'Aprovação', icon: 'heroPlay', route: '/manage-orders/executing' },
-        { id: 'manage-filter', label: 'Buscar', icon: 'heroMagnifyingGlass', route: '/manage-orders/search' }
+        { id: 'manage-filter', label: 'Buscar', icon: 'heroMagnifyingGlass', route: '/manage-orders/search' },
+         { id: 'manage-agenda', label: 'Agenda', icon: 'heroCalendarDateRange', route: '/manage-orders/agenda' }
       ],
       rolesAllowed:[EMenuRoles.ADMIN],
     },
@@ -92,3 +93,50 @@ export const menuItems: IMenuItem[] = [
       rolesAllowed:[EMenuRoles.OPERADOR,EMenuRoles.ADMIN],
     }
   ];
+
+export const routeMap: { [key: string]: string } = {
+  // --- Info ---
+  '/': 'Info',
+
+  // --- Ordens de Serviço ---
+  '/orders': 'Ordens de Serviço',
+  '/orders/create': 'Criar OS',
+  '/orders/pending': 'OS Pendentes',
+  '/orders/all': 'Minhas OS',
+
+  // --- Amostras ---
+  '/samples': 'Amostras',
+
+  // --- Análises ---
+  '/analysis': 'Análises',
+  '/analysis/waiting-authorization': 'Aguardando Autorização',
+  '/analysis/waiting-analysis': 'Aguardando Análise',
+  '/analysis/in-progress': 'Em Andamento',
+  '/analysis/completed': 'Finalizadas',
+
+  // --- Gerenciar OS ---
+  '/manage-orders': 'Gerenciar OS',
+  '/manage-orders/dashboard': 'Dashboard',
+  '/manage-orders/waiting': 'Aguardando',
+  '/manage-orders/executing': 'Aprovação',
+  '/manage-orders/search': 'Buscar',
+
+  // --- Laboratórios Externos ---
+  '/external-labs': 'Laboratórios Externos',
+  '/external-labs/remessa': 'Remessa',
+  '/external-labs/amostras': 'Amostras',
+  '/external-labs/elementos-quimicos': 'Elementos Químicos',
+  '/external-labs/laboratorios': 'Laboratórios',
+
+  // --- Gerenciar Acesso ---
+  '/access-management': 'Gerenciar Acesso',
+  '/access-management/authorize': 'Gerenciar Acesso',
+  '/access-management/create-user': 'Cadastrar Novo Usuário',
+
+  // --- Configurações ---
+  '/settings': 'Configurações',
+  '/settings/analysis': 'Configuração de Análise',
+  '/settings/parameters': 'Parâmetros',
+  '/settings/materials': 'Matéria-prima',
+  '/settings/analysis-type': 'Tipo de Análise',
+};

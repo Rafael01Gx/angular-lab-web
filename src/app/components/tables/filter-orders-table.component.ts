@@ -71,7 +71,6 @@ export interface IPaginateConfigAndFilters {
           <input
             type="text"
             [(ngModel)]="basicSearch"
-            (ngModelChange)="onBasicSearchChange()"
             placeholder="Buscar por número OS, solicitante..."
             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
@@ -437,9 +436,6 @@ export class FilterOrdersTableComponent {
     this.showAdvancedFilters.update(v => !v);
   }
 
-  onBasicSearchChange() {
-    console.log('Busca básica:', this.basicSearch());
-  }
 
   applyAdvancedFilters() {
     this.currentPage.set(1);

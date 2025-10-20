@@ -43,12 +43,6 @@ export class AmostrasComponent implements OnInit {
 
   searchTerm: string = '';
 
-  constructor() {
-    effect(() => {
-      console.log(this.amostrasFiltradas())
-      console.log(this.amostras())
-    });
-  }
 
   ngOnInit(): void {
     const elements = this.#transferState.get(ELEMENT_KEY, null);

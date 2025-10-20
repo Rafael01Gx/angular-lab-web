@@ -11,8 +11,13 @@ import {
   heroChartBarSquare,
   heroCog6Tooth,
   heroUserGroup,
+  heroInformationCircle,
+  heroListBullet,
+  heroAdjustmentsHorizontal,
+  heroBriefcase
 } from '@ng-icons/heroicons/outline';
 import {AuthService} from '../../../services/auth.service';
+import { routeMap } from '../../../shared/constants/menu-items';
 
 @Component({
   selector: 'app-header',
@@ -29,6 +34,10 @@ import {AuthService} from '../../../services/auth.service';
       heroChartBarSquare,
       heroCog6Tooth,
       heroUserGroup,
+      heroInformationCircle,
+      heroListBullet,
+      heroAdjustmentsHorizontal,
+      heroBriefcase
     }),
   ],
   host: {class: 'block'},
@@ -42,46 +51,31 @@ export class HeaderComponent {
 
   getCurrentRouteName(): string {
     const url = this.#router.url;
-    const routeMap: { [key: string]: string } = {
-      '/dashboard': 'Dashboard',
-      '/orders': 'Ordens de Serviço',
-      '/orders/create': 'Criar OS',
-      '/orders/pending': 'OS Pendentes',
-      '/orders/completed': 'OS Finalizadas',
-      '/samples': 'Amostras',
-      '/analysis': 'Análises',
-      '/analysis/waiting-authorization': 'Aguardando Autorização',
-      '/analysis/waiting-analysis': 'Aguardando Análise',
-      '/analysis/in-progress': 'Em Andamento',
-      '/analysis/completed': 'Finalizadas',
-      '/manage-orders': 'Gerenciar OS',
-      '/access-management': 'Gerenciar Acesso',
-      '/settings': 'Configurações',
-    };
+    const mapRoutes = routeMap
 
     const matchingRoute = Object.keys(routeMap)
       .sort((a, b) => b.length - a.length)
       .find((route) => url.startsWith(route));
 
-    return matchingRoute ? routeMap[matchingRoute] : 'Sistema';
+    return matchingRoute ? mapRoutes[matchingRoute] : 'Info';
   }
 
-  getCurrentRouteIcon(): string {
-    const url = this.#router.url;
+getCurrentRouteIcon(): string {
+  const url = this.#router.url;
 
-    if (url.includes('/dashboard/')) return 'heroChartBarSquare';
-    if (url.includes('/orders/')) return 'heroClipboardDocumentList';
-    if (url.includes('/samples/')) return 'heroBeaker';
-    if (url.includes('/analysis/')) return 'heroBeaker';
-    if (url.includes('/access-management/')) return 'heroUserGroup';
-    if (url.includes('/settings/')) return 'heroCog6Tooth';
+  if (url.startsWith('/orders')) return 'heroClipboardDocumentList';         // Ordens de Serviço
+  if (url.startsWith('/samples')) return 'heroBeaker';                       // Amostras
+  if (url.startsWith('/analysis')) return 'heroBriefcase';                   // Análises
+  if (url.startsWith('/manage-orders')) return 'heroAdjustmentsHorizontal';  // Gerenciar OS
+  if (url.startsWith('/external-labs')) return 'heroListBullet';             // Laboratórios Externos
+  if (url.startsWith('/access-management')) return 'heroUserGroup';          // Gerenciar Acesso
+  if (url.startsWith('/settings')) return 'heroCog6Tooth';                   // Configurações
 
-    return 'heroHome';
-  }
+  return 'heroInformationCircle';
+}
 
   onNotificationClick(): void {
-    // Implementar lógica de notificações
-    console.log(this.user());
+    // Implementar
   }
 
   onProfileClick(): void {

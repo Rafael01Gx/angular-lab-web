@@ -74,7 +74,6 @@ export class AproavacaoComponent implements OnInit {
         if (res && res.data.length > 0) {
           this.amostras.update((v) => [...v, ...res.data]);
           this.paginatedMeta.set(res.meta);
-          console.log(res.meta);
           if (isPlatformServer(this.#platFormId)) {
             this.paginatedMeta.set(res.meta);
             this.#transferState.set(AMOSTRAS_KEY, res.data);

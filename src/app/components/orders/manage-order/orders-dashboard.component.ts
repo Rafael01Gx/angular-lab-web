@@ -463,7 +463,7 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
 
    openDetails(ordem: IOrders) {
     const headerButton = {
-      label: 'Alterar Status',
+      label: '',
       action:()=>{
         console.log('Alterar Status')
       }

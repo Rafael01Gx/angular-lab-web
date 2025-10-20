@@ -25,7 +25,8 @@ import {
   heroBriefcase,heroListBullet,heroArchiveBox,heroSquare2Stack,heroGlobeAmericas,heroPresentationChartBar,
   heroInformationCircle,
   heroMagnifyingGlass,
-  heroDocumentMagnifyingGlass
+  heroDocumentMagnifyingGlass,
+  heroCalendarDateRange
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
 import { EMenuRoles, IMenuItem } from '../../../shared/interfaces/layout.interface';
@@ -65,7 +66,8 @@ import { menuItems } from '../../../shared/constants/menu-items';
       heroPresentationChartBar,
       heroInformationCircle,
       heroMagnifyingGlass,
-      heroDocumentMagnifyingGlass
+      heroDocumentMagnifyingGlass,
+      heroCalendarDateRange
     })
   ],
   host: { class: 'block max-h-full'

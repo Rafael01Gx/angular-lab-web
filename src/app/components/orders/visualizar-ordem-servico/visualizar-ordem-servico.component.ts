@@ -14,6 +14,7 @@ import {
 } from '@ng-icons/heroicons/mini';
 import {IOrders} from '../../../shared/interfaces/orders.interface';
 import {Status} from '../../../shared/enums/status.enum';
+import { getPrazoInicioFim } from '../../../shared/utils/get-prazo-inicio-fim';
 
 interface ButtonAction {
   label: string;
@@ -153,7 +154,7 @@ interface ButtonAction {
                     <ng-icon name="heroCalendarDaysMini" class="text-purple-600" size="16"></ng-icon>
                     <span class="font-medium text-gray-700 text-sm">Data Recepção</span>
                   </div>
-                  <p class="text-gray-900 text-center font-semibold">{{ ordemServico.dataRecepcao || ' - ' }}</p>
+                  <p class="text-gray-900 text-center font-semibold">{{ ordemServico.dataRecepcao && (ordemServico.dataRecepcao | date:"dd/MM/yyyy")  || ' - ' }}</p>
                 </div>
 
                 <!-- Prazo -->
@@ -163,7 +164,7 @@ interface ButtonAction {
                     <span class="font-medium text-gray-700 text-sm">Prazo</span>
                   </div>
                   <p
-                    class="text-gray-900 text-center font-semibold">{{ ordemServico.prazoInicioFim || 'Aguardando!' }}</p>
+                    class="text-gray-900 text-center font-semibold">{{ getPrazoInicioFim(ordemServico.prazoInicioFim) || 'Aguardando!' }}</p>
                 </div>
 
                 <!-- Progresso -->
@@ -256,7 +257,6 @@ interface ButtonAction {
         display: block !important;
       }
 
-      /* Otimizações para impressão */
       * {
         -webkit-print-color-adjust: exact !important;
         color-adjust: exact !important;
@@ -270,12 +270,10 @@ interface ButtonAction {
         border-color: #e5e7eb !important;
       }
 
-      /* Quebras de página */
       .page-break {
         page-break-before: always;
       }
 
-      /* Evitar quebra de elementos importantes */
       .bg-gray-50, .bg-blue-50, .bg-yellow-50 {
         page-break-inside: avoid;
       }
@@ -310,7 +308,6 @@ export class VisualizarOrdemServicoComponent {
   }
 
   onBackdropClick(event: MouseEvent): void {
-    console.log('backdrop click');
     event.stopPropagation();
     this.closeModal.emit();
   }
@@ -406,5 +403,5 @@ export class VisualizarOrdemServicoComponent {
     }).format(new Date(date));
   }
 
-
+protected readonly getPrazoInicioFim=getPrazoInicioFim
 }

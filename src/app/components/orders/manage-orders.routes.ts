@@ -34,5 +34,13 @@ export const MANAGE_ORDERS_ROUTES: Routes = [
         (m) => m.SearchOrdersComponent
       ),
   },
+  {
+    path: 'agenda',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./manage-order/agendamento-dashboard.component').then(
+        (m) => m.AgendamentoDashboardComponent
+      ),
+  },
 
 ]
