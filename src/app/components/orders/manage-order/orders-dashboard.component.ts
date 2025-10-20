@@ -91,19 +91,20 @@ interface EstatisticasCard {
 
                 <div class=" w-full text-center rounded-t-md" [ngClass]="card.cor + '-bg'"><span
                   class="text-sm font-bold text-slate-600">{{ card.titulo }}</span></div>
-                <div class="flex-1 flex justify-between px-4">
+                <div class="flex-1 flex justify-center px-4">
                   <div class="flex items-center justify-between mb-4">
                     <div class="p-2 rounded-lg" [ngClass]="card.cor + '-bg'">
                       <ng-icon [name]="card.icone" class="w-6 h-6" [ngClass]="card.cor + '-text'"/>
                     </div>
                   </div>
 
-                  <div class="flex flex-col items-center justify-center">
+                  <div class="flex flex-col items-center m-auto">
                     <div class="flex gap-2">
                       <h3 class="text-2xl font-bold text-slate-900 mb-1">{{ card.valor | number }}</h3>
 
                     </div>
                   </div>
+                  <!--
                   @if (card.tendencia) {
                     <div class="flex justify-end items-start gap-1 h-full">
                       <ng-icon
@@ -115,7 +116,7 @@ interface EstatisticasCard {
             {{ card.percentual }}%
               </span>
                     </div>
-                  }
+                  }  --> 
                 </div>
               </div>
             }
@@ -204,7 +205,7 @@ interface EstatisticasCard {
           <!-- Métricas Adicionais -->
           <div class="flex flex-2 gap-2">
 
-            <!-- Produtividade -->
+            <!-- Produtividade 
             <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
               <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 bg-green-100 rounded-lg">
@@ -227,7 +228,7 @@ interface EstatisticasCard {
                   <span class="text-sm font-bold text-green-600">{{ metricas().taxaConclusao }}%</span>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Amostras -->
             <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">

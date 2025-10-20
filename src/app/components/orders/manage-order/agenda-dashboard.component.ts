@@ -1,6 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, computed, input, OutputEmitterRef, output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
   heroBeaker,
@@ -14,7 +13,6 @@ import {
   heroCheckCircle,
   heroExclamationTriangle,
 } from '@ng-icons/heroicons/outline';
-import { AgendaService } from '../../../services/agenda.service';
 import { getPrazoInicioFim } from '../../../shared/utils/get-prazo-inicio-fim';
 
 interface AmostraDetalhes {
@@ -41,7 +39,7 @@ interface AgendamentoSemanal {
 }
 
 @Component({
-  selector: 'app-agendamento-dashboard',
+  selector: 'app-agenda-dashboard',
   standalone: true,
   imports: [CommonModule, NgIconComponent,DatePipe],
   viewProviders: [
@@ -62,16 +60,8 @@ interface AgendamentoSemanal {
   <div class="flex-1 flex flex-col bg-white p-6 overflow-hidden"> 
     <!-- Header -->
     <header class="mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-            <ng-icon name="heroCalendarDays" size="32" class="text-blue-500"></ng-icon>
-            Agenda de Ensaios
-          </h2>
-          <p class="text-slate-600">
-            Visualize e gerencie os ensaios programados por semana
-          </p>
-        </div>
+      <div class="flex items-center justify-end mb-4">
+
         
         <!-- Toggle de visualização -->
         <div class="flex gap-2 bg-white rounded-lg p-1 shadow-sm">
@@ -164,7 +154,7 @@ interface AgendamentoSemanal {
         <ng-icon name="heroExclamationTriangle" size="48" class="text-red-600 mx-auto mb-3"></ng-icon>
         <p class="text-red-800 font-medium">{{ error() }}</p>
         <button
-          (click)="carregarAgendamentos()"
+          (click)="recarregar()"
           class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
           Tentar Novamente
         </button>
@@ -501,12 +491,11 @@ tbody tr:hover {
 }
   `,
 })
-export class AgendamentoDashboardComponent implements OnInit {
-  private http = inject(HttpClient);
-#agendaService = inject(AgendaService);
-  agendamentos = signal<AgendamentoSemanal[]>([]);
-  loading = signal(true);
-  error = signal<string | null>(null);
+export class AgendaDashboardComponent {
+  agendamentos = input<AgendamentoSemanal[]>([]);
+  loading = input(true);
+  error = input<string | null>(null);
+  onErrorRetry:OutputEmitterRef<void> = output<void>();
   expandedWeeks = signal<Set<string>>(new Set());
   filtroTipo = signal<string>('');
   visualizacao = signal<'grid' | 'lista'>('grid');
@@ -540,22 +529,7 @@ export class AgendamentoDashboardComponent implements OnInit {
       .filter((sem) => sem.tiposAnalise.length > 0);
   });
 
-  ngOnInit() {
-    this.carregarAgendamentos();
-  }
 
-  async carregarAgendamentos() {
-    this.#agendaService.getAgendamentoSemanal().subscribe({
-      next: (data) => {
-        this.agendamentos.set(data);
-        this.loading.set(false);
-        this.error.set(null);
-      },
-      error: (err) => {
-        this.error.set('Erro ao carregar os agendamentos. Tente novamente mais tarde.');
-        this.loading.set(false);
-      },
-  })}
 
   toggleSemana(semana: string) {
     const expanded = new Set(this.expandedWeeks());
@@ -585,6 +559,10 @@ export class AgendamentoDashboardComponent implements OnInit {
       Térmica: 'from-orange-500 to-orange-500',
     };
     return cores[classe] || 'from-purple-500 to-purple-600';
+  }
+
+  recarregar() {
+    this.onErrorRetry.emit();
   }
   protected readonly getPrazoInicioFim=getPrazoInicioFim
 }

@@ -79,7 +79,7 @@ interface ButtonAction {
             </div>
 
             <div class="flex items-center gap-2 ml-4">
-              <!-- Botão Alterar Status -->
+
               @if (headerButton().label) {
                 <button
                   (click)="headerButton().action()"
@@ -88,8 +88,6 @@ interface ButtonAction {
                   {{ headerButton().label }}
                 </button>
               }
-
-              <!-- Botão Expandir/Recolher -->
               <button (click)="toggleExpandedClose()"
                       class="p-1 text-gray-400 hover:text-gray-600 hover:scale-110  cursor-pointer transition-colors">
                 <ng-icon

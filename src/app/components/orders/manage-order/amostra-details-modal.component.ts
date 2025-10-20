@@ -33,7 +33,7 @@ import { getPrazoInicioFim } from '../../../shared/utils/get-prazo-inicio-fim';
     template: `
     @if (isOpen() && amostra()) {
       <div 
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-md rounded-sm animate-fade-in"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/10 backdrop-blur-md rounded-sm animate-fade-in"
         (click)="closeModal()">
         
         <div 

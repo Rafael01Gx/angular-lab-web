@@ -38,8 +38,8 @@ export const MANAGE_ORDERS_ROUTES: Routes = [
     path: 'agenda',
     pathMatch: 'full',
     loadComponent: () =>
-      import('./manage-order/agendamento-dashboard.component').then(
-        (m) => m.AgendamentoDashboardComponent
+      import('./manage-order/agenda-container.component').then(
+        (m) => m.AppComponent
       ),
   },
 
