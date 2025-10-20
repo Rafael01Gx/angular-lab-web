@@ -18,4 +18,12 @@ export const ORDERS_ROUTES:Routes = [
         (m) => m.OrdersPendingTableComponent
       ),
   },
+  {
+    path: 'all',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./all-by-user/all-orders-by-user.component').then(
+        (m) => m.AllOrdersByUserComponent
+      ),
+  },
 ];

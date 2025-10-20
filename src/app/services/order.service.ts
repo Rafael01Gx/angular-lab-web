@@ -46,7 +46,24 @@ export class OrderService {
   }
     return this.#http.get<PaginatedResponse<IOrders[]>>(`${this.#apiUrl}/filter`, {params,
       withCredentials: true,
-    }).pipe(tap((res) => this.#ordens.set(res.data)), catchError(this.handleGetError.bind(this)));
+    }).pipe(catchError(this.handleGetError.bind(this)));
+  }
+
+  findByUserAndFilters(query?: Querys): Observable<PaginatedResponse<IOrders[]>> {
+    let params= new HttpParams()
+      if (query) {
+    if (query.status) params = params.append('status', query.status.toString());
+    if (query.limit) params = params.append('limit', query.limit.toString());
+    if (query.page) params = params.append('page', query.page.toString());
+    if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
+    if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
+    if (query.solicitante) params = params.append('solicitante', query.solicitante.toString());
+    if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
+    if (query.progresso) params = params.append('progresso', query.progresso.toString());
+  }
+    return this.#http.get<PaginatedResponse<IOrders[]>>(`${this.#apiUrl}/all`, {params,
+      withCredentials: true,
+    }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
   findAllByUser(query?: Querys): Observable<IOrders[]> {

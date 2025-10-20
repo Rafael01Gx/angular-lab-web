@@ -16,7 +16,7 @@ export const menuItems: IMenuItem[] = [
       children: [
         { id: 'orders-create', label: 'Criar', icon: 'heroPlus', route: '/orders/create' },
         { id: 'orders-pending', label: 'Pendentes', icon: 'heroClock', route: '/orders/pending' },
-        { id: 'orders-completed', label: 'Finalizadas', icon: 'heroCheckCircle', route: '/orders/completed' },
+        { id: 'orders-completed', label: 'Minhas Os', icon: 'heroDocumentMagnifyingGlass', route: '/orders/all' },
       ],
       rolesAllowed:[EMenuRoles.USUARIO,EMenuRoles.ADMIN],
     },

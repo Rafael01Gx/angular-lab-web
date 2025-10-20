@@ -6,17 +6,18 @@ import { IOrders } from "../../../shared/interfaces/orders.interface";
 
 
 @Component({
-    selector: 'app-search-orders',
+    selector: 'app-all-orders-by-user',
     imports: [FilterOrdersTableComponent],
     template: `
 <app-filter-orders-table
         [isLoading]="isLoading()"
         [data]="ordensData()"
+        [filtroUsuario]="false" 
         (configAndFilters)="setConfigAndFilters($event)"
          class="w-full h-full" />
 `
 })
-export class SearchOrdersComponent implements OnInit {
+export class AllOrdersByUserComponent implements OnInit {
     #ordemService = inject(OrderService);
     ordensData = signal<PaginatedResponse<IOrders[]>|null>(null)
     isLoading = signal<boolean>(false);
@@ -43,7 +44,7 @@ export class SearchOrdersComponent implements OnInit {
             ...this.paginateConfig().advancedFilters
         };
         console.log(query)
-        this.#ordemService.findByFilters(query).subscribe({
+        this.#ordemService.findByUserAndFilters(query).subscribe({
             next: (response: PaginatedResponse<IOrders[]>) => {
                 this.ordensData.set(response);
                 this.isLoading.set(false);

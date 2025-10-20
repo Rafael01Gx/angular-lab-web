@@ -3,9 +3,9 @@ import { Component, computed, effect, inject, input, model, output, OutputEmitte
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { 
-  heroChevronLeft, 
-  heroChevronRight, 
+import {
+  heroChevronLeft,
+  heroChevronRight,
   heroFunnel,
   heroXMark,
   heroMagnifyingGlass,
@@ -15,20 +15,28 @@ import {
 } from '@ng-icons/heroicons/outline';
 import { PaginatedResponse, Querys } from '../../shared/interfaces/querys.interface';
 import { IOrders } from '../../shared/interfaces/orders.interface';
-import { OrderService } from '../../services/order.service';
+
 import { debouncedSignal } from '../../shared/utils/debounced-signal';
 import { IAmostra } from '../../shared/interfaces/amostra.interface';
+import { LaudoAmostraService } from '../../services/laudo-pdf.service';
 
+export interface IPaginateConfigAndFilters {
+  currentPage: number;
+  itemsPerPage: number;
+  totalItems: number;
+  totalPages: number;
+  advancedFilters?: Querys | null;
+}
 
 @Component({
   selector: 'app-filter-orders-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent,DatePipe],
+  imports: [CommonModule, FormsModule, NgIconComponent, DatePipe],
   viewProviders: [
-    provideIcons({ 
-      heroChevronLeft, 
-      heroChevronRight, 
-      heroFunnel, 
+    provideIcons({
+      heroChevronLeft,
+      heroChevronRight,
+      heroFunnel,
       heroXMark,
       heroMagnifyingGlass,
       heroChevronDown,
@@ -120,7 +128,7 @@ import { IAmostra } from '../../shared/interfaces/amostra.interface';
             </div>
                  -->
             <!-- Nome do Usuário  -->
-            <div>
+            @if(filtroUsuario()){<div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Solicitante</label>
               <input
                 type="text"
@@ -128,7 +136,7 @@ import { IAmostra } from '../../shared/interfaces/amostra.interface';
                 placeholder="Nome do solicitante"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div>}
            
           </div> 
 
@@ -218,7 +226,7 @@ import { IAmostra } from '../../shared/interfaces/amostra.interface';
                       <button
                     (click)="imprimirLaudo(ordem, $event)"
                     class="inline-flex items-center px-3 py-1.5 button-gradient-blue"
-                    [disabled]="ordem.progresso! < 100 || ordem.revisor === null || ordem.revisor === undefined"
+                    [disabled]="ordem.progresso! < 100 "
                   > 
                     <ng-icon name="heroPrinter"/>
                   </button> 
@@ -297,17 +305,17 @@ import { IAmostra } from '../../shared/interfaces/amostra.interface';
           <ng-icon name="heroMagnifyingGlass" size="48" class="text-gray-400 mb-4"></ng-icon>
           <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma amostra encontrada</h3>
           <p class="text-gray-600">Tente ajustar os filtros de busca ou ultilize o filtro avançado.</p>
-        </div>
+        </div> 
       }</div>
     </div>
   `,
   styles: []
 })
 export class FilterOrdersTableComponent {
-  private ordemService = inject(OrderService);
-  // Signals para gerenciar o estado
-  applyFilter: OutputEmitterRef<void> = output<void>();
-  ordens = input<IOrders[]>([]);
+#laudoAmostraService = inject(LaudoAmostraService);
+  filtroUsuario = input<boolean>(true)
+  configAndFilters: OutputEmitterRef<IPaginateConfigAndFilters> = output<IPaginateConfigAndFilters>();
+  data = input<PaginatedResponse<IOrders[]>|null>();
   ordensFiltradas = signal<IOrders[]>([]);
   isLoading = input<boolean>(false);
   currentPage = signal<number>(1);
@@ -316,18 +324,35 @@ export class FilterOrdersTableComponent {
   totalPages = signal<number>(0);
   showAdvancedFilters = signal(false);
   basicSearch = signal('');
+  advancedFilters = signal<Querys>({});
   buscaDebounced = debouncedSignal(this.basicSearch, 400);
-  
+
+  config = computed<IPaginateConfigAndFilters>(() => {
+    return {
+      currentPage: this.currentPage(),
+      itemsPerPage: this.itemsPerPage(),
+      totalItems: this.totalItems(),
+      totalPages: this.totalPages(),
+      advancedFilters: this.advancedFilters(),
+    }
+  })
 
   constructor() {
     effect(() => {
       const valor = this.buscaDebounced().toLowerCase();
-      const filtro = this.ordens().filter((o) => o.numeroOs?.toLowerCase().includes(valor) || o.solicitante?.name?.toLowerCase().includes(valor))
-      valor.length > 0 ? this.ordensFiltradas.set(filtro) : this.ordensFiltradas.set(this.ordens());
+      const filtro = this.data()?.data.filter((o) => o.numeroOs?.toLowerCase().includes(valor) || o.solicitante?.name?.toLowerCase().includes(valor))
+      valor.length > 0 ? this.ordensFiltradas.set(filtro!) : this.ordensFiltradas.set(this.data()?.data!);
     });
+    effect(() => {
+      if (this.data()) {
+        this.currentPage.set(this.data()?.meta.currentPage!)
+        this.totalItems.set(this.data()?.meta.total!)
+        this.totalPages.set(this.data()?.meta.totalPages!)
+      }
+    })
   }
 
-  advancedFilters = signal<Querys>({});
+
 
   statusOptions = [
     { value: keyOfStatus(Status.AGUARDANDO), label: 'Aguardando Autorização' },
@@ -350,7 +375,7 @@ export class FilterOrdersTableComponent {
     const current = this.currentPage();
     const total = this.totalPages();
     const pages: (number | string)[] = [];
-    
+
     if (total <= 7) {
       for (let i = 1; i <= total; i++) pages.push(i);
     } else {
@@ -370,7 +395,7 @@ export class FilterOrdersTableComponent {
         pages.push(total);
       }
     }
-    
+
     return pages;
   });
 
@@ -387,8 +412,8 @@ export class FilterOrdersTableComponent {
 
   activeFiltersList = computed(() => {
     const filters = this.advancedFilters();
-    const list: Array<{key: string, label: string, value: string}> = [];
-    
+    const list: Array<{ key: string, label: string, value: string }> = [];
+
     if (filters.status) {
       list.push({ key: 'status', label: 'Status', value: filters.status });
     }
@@ -400,11 +425,11 @@ export class FilterOrdersTableComponent {
     }
     if (filters.solicitante) {
       list.push({ key: 'solicitante', label: 'Solicitante', value: filters.solicitante });
-     }
+    }
     // if (filters.userName) {
     //   list.push({ key: 'userName', label: 'solicitante', value: filters.userName });
     // }
-    
+
     return list;
   });
 
@@ -418,13 +443,13 @@ export class FilterOrdersTableComponent {
 
   applyAdvancedFilters() {
     this.currentPage.set(1);
-    this.applyFilter.emit();
+    this.configAndFilters.emit(this.config());
   }
 
   clearAdvancedFilters() {
     this.advancedFilters.set({});
     this.currentPage.set(1);
-    this.applyFilter.emit();
+    this.configAndFilters.emit(this.config());
   }
 
   removeFilter(key: string) {
@@ -432,7 +457,7 @@ export class FilterOrdersTableComponent {
     delete filters[key as keyof Querys];
     this.advancedFilters.set(filters);
     this.currentPage.set(1);
-    this.applyFilter.emit();
+    this.configAndFilters.emit(this.config());
   }
 
   previousPage() {
@@ -455,7 +480,7 @@ export class FilterOrdersTableComponent {
 
   onItemsPerPageChange() {
     this.currentPage.set(1);
-    this.applyFilter.emit();
+    this.configAndFilters.emit(this.config());
   }
 
   formatDate(dateString: string): string {
@@ -482,12 +507,16 @@ export class FilterOrdersTableComponent {
     }
   }
 
-  imprimirLaudo(ordem: IOrders, event: Event) {
-    event.stopPropagation();
-    if (!ordem) return;
-   // this.#laudoAmostraService.generateLaudoPdf(amostra);
+async imprimirLaudo(ordem: IOrders, event: Event) {
+  event.stopPropagation();
+  if (!ordem) return;
+
+  for (const amostra of ordem.amostras) {
+    await this.#laudoAmostraService.generateLaudoPdf(amostra);
   }
-  getAmostrasName(amostras:IAmostra[]):string{
-    return amostras.flatMap(a=> a.nomeAmostra).toString()
+}
+  getAmostrasName(amostras: IAmostra[]): string {
+    return amostras.flatMap(a => a.nomeAmostra).toString()
   }
+
 }
