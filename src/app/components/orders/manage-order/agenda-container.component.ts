@@ -165,7 +165,6 @@ export class AppComponent implements OnInit {
           this.#transferState.set(AGENDA_KEY, data);
         }
         this.agendamentos.set(data);
-        console.log('Agendamentos carregados:', data);
         this.loading.set(false);
         this.error.set(null);
       },

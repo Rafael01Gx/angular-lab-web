@@ -47,4 +47,7 @@ export class ToastrService {
   warning(message: string, title: string = 'Aviso') {
     return this.show(title, message, 'warning');
   }
+  notification(message: string, title: string = 'Informação') {
+    return this.show(title, message, 'info');
+  }
 }

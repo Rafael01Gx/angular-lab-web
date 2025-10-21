@@ -40,7 +40,6 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 })
 export class MainContentComponent {
   sidebarExpanded = signal(true);
-  notificationCount = 3;
   platformID = inject(PLATFORM_ID);
 
 

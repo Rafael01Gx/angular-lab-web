@@ -1,4 +1,4 @@
-import {Component, inject, input, signal} from '@angular/core';
+import {Component, computed, inject, input, OnInit, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {NgIconComponent, provideIcons} from '@ng-icons/core';
 import {
@@ -18,6 +18,7 @@ import {
 } from '@ng-icons/heroicons/outline';
 import {AuthService} from '../../../services/auth.service';
 import { routeMap } from '../../../shared/constants/menu-items';
+import { NotificationsService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-header',
@@ -42,12 +43,17 @@ import { routeMap } from '../../../shared/constants/menu-items';
   ],
   host: {class: 'block'},
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   #authService = inject(AuthService);
-  notificationCount = input<number>(0);
+  #notificationsService = inject(NotificationsService);
+  notificationCount = computed(() => this.#notificationsService.unreadCount());
   #router = inject(Router);
   authService = inject(AuthService);
   user = signal(this.#authService.currentUser());
+
+    ngOnInit() {
+    this.#notificationsService.initialize();
+  }
 
   getCurrentRouteName(): string {
     const url = this.#router.url;
@@ -75,7 +81,7 @@ getCurrentRouteIcon(): string {
 }
 
   onNotificationClick(): void {
-    // Implementar
+    this.#router.navigate(['/notifications']);
   }
 
   onProfileClick(): void {
