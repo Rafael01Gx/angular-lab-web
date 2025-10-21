@@ -92,6 +92,7 @@ export const routes: Routes = [
             (m) => m.SETTINGS_ROUTES
           ),
       },
+
     ],
   },
   { path: '**', redirectTo: '/', pathMatch: 'full' },

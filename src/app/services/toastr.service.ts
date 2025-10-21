@@ -16,13 +16,15 @@ export class ToastrService {
   #toasts: IToast[] = [];
   #toastSubject = new BehaviorSubject<IToast[]>([]);
   toasts$ = this.#toastSubject.asObservable();
+  idCounter = 1;
 
   private show(
     title: string,
     message: string,
     type: 'success' | 'error' | 'info' | 'warning'
   ) {
-    const id = Date.now();
+    const id = this.idCounter;
+    this.idCounter++;
     const toast: IToast = { id, title, message, type };
     this.#toasts.push(toast);
     this.#toastSubject.next(this.#toasts);

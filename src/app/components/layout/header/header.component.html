@@ -44,25 +44,9 @@
       </div>
 
       <!-- Notifications -->
-      <button
-        class="relative text-gray-400 p-2 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
-        (click)="onNotificationClick()"
-        [attr.aria-label]="
-          'Notificações' +
-          (notificationCount() > 0
-            ? ' (' + notificationCount() + ' não lidas)'
-            : '')
-        "
-      >
-        <ng-icon name="heroBell" size="20"></ng-icon>
-        @if(notificationCount() > 0){
-        <span
-          class="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-red-400 to-pink-500 text-white text-xs rounded-full flex items-center justify-center font-medium shadow-lg animate-pulse"
-        >
-          {{ notificationCount() > 99 ? "99+" : notificationCount() }}
-        </span>
-        }
-      </button>
+
+      <app-notifications [notifications]="notifications()" (onMarkAllAsRead)="onMarkAllAsRead()" (onRead)="onRead($event)" />
+
 
       <button
         class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"

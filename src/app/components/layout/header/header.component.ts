@@ -1,6 +1,6 @@
-import {Component, computed, inject, input, OnInit, signal} from '@angular/core';
-import {Router} from '@angular/router';
-import {NgIconComponent, provideIcons} from '@ng-icons/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
   heroBeaker,
   heroBell,
@@ -16,13 +16,14 @@ import {
   heroAdjustmentsHorizontal,
   heroBriefcase
 } from '@ng-icons/heroicons/outline';
-import {AuthService} from '../../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 import { routeMap } from '../../../shared/constants/menu-items';
 import { NotificationsService } from '../../../services/notification.service';
+import { NotificationsComponent } from "../../notification/notifications.component";
 
 @Component({
   selector: 'app-header',
-  imports: [NgIconComponent],
+  imports: [NgIconComponent, NotificationsComponent],
   templateUrl: './header.component.html',
   viewProviders: [
     provideIcons({
@@ -41,17 +42,18 @@ import { NotificationsService } from '../../../services/notification.service';
       heroBriefcase
     }),
   ],
-  host: {class: 'block'},
+  host: { class: 'block' },
 })
 export class HeaderComponent implements OnInit {
   #authService = inject(AuthService);
   #notificationsService = inject(NotificationsService);
   notificationCount = computed(() => this.#notificationsService.unreadCount());
+  notifications = computed(() => this.#notificationsService.notifications().slice(0, 5));
   #router = inject(Router);
   authService = inject(AuthService);
   user = signal(this.#authService.currentUser());
 
-    ngOnInit() {
+  ngOnInit() {
     this.#notificationsService.initialize();
   }
 
@@ -66,19 +68,19 @@ export class HeaderComponent implements OnInit {
     return matchingRoute ? mapRoutes[matchingRoute] : 'Info';
   }
 
-getCurrentRouteIcon(): string {
-  const url = this.#router.url;
+  getCurrentRouteIcon(): string {
+    const url = this.#router.url;
 
-  if (url.startsWith('/orders')) return 'heroClipboardDocumentList';         // Ordens de Serviço
-  if (url.startsWith('/samples')) return 'heroBeaker';                       // Amostras
-  if (url.startsWith('/analysis')) return 'heroBriefcase';                   // Análises
-  if (url.startsWith('/manage-orders')) return 'heroAdjustmentsHorizontal';  // Gerenciar OS
-  if (url.startsWith('/external-labs')) return 'heroListBullet';             // Laboratórios Externos
-  if (url.startsWith('/access-management')) return 'heroUserGroup';          // Gerenciar Acesso
-  if (url.startsWith('/settings')) return 'heroCog6Tooth';                   // Configurações
+    if (url.startsWith('/orders')) return 'heroClipboardDocumentList';         // Ordens de Serviço
+    if (url.startsWith('/samples')) return 'heroBeaker';                       // Amostras
+    if (url.startsWith('/analysis')) return 'heroBriefcase';                   // Análises
+    if (url.startsWith('/manage-orders')) return 'heroAdjustmentsHorizontal';  // Gerenciar OS
+    if (url.startsWith('/external-labs')) return 'heroListBullet';             // Laboratórios Externos
+    if (url.startsWith('/access-management')) return 'heroUserGroup';          // Gerenciar Acesso
+    if (url.startsWith('/settings')) return 'heroCog6Tooth';                   // Configurações
 
-  return 'heroInformationCircle';
-}
+    return 'heroInformationCircle';
+  }
 
   onNotificationClick(): void {
     this.#router.navigate(['/notifications']);
@@ -94,5 +96,14 @@ getCurrentRouteIcon(): string {
         this.#router.navigate(['/login']);
       },
     });
+  }
+
+
+  onRead(id: number| string) {
+    if (!id) return;
+    this.#notificationsService.markAsRead(id);
+  }
+  onMarkAllAsRead() {
+    this.#notificationsService.markAllAsRead();
   }
 }

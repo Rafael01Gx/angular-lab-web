@@ -25,7 +25,7 @@ import {
   ],
   template: `
     <div class="fixed top-5 right-5 z-[1000] flex flex-col items-end pointer-events-none">
-      @for(toast of toasts; track toast.id){
+      @for(toast of toasts; track toast.id) {
       <div
         class="flex items-center w-80 min-h-16 rounded-lg mb-4 overflow-hidden relative shadow-lg backdrop-blur-sm transition-all duration-300 ease-out pointer-events-auto"
         [class]="getToastClasses(toast.type)"

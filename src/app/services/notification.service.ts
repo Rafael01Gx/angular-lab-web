@@ -123,9 +123,13 @@ export class NotificationsService {
     });
 
     this.#socket.on('new-notification', (notification: INotifications) => {
+      if (isPlatformBrowser(this.#platformId)) {
+      notification.data = new Date().toISOString();
+      notification.id = `localid-${Date.now()}`;
+      notification.read = false;
       this.#notifications.update(current => [notification, ...current]);
       this.#toastr.info(notification.message, notification.title);
-      this.playNotificationSound();
+      this.playNotificationSound();}
     });
 
     this.#socket.on('disconnect', (reason) => {
@@ -143,7 +147,6 @@ export class NotificationsService {
       this.#error.set('Erro na conexão em tempo real');
     });
 
-    // Tentativa de reconexão
     this.#socket.on('reconnect_attempt', (attempt) => {
       console.log(`Tentativa de reconexão ${attempt}...`);
     });
@@ -156,7 +159,13 @@ export class NotificationsService {
     });
   }
 
-  markAsRead(id: number): void {
+  markAsRead(id: number| string): void {
+    if (typeof id == "string" && id.includes("localid-")) {
+      this.#notifications.update(notifications =>
+            notifications.map(n => n.id === id ? { ...n, read: true } : n)
+          );
+          return;
+    };
     this.#http.patch<INotifications>(`${this.#apiUrl}/${id}/read`,{},{withCredentials: true})
       .pipe(
         tap(updatedNotification => {
@@ -176,7 +185,7 @@ export class NotificationsService {
 
   markAllAsRead(): void {
     const unreadIds = this.#notifications()
-      .filter(n => !n.read)
+      .filter(n => !n.read && !(typeof n.id === "string" && n.id.includes("localid-")))
       .map(n => n.id);
 
     if (unreadIds.length === 0) {
@@ -265,7 +274,7 @@ export class NotificationsService {
     }
 
     try {
-      const audio = new Audio('/assets/sounds/notification.mp3');
+      const audio = new Audio('/sounds/notification.mp3');
       audio.volume = 0.5;
       audio.play().catch(err => {
         console.warn('Não foi possível reproduzir som de notificação:', err);

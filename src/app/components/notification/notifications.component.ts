@@ -1,4 +1,4 @@
-import { Component, input, output, computed, signal } from '@angular/core';
+import { Component, input, output, computed, signal, OutputEmitterRef } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { 
   heroBell, 
@@ -9,7 +9,7 @@ import {
 } from '@ng-icons/heroicons/outline';
 
 export interface INotifications {
-  id: number;
+  id: number| string;
   title: string;
   message: string;
   data?: string;
@@ -19,9 +19,8 @@ export interface INotifications {
 
 @Component({
   selector: 'app-notifications',
-  standalone: true,
   imports: [NgIconComponent],
-  providers: [
+  viewProviders: [
     provideIcons({ 
       heroBell, 
       heroCheck, 
@@ -33,7 +32,7 @@ export interface INotifications {
   template: `
     <div class="relative">
       <button
-        type="button"
+        type="relative text-gray-400 p-2 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
         (click)="toggleDropdown()"
         class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
       >
@@ -157,8 +156,8 @@ export interface INotifications {
 })
 export class NotificationsComponent {
   notifications = input.required<INotifications[]>();
-  onRead = output<number>();
-  onMarkAllAsRead = output<void>();
+  onRead:OutputEmitterRef<number|string> = output<number|string>();
+  onMarkAllAsRead : OutputEmitterRef<void>  = output<void>();
 
   isOpen = signal(false);
   unreadCount = computed(() => 
@@ -176,6 +175,7 @@ export class NotificationsComponent {
   }
 
   markAllAsRead(): void {
+    this.isOpen.set(false);
     this.onMarkAllAsRead.emit();
   }
 }
