@@ -99,12 +99,13 @@ export class NotificationsService {
     try {
       this.#socket = io(environment.apiURL, {
         withCredentials: true,
-        transports: ['websocket', 'polling'],
+        transports: [ 'polling','websocket'],
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        timeout: 20000
+        timeout: 20000,
+        autoConnect: true,
       });
 
       this.setupSocketListeners();
@@ -123,14 +124,13 @@ export class NotificationsService {
     });
 
     this.#socket.on('new-notification', (notification: INotifications) => {
-      if (isPlatformBrowser(this.#platformId)) {
       notification.data = new Date().toISOString();
       notification.id = `localid-${Date.now()}`;
       notification.read = false;
       this.#notifications.update(current => [notification, ...current]);
       this.#toastr.info(notification.message, notification.title);
       this.playNotificationSound();}
-    });
+    );
 
     this.#socket.on('disconnect', (reason) => {
       console.log('WebSocket desconectado:', reason);
