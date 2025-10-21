@@ -146,6 +146,16 @@ export class ParametrosComponent implements OnInit {
 
   }
 
+  clearForm() {
+     this.materiaPrimaForm.setValue({
+      casasDecimais: 0,
+      subDescricao: '',
+      descricao: '',
+      unidadeResultado: '',
+      tipoAnaliseId: ''
+    })
+  }
+
   salvarItem(): void {
     if (
       !this.materiaPrimaForm.value.tipoAnaliseId ||
@@ -170,6 +180,7 @@ export class ParametrosComponent implements OnInit {
             if (this.editItemIndex() !== -1) {
               this.parametros()[this.editItemIndex()!] = res;
             }
+            this.cancelarEdicao();
           },
         });
     } else {
@@ -182,13 +193,7 @@ export class ParametrosComponent implements OnInit {
       });
     }
 
-    this.materiaPrimaForm.setValue({
-      casasDecimais: 0,
-      subDescricao: '',
-      descricao: '',
-      unidadeResultado: '',
-      tipoAnaliseId: ''
-    })
+    this.clearForm();
 
     // paginação
     if (this.paginaAtual > this.totalPaginas && this.totalPaginas > 0) {

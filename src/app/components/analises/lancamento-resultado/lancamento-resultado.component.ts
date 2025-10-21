@@ -1,20 +1,21 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
-import {AnaliseForm, ParametrosForm} from '../../../shared/interfaces/form-analise.interface';
+import { ChangeDetectorRef, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { AnaliseForm, ParametrosForm } from '../../../shared/interfaces/form-analise.interface';
 import {
   LancamentoResultadoFormComponent
 } from '../../forms/lancamento-resultado-form/lancamento-resultado-form.component';
-import {ActivatedRoute, Router} from '@angular/router';
-import {IAnalysisSettings} from '../../../shared/interfaces/analysis-settings.interface';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {IAmostra} from '../../../shared/interfaces/amostra.interface';
-import {CommonModule, DatePipe, Location} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {NgIcon, provideIcons} from '@ng-icons/core';
-import {heroArrowSmallLeft} from '@ng-icons/heroicons/outline';
-import {AmostrasService} from '../../../services/amostras.service';
-import {ToastrService} from '../../../services/toastr.service';
-import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
+import { ActivatedRoute } from '@angular/router';
+import { IAnalysisSettings } from '../../../shared/interfaces/analysis-settings.interface';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IAmostra } from '../../../shared/interfaces/amostra.interface';
+import { CommonModule, DatePipe, Location } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { heroArrowSmallLeft } from '@ng-icons/heroicons/outline';
+import { AmostrasService } from '../../../services/amostras.service';
+import { ToastrService } from '../../../services/toastr.service';
+import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
 import { keyOfStatus, Status } from '../../../shared/enums/status.enum';
+import { AnalysisSettingsService } from '../../../services/analysis-settings.service';
 
 @Component({
   selector: 'app-lancamento-resultado',
@@ -24,11 +25,10 @@ import { keyOfStatus, Status } from '../../../shared/enums/status.enum';
     CommonModule,
     FormsModule, DatePipe, NgIcon
   ],
-  viewProviders: [provideIcons({heroArrowSmallLeft})],
+  viewProviders: [provideIcons({ heroArrowSmallLeft })],
   template: `
     <div class="w-full h-full flex gap-6 p-6 bg-gray-50">
 
-      <!-- Header com botão voltar -->
       @if (amostra() && configuracoes()) {
 
         <!-- Coluna Esquerda: Informações e Seleção -->
@@ -60,15 +60,15 @@ import { keyOfStatus, Status } from '../../../shared/enums/status.enum';
             <div class="space-y-3">
               <div>
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">OS</p>
-                <p class="text-sm font-medium text-gray-900">{{ amostra().numeroOs }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ amostra()!.numeroOs }}</p>
               </div>
               <div>
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Amostra</p>
-                <p class="text-sm font-medium text-gray-900">{{ amostra().nomeAmostra }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ amostra()!.nomeAmostra }}</p>
               </div>
               <div>
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Data</p>
-                <p class="text-sm font-medium text-gray-900">{{ amostra().dataAmostra | date: 'dd-MM-yyyy' }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ amostra()!.dataAmostra | date: 'dd-MM-yyyy' }}</p>
               </div>
             </div>
           </div>
@@ -224,25 +224,23 @@ import { keyOfStatus, Status } from '../../../shared/enums/status.enum';
 })
 export class LancamentoResultadoComponent {
   #route = inject(ActivatedRoute);
+  #cdr = inject(ChangeDetectorRef);
   #location = inject(Location);
   #amostrasService = inject(AmostrasService);
+  #analiseConfigService = inject(AnalysisSettingsService);
   #confirmModal = inject(ConfirmationModalService);
   #toast = inject(ToastrService);
-  currentAnalise = signal<AnaliseForm | Record<string, ParametrosForm> | null>(null);
-  data = toSignal(this.#route.data);
-
-  analiseTipo = computed(() => {
-    const configs = this.data()?.['configssettings'] as IAnalysisSettings[];
-    return configs?.[0]?.tipoAnalise?.tipo as string;
+  currentAnalise = signal<AnaliseForm | Record<string, ParametrosForm> | null>(null)
+  configuracoes = signal<IAnalysisSettings[]>([]);
+  analiseTipo = computed(() => this.configuracoes()?.[0]?.tipoAnalise?.tipo as string);
+  amostra = signal<IAmostra | null>(null);
+  params = toSignal(this.#route.queryParamMap);
+  ids = computed(() => {
+    const config_id = this.params()?.get('config')!;
+    const amostra_id = this.params()?.get('amostra')!;
+    return { config_id, amostra_id };
   });
-  amostraRota = computed(() => this.data()?.['amostra'] as IAmostra)
-  amostra = signal<IAmostra>(this.amostraRota());
 
-
-  configuracoes = computed(() => this.data()?.['configssettings'] as IAnalysisSettings[]
-  );
-
-  // Verifica se já existe resultado para o tipo de análise atual
   resultadoExiste = computed(() => {
     const tipo = this.analiseTipo();
     const amostra = this.amostra();
@@ -251,12 +249,19 @@ export class LancamentoResultadoComponent {
 
   constructor() {
     effect(() => {
-      if (this.resultadoExiste())
-        this.currentAnalise.set(this.amostra().resultados[this.analiseTipo()]);
+      if (this.resultadoExiste() && this.amostra())
+        this.currentAnalise.set(this.amostra()!.resultados[this.analiseTipo()]);
+    });
+    effect(() => {
+      if (this.ids()) {
+        this.loadAmostra();
+        this.loadConfig();
+        console.log('IDs carregados:', this.ids());
+
+      }
     });
   }
 
-  // Chamado quando uma configuração é selecionada
   onConfigChange(configId: string | null) {
     if (!configId) {
       this.currentAnalise.set(null);
@@ -280,13 +285,13 @@ export class LancamentoResultadoComponent {
       console.error('Tipo de análise não encontrado');
       return;
     }
-
     const updateAmostra = this.amostra();
+    if (!updateAmostra) return;
     updateAmostra.status = keyOfStatus(Status.EXECUCAO) as Status;
     if (!updateAmostra.resultados) {
       updateAmostra.resultados = {};
     }
-    updateAmostra.resultados[tipo] = {...data};
+    updateAmostra.resultados[tipo] = { ...data };
     this.atualizarAmostra(updateAmostra).subscribe((res) => {
       if (res) {
         this.#toast.success("Análise salva com sucesso!");
@@ -301,7 +306,7 @@ export class LancamentoResultadoComponent {
   }
 
   atualizarAmostra(data: IAmostra) {
-    return this.#amostrasService.update(this.amostra().id, data);
+    return this.#amostrasService.update(this.amostra()!.id, data);
   }
 
 
@@ -311,6 +316,7 @@ export class LancamentoResultadoComponent {
     this.#confirmModal.confirmDelete(tipo, "Remover resultados?").then((confirm) => {
       if (confirm) {
         const updateAmostra = this.amostra();
+        if (!updateAmostra || !updateAmostra.resultados) return;
         delete updateAmostra.resultados[tipo]
         this.atualizarAmostra(updateAmostra).subscribe((res) => {
           if (res) {
@@ -326,5 +332,22 @@ export class LancamentoResultadoComponent {
   voltar() {
     this.#location.back();
 
+  }
+
+  async loadConfig() {
+    const config_id = this.ids().config_id;
+    return this.#analiseConfigService.findByAnalisysId(config_id).subscribe((configs) => {
+      if (configs) {
+        this.configuracoes.set(configs);
+      }
+    });
+  }
+  async loadAmostra() {
+    const amostra_id = this.ids().amostra_id;
+    return this.#amostrasService.findById(amostra_id).subscribe((amostra) => {
+      if (amostra) {
+        this.amostra.set(amostra);
+      }
+    });
   }
 }
