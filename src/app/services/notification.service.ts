@@ -63,7 +63,7 @@ export class NotificationsService {
     this.#isLoading.set(true);
     this.#error.set(null);
 
-    this.#http.get<INotifications[]>(this.#apiUrl,{withCredentials: true})
+    this.#http.get<INotifications[]>(`${this.#apiUrl}/all`,{withCredentials: true})
       .pipe(
         retry({ count: 3, delay: 1000 }),
         tap(notifications => {
