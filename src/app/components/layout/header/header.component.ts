@@ -48,7 +48,7 @@ export class HeaderComponent implements OnInit {
   #authService = inject(AuthService);
   #notificationsService = inject(NotificationsService);
   notificationCount = computed(() => this.#notificationsService.unreadCount());
-  notifications = computed(() => this.#notificationsService.notifications().slice(0, 5));
+  notifications = computed(() => this.#notificationsService.notifications().slice(0, 20));
   #router = inject(Router);
   authService = inject(AuthService);
   user = signal(this.#authService.currentUser());
