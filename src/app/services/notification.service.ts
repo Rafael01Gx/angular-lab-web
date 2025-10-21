@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed, DestroyRef, PLATFORM_ID, afterNextRender } from '@angular/core';
+import { Injectable, inject, signal, computed, DestroyRef, PLATFORM_ID, afterNextRender, TransferState, makeStateKey } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -8,6 +8,7 @@ import { ToastrService } from './toastr.service';
 import { isPlatformBrowser } from '@angular/common';
 import { INotifications } from '../components/notification/notifications.component';
 
+const NOTIFICATION_STATE_KEY = makeStateKey<INotifications[]>('notifications-state');
 @Injectable({
   providedIn: 'root'
 })
@@ -17,6 +18,7 @@ export class NotificationsService {
   #toastr = inject(ToastrService);
   #destroyRef = inject(DestroyRef);
   #platformId = inject(PLATFORM_ID);
+  #transdferState = inject(TransferState);
 
 
   #socket: Socket | null = null;
@@ -60,6 +62,12 @@ export class NotificationsService {
   }
 
   loadNotifications(): void {
+    const savedNotifications = this.#transdferState.get<INotifications[]>(NOTIFICATION_STATE_KEY, []);
+    if (savedNotifications.length > 0) {
+      this.#notifications.set(savedNotifications);
+      this.#transdferState.remove(NOTIFICATION_STATE_KEY);
+      return;
+    }
     this.#isLoading.set(true);
     this.#error.set(null);
 
@@ -99,7 +107,7 @@ export class NotificationsService {
     try {
       this.#socket = io(environment.apiURL, {
         withCredentials: true,
-        transports: [ 'polling','websocket'],
+        transports: ['websocket'],
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
@@ -123,6 +131,7 @@ export class NotificationsService {
       this.#error.set(null);
     });
 
+       if (isPlatformBrowser(this.#platformId)) {
     this.#socket.on('new-notification', (notification: INotifications) => {
       notification.data = new Date().toISOString();
       notification.id = `localid-${Date.now()}`;
@@ -130,7 +139,7 @@ export class NotificationsService {
       this.#notifications.update(current => [notification, ...current]);
       this.#toastr.info(notification.message, notification.title);
       this.playNotificationSound();}
-    );
+    ); }
 
     this.#socket.on('disconnect', (reason) => {
       console.log('WebSocket desconectado:', reason);
