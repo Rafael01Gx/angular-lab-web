@@ -98,7 +98,6 @@ export class NotificationsService {
 
     try {
       this.#socket = io(environment.apiURL, {
-        path: '/socket.io/',
         withCredentials: true,
         transports: ['websocket', 'polling'],
         reconnection: true,
