@@ -256,8 +256,6 @@ export class LancamentoResultadoComponent {
       if (this.ids()) {
         this.loadAmostra();
         this.loadConfig();
-        console.log('IDs carregados:', this.ids());
-
       }
     });
   }
