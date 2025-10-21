@@ -26,6 +26,7 @@ import { IUser, UpdateUserData } from '../../shared/interfaces/user.interface';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { NgxMaskDirective } from 'ngx-mask';
+import { ToastrService } from '../../services/toastr.service';
 
 @Component({
   selector: 'app-perfil',
@@ -59,6 +60,7 @@ import { NgxMaskDirective } from 'ngx-mask';
 export class PerfilComponent implements OnInit {
   #userService = inject(UserService);
   #authService = inject(AuthService);
+  #toast = inject(ToastrService);
   #fb = inject(FormBuilder);
   #platformId = inject(PLATFORM_ID);
   currentUser = signal<IUser | null>(null);
@@ -178,6 +180,7 @@ export class PerfilComponent implements OnInit {
         this.#userService.update(updateData).subscribe({
           complete: () => {
             this.isLoading.set(false);
+            this.#toast.success('Perfil atualizado com sucesso!', 'Sucesso');
             if (this.showPasswordFields()) {
               this.showPasswordFields.set(false);
               this.profileForm.get('oldPassword')?.setValue('');
@@ -187,6 +190,7 @@ export class PerfilComponent implements OnInit {
           },
           error: (err) => {
             this.isLoading.set(false);
+            this.#toast.error(err.error.message || 'Erro ao atualizar perfil.');
           },
         });
       } catch (error) {

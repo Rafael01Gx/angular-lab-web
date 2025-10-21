@@ -69,7 +69,7 @@ export class AproavacaoComponent implements OnInit {
   private carregarAmostras(limit: number = 20, page: number = 1,status:string='EXECUCAO',progresso:number=100) {
     const query: Querys = { limit, page ,progresso,status};
     this.#amostraService
-      .findAllWithAnalystsAndCompleted(query)
+      .findCompletePendingApproval(query)
       .subscribe((res) => {
         if (res && res.data.length > 0) {
           this.amostras.update((v) => [...v, ...res.data]);

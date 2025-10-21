@@ -33,19 +33,18 @@ export class AmostrasService {
   }
 
 findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
-  let params = new HttpParams();
-
-  if (query) {
-    if (query.status) params = params.append('status', query.status.toString());
-    if (query.limit) params = params.append('limit', query.limit.toString());
-    if (query.page) params = params.append('page', query.page.toString());
-    if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
-    if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
-    if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
-    if (query.progresso) params = params.append('progresso', query.progresso.toString());
-  }
-
+  const params = this.queryContructor(query);
   return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/amostras`, {
+    params,
+    withCredentials: true,
+  }).pipe(
+    catchError(this.handleGetError.bind(this))
+  );
+}
+
+findCompletePendingApproval(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
+  const params = this.queryContructor(query);
+  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/aguardando-aprovacao`, {
     params,
     withCredentials: true,
   }).pipe(
@@ -89,4 +88,23 @@ findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IA
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
+
+  
+
+queryContructor(query?: Querys): HttpParams {
+
+  let params = new HttpParams();
+
+  if (query) {
+    if (query.status) params = params.append('status', query.status.toString());
+    if (query.limit) params = params.append('limit', query.limit.toString());
+    if (query.page) params = params.append('page', query.page.toString());
+    if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
+    if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
+    if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
+    if (query.progresso) params = params.append('progresso', query.progresso.toString());
+  }  
+  return params;
+
+}
 }
