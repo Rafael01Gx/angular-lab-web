@@ -105,7 +105,7 @@ export class NotificationsService {
     }
 
     try {
-      this.#socket = io(`${environment.apiURL}`, {
+      this.#socket = io(`${this.#apiUrl}`, {
         withCredentials: true,
         transports: ['websocket'],
         reconnection: true,
@@ -113,7 +113,6 @@ export class NotificationsService {
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         timeout: 20000,
-        autoConnect: true,
       });
 
       this.setupSocketListeners();
