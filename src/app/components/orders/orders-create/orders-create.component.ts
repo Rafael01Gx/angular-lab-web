@@ -41,6 +41,7 @@ export class OrdersCreateComponent implements OnInit {
   #confirm = inject(ConfirmationModalService);
   #etiqueta = inject(EtiquetasService);
 
+  isLoading= signal<boolean>(false)
   identificacao = signal('');
   data = signal('');
   observacao = signal('');
@@ -117,6 +118,7 @@ export class OrdersCreateComponent implements OnInit {
     }
     this.#confirm.confirmWarning("Enviar","Confirmar envio das remessa?").then((confirm)=>{
       if(confirm){
+        this.isLoading.set(true)
         this.#orderService.create(amostras as  Partial<IAmostra[]>).subscribe((ordem)=>{
           if(ordem){
             setTimeout(()=>{
@@ -128,6 +130,7 @@ export class OrdersCreateComponent implements OnInit {
             },500)
           }
           this.clearForm();
+          this.isLoading.set(false)
           this.observacao.set('')
           this.amostras.set([])
         })

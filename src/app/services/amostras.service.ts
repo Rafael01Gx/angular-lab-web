@@ -42,9 +42,9 @@ findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IA
   );
 }
 
-findCompletePendingApproval(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
+findComplete(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
   const params = this.queryContructor(query);
-  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/aguardando-aprovacao`, {
+  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/completas`, {
     params,
     withCredentials: true,
   }).pipe(

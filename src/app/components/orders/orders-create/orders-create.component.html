@@ -186,18 +186,19 @@
 
     <button
       (click)="cancel()"
-      [disabled]="amostras().length === 0"
+      [disabled]="amostras().length === 0 || isLoading()"
       class="px-6 py-3 max-h-[50px] border hover:bg-gradient-to-r hover:from-gray-500/90 hover:to-gray-700/90 hover:text-white border-gray-300 text-gray-700 rounded-md transition-colors flex items-center gap-2 disabled:cursor-not-allowed"
     >
       <ng-icon name="heroXMark" class="text-sm"></ng-icon>
       Cancelar
     </button>
     <button
+      [disabled]="isLoading() || amostras().length >= 0 "
       (click)="save()"
       class="px-6 py-3 max-h-[50px] bg-gradient-to-r from-violet-500/80 to-blue-600/80 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
     >
-      <ng-icon name="heroCheck" class="text-sm"></ng-icon>
-      Salvar
+      <ng-icon name="heroCheck" class="text-sm" [class.animate-spin]="isLoading()"></ng-icon>
+      {{isLoading() ? "Enviando...": "Salvar"}}
     </button>
   </div>
 </div>

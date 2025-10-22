@@ -42,7 +42,6 @@ export class SearchOrdersComponent implements OnInit {
             limit: this.paginateConfig().itemsPerPage,
             ...this.paginateConfig().advancedFilters
         };
-        console.log(query)
         this.#ordemService.findByFilters(query).subscribe({
             next: (response: PaginatedResponse<IOrders[]>) => {
                 this.ordensData.set(response);
