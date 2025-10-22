@@ -105,7 +105,7 @@ export class NotificationsService {
     }
 
     try {
-      this.#socket = io(`${this.#apiUrl}`, {
+      this.#socket = io(environment.apiURL, {
         withCredentials: true,
         transports: ['websocket'],
         reconnection: true,
