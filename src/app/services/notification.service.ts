@@ -105,7 +105,7 @@ export class NotificationsService {
     }
 
     try {
-      this.#socket = io(`${environment.apiURL}/`, {
+      this.#socket = io(`${environment.apiURL}/stream`, {
         withCredentials: true,
         transports: ['websocket', 'polling'],
         reconnection: true,
@@ -154,7 +154,6 @@ export class NotificationsService {
 
     this.#socket.on('connect_error', (error) => {
       console.error('Erro de conexão WebSocket:', error);
-      console.log(io(`${environment.apiURL}/`))
       this.#isConnected.set(false);
       this.#error.set('Erro na conexão em tempo real');
     });
