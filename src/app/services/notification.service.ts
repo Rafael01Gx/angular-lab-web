@@ -71,7 +71,7 @@ export class NotificationsService {
     this.#isLoading.set(true);
     this.#error.set(null);
 
-    this.#http.get<INotifications[]>(`${this.#apiUrl}/all`,{withCredentials: true})
+    this.#http.get<INotifications[]>(`${this.#apiUrl}/all`, { withCredentials: true })
       .pipe(
         retry({ count: 3, delay: 1000 }),
         tap(notifications => {
@@ -105,10 +105,9 @@ export class NotificationsService {
     }
 
     try {
-      this.#socket = io(environment.apiURL, {
+      this.#socket = io(`${environment.apiURL}/notifications`, {
         withCredentials: true,
-        path: '/socket.io',
-        transports: ['websocket'],
+        transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
@@ -132,20 +131,22 @@ export class NotificationsService {
       this.#error.set(null);
     });
 
-       if (isPlatformBrowser(this.#platformId)) {
-    this.#socket.on('new-notification', (notification: INotifications) => {
-      notification.data = new Date().toISOString();
-      notification.id = `localid-${Date.now()}`;
-      notification.read = false;
-      this.#notifications.update(current => [notification, ...current]);
-      this.#toastr.info(notification.message, notification.title);
-      this.playNotificationSound();}
-    ); }
+    if (isPlatformBrowser(this.#platformId)) {
+      this.#socket.on('new-notification', (notification: INotifications) => {
+        notification.data = new Date().toISOString();
+        notification.id = `localid-${Date.now()}`;
+        notification.read = false;
+        this.#notifications.update(current => [notification, ...current]);
+        this.#toastr.info(notification.message, notification.title);
+        this.playNotificationSound();
+      }
+      );
+    }
 
     this.#socket.on('disconnect', (reason) => {
       console.log('WebSocket desconectado:', reason);
       this.#isConnected.set(false);
-      
+
       if (reason === 'io server disconnect') {
         this.#socket?.connect();
       }
@@ -169,14 +170,14 @@ export class NotificationsService {
     });
   }
 
-  markAsRead(id: number| string): void {
+  markAsRead(id: number | string): void {
     if (typeof id == "string" && id.includes("localid-")) {
       this.#notifications.update(notifications =>
-            notifications.map(n => n.id === id ? { ...n, read: true } : n)
-          );
-          return;
+        notifications.map(n => n.id === id ? { ...n, read: true } : n)
+      );
+      return;
     };
-    this.#http.patch<INotifications>(`${this.#apiUrl}/${id}/read`,{},{withCredentials: true})
+    this.#http.patch<INotifications>(`${this.#apiUrl}/${id}/read`, {}, { withCredentials: true })
       .pipe(
         tap(updatedNotification => {
           this.#notifications.update(notifications =>
@@ -203,7 +204,7 @@ export class NotificationsService {
       return;
     }
 
-    this.#http.patch(`${this.#apiUrl}/read-all`, { ids: unreadIds },{withCredentials: true})
+    this.#http.patch(`${this.#apiUrl}/read-all`, { ids: unreadIds }, { withCredentials: true })
       .pipe(
         tap(() => {
           this.#notifications.update(notifications =>
@@ -222,7 +223,7 @@ export class NotificationsService {
   }
 
   deleteNotification(id: number): void {
-    this.#http.delete(`${this.#apiUrl}/${id}`,{withCredentials: true})
+    this.#http.delete(`${this.#apiUrl}/${id}`, { withCredentials: true })
       .pipe(
         tap(() => {
           this.#notifications.update(notifications =>
@@ -250,7 +251,7 @@ export class NotificationsService {
       return;
     }
 
-    this.#http.delete(`${this.#apiUrl}/clear-read`, { body: { ids: readIds },withCredentials:true },)
+    this.#http.delete(`${this.#apiUrl}/clear-read`, { body: { ids: readIds }, withCredentials: true },)
       .pipe(
         tap(() => {
           this.#notifications.update(notifications =>
