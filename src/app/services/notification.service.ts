@@ -154,6 +154,7 @@ export class NotificationsService {
 
     this.#socket.on('connect_error', (error) => {
       console.error('Erro de conexão WebSocket:', error);
+      console.log(this.#socket)
       this.#isConnected.set(false);
       this.#error.set('Erro na conexão em tempo real');
     });
