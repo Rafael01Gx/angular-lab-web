@@ -107,7 +107,7 @@ export class NotificationsService {
     try {
       this.#socket = io(environment.appURL, {
         withCredentials: true,
-        transports: ['websocket'],
+        transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
