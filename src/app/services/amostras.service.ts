@@ -65,6 +65,14 @@ findComplete(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
+  findAllWithUsersByOs(numberOs:string): Observable<IAmostra[]> {
+    return this.#http.get<IAmostra[]>(`${this.#apiUrl}/ordem-servico/${numberOs}`, {
+      withCredentials: true,
+    }).pipe(catchError(this.handleGetError.bind(this)));
+  }
+
+
+
   create(amostras: Partial<IAmostra[]>): Observable<IAmostra> {
     return this.#http.post<IAmostra>(`${this.#apiUrl}`, {amostras}, {
       withCredentials: true,
