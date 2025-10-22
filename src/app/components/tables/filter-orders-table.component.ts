@@ -627,11 +627,11 @@ async imprimirLaudo(ordem: IOrders, event: Event) {
       }),
       switchMap((pdfPromises) => {
         if (pdfPromises.length === 0) {
-          return of([]);
+          return [];
         }
         return forkJoin(pdfPromises);
       })
-    );
+    ).subscribe();
 }
   getAmostrasName(amostras: IAmostra[]): string {
     return amostras.flatMap((a) => a.nomeAmostra).toString();
