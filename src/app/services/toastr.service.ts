@@ -1,6 +1,7 @@
 import { Message } from 'esbuild';
-import { Injectable } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { isPlatformServer } from '@angular/common';
 
 export interface IToast {
   id: number;
@@ -14,6 +15,7 @@ export interface IToast {
 })
 export class ToastrService {
   #toasts: IToast[] = [];
+  #platformId = inject(PLATFORM_ID);
   #toastSubject = new BehaviorSubject<IToast[]>([]);
   toasts$ = this.#toastSubject.asObservable();
   idCounter = 1;
@@ -23,6 +25,7 @@ export class ToastrService {
     message: string,
     type: 'success' | 'error' | 'info' | 'warning'
   ) {
+    if (isPlatformServer(this.#platformId)) return;
     const id = this.idCounter;
     this.idCounter++;
     const toast: IToast = { id, title, message, type };
