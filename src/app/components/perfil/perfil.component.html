@@ -139,8 +139,9 @@
                     formControlName="phone"
                     class="w-full input-icon-left"
                     placeholder="(11) 99999-9999"
-                    mask="(00) 0 0000-0000"
-                    maxlength="15"
+                    mask="(00) 0000-0000||(00) 0 0000-0000"
+                    [dropSpecialCharacters]="false"
+                    maxlength="16"
                   />
                   <ng-icon name="heroPhone" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"></ng-icon>
                 </div>
@@ -167,7 +168,7 @@
                 </div>
               </div>
 
-              <div class="space-y-2 md:col-span-2">
+              <div class="space-y-2">
                 <label class="block text-sm font-medium text-gray-700"
                   >Função</label
                 >
@@ -184,6 +185,22 @@
                   ></ng-icon>
                 </div>
               </div>
+              
+               <div class="space-y-2 flex items-center">
+               
+                <div class="relative flex items-center ml-4 mt-4 gap-6">
+                   <p class="text-md font-medium text-gray-700"
+                  >Receber notificações por e-mail?</p
+                >
+                  <input
+                    type="checkbox"
+                    formControlName="receives_email"
+                    class=" w-4 h-4"
+                  />
+                 
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -346,6 +363,7 @@
         >
           <button
             type="button"
+            (click)="cancel()"
             class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium"
           >
             Cancelar
