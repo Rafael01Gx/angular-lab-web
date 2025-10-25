@@ -4,13 +4,15 @@ import {environment} from '../../environments/environment';
 import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {AmostraLabExterno, AmostraLabExternoFull} from '../shared/interfaces/laboratorios-externos.interfaces';
+import {API_ROUTES} from '../shared/constants/routes.constant';
 
+const { AMOSTRAS_LAB_EXTERNO } = API_ROUTES;
 
 @Injectable({
   providedIn: 'root',
 })
 export class AmostrasLabExternos {
-  #apiUrl = `${environment.apiURL}/amostra-lab-externo`;
+  #apiUrl = `${environment.apiURL}/${AMOSTRAS_LAB_EXTERNO.BASE}`;
   #http = inject(HttpClient);
   #toastr = inject(ToastrService);
 
@@ -25,25 +27,25 @@ export class AmostrasLabExternos {
   }
 
   findAll(): Observable<AmostraLabExternoFull[]> {
-    return this.#http.get<AmostraLabExternoFull[]>(`${this.#apiUrl}`, {
+    return this.#http.get<AmostraLabExternoFull[]>(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.GET.FIND_ALL}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
   create(body: AmostraLabExterno): Observable<AmostraLabExternoFull> {
-    return this.#http.post<AmostraLabExternoFull>(`${this.#apiUrl}`, body, {
+    return this.#http.post<AmostraLabExternoFull>(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.POST.CREATE}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   update(id: number, body: AmostraLabExterno): Observable<AmostraLabExterno> {
-    return this.#http.patch<AmostraLabExterno>(`${this.#apiUrl}/${id}`, body, {
+    return this.#http.patch<AmostraLabExterno>(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.PATCH.UPDATE+id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   delete(id: number): Observable<any> {
-    return this.#http.delete(`${this.#apiUrl}/${id}`, {
+    return this.#http.delete(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.DELETE.DELETE+id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }

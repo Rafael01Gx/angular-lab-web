@@ -4,13 +4,15 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {IAnalysisSettings} from '../shared/interfaces/analysis-settings.interface';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {ToastrService} from './toastr.service';
+import {API_ROUTES} from '../shared/constants/routes.constant';
 
+const { CONFIG_ANALISES } = API_ROUTES;
 
 @Injectable({
   providedIn: 'root',
 })
 export class AnalysisSettingsService {
-  #apiUrl = `${environment.apiURL}/config-analise`;
+  #apiUrl = `${environment.apiURL}/${CONFIG_ANALISES.BASE}`;
   #http = inject(HttpClient);
   #toastr = inject(ToastrService);
 
@@ -25,12 +27,13 @@ export class AnalysisSettingsService {
   }
 
   findAll(): Observable<IAnalysisSettings[]> {
-    return this.#http.get<IAnalysisSettings[]>(`${this.#apiUrl}`, {
+    return this.#http.get<IAnalysisSettings[]>(`${this.#apiUrl}/${CONFIG_ANALISES.GET.FIND_ALL}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
+
   findByAnalisysId(id:string|number): Observable<IAnalysisSettings[]> {
-    return this.#http.get<IAnalysisSettings[]>(`${this.#apiUrl}/analise/${id}`, {
+    return this.#http.get<IAnalysisSettings[]>(`${this.#apiUrl}/${CONFIG_ANALISES.GET.FIND_BY_TIPO_ANALISE_ID+id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
@@ -41,7 +44,7 @@ export class AnalysisSettingsService {
       return p.id;
     });
     return this.#http.post<IAnalysisSettings>(
-      `${this.#apiUrl}`,
+      `${this.#apiUrl}/${CONFIG_ANALISES.POST.CREATE}`,
       {parametros: parametrosId, ...data},
       {
         withCredentials: true,
@@ -55,7 +58,7 @@ export class AnalysisSettingsService {
       return p.id;
     });
     return this.#http.patch<IAnalysisSettings>(
-      `${this.#apiUrl}/${id}`,
+      `${this.#apiUrl}/${CONFIG_ANALISES.PATCH.UPDATE+id}`,
       {parametros: parametrosId, ...data},
       {
         withCredentials: true,
@@ -64,7 +67,7 @@ export class AnalysisSettingsService {
   }
 
   delete(id: number): Observable<any> {
-    return this.#http.delete(`${this.#apiUrl}/${id}`, {
+    return this.#http.delete(`${this.#apiUrl}/${CONFIG_ANALISES.DELETE.DELETE+id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }

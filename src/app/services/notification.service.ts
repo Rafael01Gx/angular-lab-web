@@ -1,19 +1,25 @@
-import { Injectable, inject, signal, computed, DestroyRef, PLATFORM_ID, afterNextRender, TransferState, makeStateKey } from '@angular/core';
+import {
+  Injectable, inject, signal, computed, DestroyRef, PLATFORM_ID, afterNextRender, TransferState, makeStateKey,
+  ApplicationRef
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, tap, of, retry } from 'rxjs';
+import {catchError, tap, of, retry, take} from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ToastrService } from './toastr.service';
 import { isPlatformBrowser } from '@angular/common';
 import { INotifications } from '../components/notification/notifications.component';
+import {API_ROUTES} from '../shared/constants/routes.constant';
+import {filter} from 'rxjs/operators';
 
+const { NOTIFICACOES } = API_ROUTES;
 const NOTIFICATION_STATE_KEY = makeStateKey<INotifications[]>('notifications-state');
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationsService {
-  #apiUrl = `${environment.apiURL}/notificacoes`;
+  #apiUrl = `${environment.apiURL}/${NOTIFICACOES.BASE}`;
   #http = inject(HttpClient);
   #toastr = inject(ToastrService);
   #destroyRef = inject(DestroyRef);
@@ -23,6 +29,7 @@ export class NotificationsService {
 
   #socket: Socket | null = null;
   #isInitialized = signal(false);
+  #appRef = inject(ApplicationRef);
 
   #notifications = signal<INotifications[]>([]);
   #isLoading = signal<boolean>(false);
@@ -41,13 +48,13 @@ export class NotificationsService {
     });
 
     if (isPlatformBrowser(this.#platformId)) {
-      afterNextRender(() => {
-        setTimeout(() => {
+      this.#appRef.isStable
+        .pipe(filter(stable => stable), take(1))
+        .subscribe(() => {
           if (this.#isInitialized()) {
             this.connectWebSocket();
           }
-        }, 100);
-      });
+        });
     }
   }
 
@@ -55,10 +62,6 @@ export class NotificationsService {
   initialize(): void {
     this.loadNotifications();
     this.#isInitialized.set(true);
-
-    if (isPlatformBrowser(this.#platformId) && !this.#socket) {
-      this.connectWebSocket();
-    }
   }
 
   loadNotifications(): void {
@@ -71,7 +74,7 @@ export class NotificationsService {
     this.#isLoading.set(true);
     this.#error.set(null);
 
-    this.#http.get<INotifications[]>(`${this.#apiUrl}/all`, { withCredentials: true })
+    this.#http.get<INotifications[]>(`${this.#apiUrl}/${NOTIFICACOES.GET.GET_MY_NOTIFICATIONS}`, { withCredentials: true })
       .pipe(
         retry({ count: 3, delay: 1000 }),
         tap(notifications => {
@@ -176,7 +179,7 @@ export class NotificationsService {
       );
       return;
     };
-    this.#http.patch<INotifications>(`${this.#apiUrl}/${id}/read`, {}, { withCredentials: true })
+    this.#http.patch<INotifications>(`${this.#apiUrl}/${NOTIFICACOES.PATCH.MARK_AS_READ+id}`, {}, { withCredentials: true })
       .pipe(
         tap(updatedNotification => {
           this.#notifications.update(notifications =>
@@ -203,7 +206,7 @@ export class NotificationsService {
       return;
     }
 
-    this.#http.patch(`${this.#apiUrl}/read-all`, { ids: unreadIds }, { withCredentials: true })
+    this.#http.patch(`${this.#apiUrl}/${NOTIFICACOES.PATCH.MARK_ALL_AS_READ}`, { ids: unreadIds }, { withCredentials: true })
       .pipe(
         tap(() => {
           this.#notifications.update(notifications =>
@@ -222,7 +225,7 @@ export class NotificationsService {
   }
 
   deleteNotification(id: number): void {
-    this.#http.delete(`${this.#apiUrl}/${id}`, { withCredentials: true })
+    this.#http.delete(`${this.#apiUrl}/${NOTIFICACOES.DELETE.DELETE_NOTIFICATION+id}`, { withCredentials: true })
       .pipe(
         tap(() => {
           this.#notifications.update(notifications =>
@@ -250,7 +253,7 @@ export class NotificationsService {
       return;
     }
 
-    this.#http.delete(`${this.#apiUrl}/clear-read`, { body: { ids: readIds }, withCredentials: true },)
+    this.#http.delete(`${this.#apiUrl}/${NOTIFICACOES.DELETE.CLEAR_READ_NOTIFICATIONS}`, { body: { ids: readIds }, withCredentials: true },)
       .pipe(
         tap(() => {
           this.#notifications.update(notifications =>

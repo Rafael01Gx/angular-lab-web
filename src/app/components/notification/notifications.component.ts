@@ -1,11 +1,11 @@
 import { Component, input, output, computed, signal, OutputEmitterRef } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { 
-  heroBell, 
-  heroCheck, 
+import {
+  heroBell,
+  heroCheck,
   heroXMark,
   heroEnvelope,
-  heroEnvelopeOpen 
+  heroEnvelopeOpen
 } from '@ng-icons/heroicons/outline';
 
 export interface INotifications {
@@ -21,23 +21,22 @@ export interface INotifications {
   selector: 'app-notifications',
   imports: [NgIconComponent],
   viewProviders: [
-    provideIcons({ 
-      heroBell, 
-      heroCheck, 
+    provideIcons({
+      heroBell,
+      heroCheck,
       heroXMark,
       heroEnvelope,
-      heroEnvelopeOpen 
+      heroEnvelopeOpen
     })
   ],
   template: `
     <div class="relative">
       <button
-        type="relative text-gray-400 p-2 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
         (click)="toggleDropdown()"
-        class="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
+        class="relative p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
       >
         <ng-icon name="heroBell" size="24"></ng-icon>
-        
+
         @if (unreadCount() > 0) {
           <span
             class="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full border-2 border-white"
@@ -160,7 +159,7 @@ export class NotificationsComponent {
   onMarkAllAsRead : OutputEmitterRef<void>  = output<void>();
 
   isOpen = signal(false);
-  unreadCount = computed(() => 
+  unreadCount = computed(() =>
     this.notifications().filter(n => !n.read).length
   );
 

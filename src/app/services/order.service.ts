@@ -6,12 +6,15 @@ import {IOrders, IOrderStatistics} from '../shared/interfaces/orders.interface';
 import {IAmostra} from '../shared/interfaces/amostra.interface';
 import {ToastrService} from './toastr.service';
 import {PaginatedResponse, Querys} from '../shared/interfaces/querys.interface';
+import {API_ROUTES} from '../shared/constants/routes.constant';
+
+const { ORDENS_DE_SERVICO } = API_ROUTES;
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderService {
-  #apiUrl = `${environment.apiURL}/ordem-servico`;
+  #apiUrl = `${environment.apiURL}/${ORDENS_DE_SERVICO.BASE}`;
   #http = inject(HttpClient);
   #toastr = inject(ToastrService);
   #ordens = signal<IOrders[]>([]);
@@ -27,71 +30,52 @@ export class OrderService {
   }
 
   findAll(query?: Querys): Observable<IOrders[]> {
-    return this.#http.get<IOrders[]>(`${this.#apiUrl}?${query?.status}`, {
+    return this.#http.get<IOrders[]>(`${this.#apiUrl}${ORDENS_DE_SERVICO.GET.FIND_ALL}?${query?.status}`, {
       withCredentials: true,
     }).pipe(tap((ordens) => this.#ordens.set(ordens)), catchError(this.handleGetError.bind(this)));
   }
 
   findByFilters(query?: Querys): Observable<PaginatedResponse<IOrders[]>> {
-    let params= new HttpParams()
-      if (query) {
-    if (query.status) params = params.append('status', query.status.toString());
-    if (query.limit) params = params.append('limit', query.limit.toString());
-    if (query.page) params = params.append('page', query.page.toString());
-    if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
-    if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
-    if (query.solicitante) params = params.append('solicitante', query.solicitante.toString());
-    if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
-    if (query.progresso) params = params.append('progresso', query.progresso.toString());
-  }
-    return this.#http.get<PaginatedResponse<IOrders[]>>(`${this.#apiUrl}/filter`, {params,
+    const params = this.queryCostructor(query);
+    return this.#http.get<PaginatedResponse<IOrders[]>>(`${this.#apiUrl}/${ORDENS_DE_SERVICO.GET.FIND_BY_FILTERS}`, {params,
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
   findByUserAndFilters(query?: Querys): Observable<PaginatedResponse<IOrders[]>> {
-    let params= new HttpParams()
-      if (query) {
-    if (query.status) params = params.append('status', query.status.toString());
-    if (query.limit) params = params.append('limit', query.limit.toString());
-    if (query.page) params = params.append('page', query.page.toString());
-    if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
-    if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
-    if (query.solicitante) params = params.append('solicitante', query.solicitante.toString());
-    if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
-    if (query.progresso) params = params.append('progresso', query.progresso.toString());
-  }
+    const params = this.queryCostructor(query);
     return this.#http.get<PaginatedResponse<IOrders[]>>(`${this.#apiUrl}/all`, {params,
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
+
   findAllByUser(query?: Querys): Observable<IOrders[]> {
-    return this.#http.get<IOrders[]>(`${this.#apiUrl}/user?${query?.status}`, {
+    return this.#http.get<IOrders[]>(`${this.#apiUrl}/${ORDENS_DE_SERVICO.GET.FIND_ALL_BY_USER}?${query?.status}`, {
       withCredentials: true,
     }).pipe(tap((ordens) => this.#ordens.set(ordens)), catchError(this.handleGetError.bind(this)));
   }
 
   create(amostras: Partial<IAmostra[]>): Observable<IOrders> {
-    return this.#http.post<IOrders>(`${this.#apiUrl}`, {amostras}, {
+    return this.#http.post<IOrders>(`${this.#apiUrl}/${ORDENS_DE_SERVICO.POST.CREATE}`, {amostras}, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   update(id: number | string, body: Partial<IOrders>): Observable<IOrders> {
-    return this.#http.patch<IOrders>(`${this.#apiUrl}/${id}`, body, {
+    return this.#http.patch<IOrders>(`${this.#apiUrl}/${ORDENS_DE_SERVICO.PATCH.UPDATE+id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   updateRecepcaoAgendamento(id: number | string, body: Partial<IOrders>): Observable<IOrders> {
-    return this.#http.patch<IOrders>(`${this.#apiUrl}/agendar/${id}`, body, {
+    return this.#http.patch<IOrders>(`${this.#apiUrl}/${ORDENS_DE_SERVICO.PATCH.AGENDAR+id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   delete(id: number): Observable<any> {
-    return this.#http.delete(`${this.#apiUrl}/${id}`, {
+    return this.#http.delete(`${this.#apiUrl}/${ORDENS_DE_SERVICO.DELETE.DELETE+id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
@@ -101,7 +85,7 @@ export class OrderService {
   }
 
   buscarEstatisticas(): Observable<IOrderStatistics>{
-    return this.#http.get<IOrderStatistics>(`${this.#apiUrl}/estatisticas`,{withCredentials: true})
+    return this.#http.get<IOrderStatistics>(`${this.#apiUrl}/${ORDENS_DE_SERVICO.GET.GET_ESTATISTICAS}`,{withCredentials: true})
       .pipe(
         catchError(error => {
           console.error('Erro ao buscar estatísticas:', error);
@@ -113,4 +97,19 @@ export class OrderService {
         })
       );
   }
+  queryCostructor(query?: Querys): HttpParams {
+    let params= new HttpParams()
+    if (query) {
+      if (query.status) params = params.append('status', query.status.toString());
+      if (query.limit) params = params.append('limit', query.limit.toString());
+      if (query.page) params = params.append('page', query.page.toString());
+      if (query.dataInicio) params = params.append('dataInicio', query.dataInicio.toString());
+      if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
+      if (query.solicitante) params = params.append('solicitante', query.solicitante.toString());
+      if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
+      if (query.progresso) params = params.append('progresso', query.progresso.toString());
+    }
+    return params;
+  }
+
 }

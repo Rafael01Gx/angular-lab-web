@@ -3,12 +3,15 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
+import {API_ROUTES} from '../shared/constants/routes.constant';
+
+const { AUTH } = API_ROUTES;
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  #apiUrl = `${environment.apiURL}/auth`;
+  #apiUrl = `${environment.apiURL}/${AUTH.BASE}`;
   #http = inject(HttpClient);
 
   #user$ = signal<IUser | null>(null);
@@ -20,7 +23,7 @@ export class AuthService {
   login(email: string, password: string): Observable<IUserResponse> {
     return this.#http
       .post<IUserResponse>(
-        `${this.#apiUrl}/login`,
+        `${this.#apiUrl}/${AUTH.POST.LOGIN}`,
         { email, password },
         { withCredentials: true }
       )
@@ -33,7 +36,7 @@ export class AuthService {
 
   logout(): Observable<any> {
     return this.#http
-      .post(`${this.#apiUrl}/logout`, {}, { withCredentials: true })
+      .post(`${this.#apiUrl}/${AUTH.POST.LOGOUT}`, {}, { withCredentials: true })
       .pipe(
         tap(() => {
           this.clearUser();
@@ -43,7 +46,7 @@ export class AuthService {
 
   checkAuthStatus(): Observable<IUserResponse | null> {
     return this.#http
-      .get<IUserResponse>(`${this.#apiUrl}/profile`, {
+      .get<IUserResponse>(`${this.#apiUrl}/${AUTH.GET.PROFILE}`, {
         withCredentials: true,
       })
       .pipe(
@@ -57,7 +60,7 @@ export class AuthService {
 
   async create(user: IUser): Promise<IUserResponse> {
     return firstValueFrom(
-      this.#http.post<IUserResponse>(`${this.#apiUrl}/register`, user, {
+      this.#http.post<IUserResponse>(`${this.#apiUrl}/${AUTH.POST.REGISTER}`, user, {
         withCredentials: true,
       })
     );

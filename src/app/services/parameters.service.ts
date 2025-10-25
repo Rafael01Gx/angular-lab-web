@@ -4,13 +4,16 @@ import {environment} from '../../environments/environment';
 import {IParameters} from '../shared/interfaces/parameters.interface';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {ToastrService} from './toastr.service';
+import {API_ROUTES} from '../shared/constants/routes.constant';
+
+const { PARAMETROS_ANALISES } = API_ROUTES;
 
 @Injectable({
   providedIn: 'root'
 })
 export class ParametersService {
   #http = inject(HttpClient);
-  #apiUrl = `${environment.apiURL}/parametro-analise`;
+  #apiUrl = `${environment.apiURL}/${PARAMETROS_ANALISES.BASE}`;
   #toastr = inject(ToastrService);
 
   handleSetError(err: HttpErrorResponse): Observable<never> {
@@ -24,25 +27,25 @@ export class ParametersService {
   }
 
   findAll(): Observable<IParameters[]> {
-    return this.#http.get<IParameters[]>(`${this.#apiUrl}`, {
+    return this.#http.get<IParameters[]>(`${this.#apiUrl}/${PARAMETROS_ANALISES.GET.FIND_ALL}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
   create(body: IParameters): Observable<IParameters> {
-    return this.#http.post<IParameters>(`${this.#apiUrl}`, body, {
+    return this.#http.post<IParameters>(`${this.#apiUrl}/${PARAMETROS_ANALISES.POST.CREATE}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   update(id: number, body: IParameters): Observable<IParameters> {
-    return this.#http.patch<IParameters>(`${this.#apiUrl}/${id}`, body, {
+    return this.#http.patch<IParameters>(`${this.#apiUrl}/${PARAMETROS_ANALISES.PATCH.UPDATE+id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   delete(id: number): Observable<any> {
-    return this.#http.delete(`${this.#apiUrl}/${id}`, {
+    return this.#http.delete(`${this.#apiUrl}/${PARAMETROS_ANALISES.DELETE.DELETE+id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }

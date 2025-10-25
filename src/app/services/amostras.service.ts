@@ -5,14 +5,15 @@ import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, tap, throwError} from 'rxjs';
 import {IAmostra} from '../shared/interfaces/amostra.interface';
 import {PaginatedResponse, Querys} from '../shared/interfaces/querys.interface';
+import {API_ROUTES} from '../shared/constants/routes.constant';
 
-
+const { AMOSTRAS } = API_ROUTES;
 
 @Injectable({
   providedIn: 'root',
 })
 export class AmostrasService {
-  #apiUrl = `${environment.apiURL}/amostra`;
+  #apiUrl = `${environment.apiURL}/${AMOSTRAS.BASE}`;
   #http = inject(HttpClient);
   #toastr = inject(ToastrService);
 
@@ -27,14 +28,14 @@ export class AmostrasService {
   }
 
   findAll(query?: Querys): Observable<IAmostra[]> {
-    return this.#http.get<IAmostra[]>(`${this.#apiUrl}?${query?.status}`, {
+    return this.#http.get<IAmostra[]>(`${this.#apiUrl}${AMOSTRAS.GET.FIND_ALL}?${query?.status}`, {
       withCredentials: true,
     }).pipe( catchError(this.handleGetError.bind(this)));
   }
 
 findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
   const params = this.queryContructor(query);
-  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/amostras`, {
+  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/${AMOSTRAS.GET.FIND_ALL_WITH_USERS}`, {
     params,
     withCredentials: true,
   }).pipe(
@@ -44,7 +45,7 @@ findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IA
 
 findComplete(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
   const params = this.queryContructor(query);
-  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/completas`, {
+  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/${AMOSTRAS.GET.FIND_ALL_WITH_USERS_ADMIN}`, {
     params,
     withCredentials: true,
   }).pipe(
@@ -54,19 +55,19 @@ findComplete(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
 
 
   findById(id: string|number): Observable<IAmostra> {
-    return this.#http.get<IAmostra>(`${this.#apiUrl}/${id}`, {
+    return this.#http.get<IAmostra>(`${this.#apiUrl}/${AMOSTRAS.GET.FIND_BY_ID+id}`, {
       withCredentials: true,
     }).pipe( catchError(this.handleGetError.bind(this)));
   }
 
   findAllByUser(query?: Querys): Observable<IAmostra[]> {
-    return this.#http.get<IAmostra[]>(`${this.#apiUrl}/user?${query?.status}`, {
+    return this.#http.get<IAmostra[]>(`${this.#apiUrl}/${AMOSTRAS.GET.FIND_ALL_BY_USER}?${query?.status}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
   findAllWithUsersByOs(numberOs:string): Observable<IAmostra[]> {
-    return this.#http.get<IAmostra[]>(`${this.#apiUrl}/ordem-servico/${numberOs}`, {
+    return this.#http.get<IAmostra[]>(`${this.#apiUrl}/${AMOSTRAS.GET.FIND_ALL_WITH_USERS_BY_OS+numberOs}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
@@ -74,30 +75,30 @@ findComplete(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
 
 
   create(amostras: Partial<IAmostra[]>): Observable<IAmostra> {
-    return this.#http.post<IAmostra>(`${this.#apiUrl}`, {amostras}, {
+    return this.#http.post<IAmostra>(`${this.#apiUrl}/${AMOSTRAS.POST.CREATE}`, {amostras}, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   update(id: number | string, body: Partial<IAmostra>): Observable<IAmostra> {
-    return this.#http.patch<IAmostra>(`${this.#apiUrl}/${id}`, body, {
+    return this.#http.patch<IAmostra>(`${this.#apiUrl}/${AMOSTRAS.PATCH.UPDATE+id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   assinar(id: number | string, body: Partial<IAmostra>): Observable<IAmostra> {
-    return this.#http.patch<IAmostra>(`${this.#apiUrl}/assinar/${id}`,{body}, {
+    return this.#http.patch<IAmostra>(`${this.#apiUrl}/${AMOSTRAS.PATCH.ASSINAR+id}`,{body}, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
   delete(id: number): Observable<any> {
-    return this.#http.delete(`${this.#apiUrl}/${id}`, {
+    return this.#http.delete(`${this.#apiUrl}/${AMOSTRAS.DELETE.DELETE+id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
-  
+
 
 queryContructor(query?: Querys): HttpParams {
 
@@ -111,7 +112,7 @@ queryContructor(query?: Querys): HttpParams {
     if (query.dataFim) params = params.append('dataFim', query.dataFim.toString());
     if (query.concluidas) params = params.append('concluidas', query.concluidas.toString());
     if (query.progresso) params = params.append('progresso', query.progresso.toString());
-  }  
+  }
   return params;
 
 }
