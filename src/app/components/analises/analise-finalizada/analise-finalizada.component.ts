@@ -60,7 +60,7 @@ export class AnaliseFinalizadaComponent implements OnInit {
   private carregarAmostras(limit: number = 20, page: number = 1 ,progresso: number = 100) {
     const query: Querys = { limit, page , progresso};
     this.#amostraService
-      .findAllWithAnalystsAndCompleted(query)
+      .findComplete(query)
       .subscribe((res) => {
         if (res && res.data.length > 0) {
           this.amostras.update((v) => [...v, ...res.data]);

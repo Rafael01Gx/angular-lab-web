@@ -74,6 +74,7 @@ export class RemessaComponent implements OnInit {
   elementos = signal<ElementoQuimico[]>([]);
   amostras = signal<AmostraLabExterno[]>([]);
   laboratorios = signal<Laboratorio[]>([]);
+  isLoading = signal<boolean>(false);
 
   remessas = signal<Remessa[]>([])
   remessasFiltradas = signal<Remessa[]>([])
@@ -85,19 +86,10 @@ export class RemessaComponent implements OnInit {
     amostras: [],
   };
 
-  // Amostra selecionada para adicionar à remessa
   amostraSelecionada: AmostraLabExterno | null = null;
-
-  // Termo de pesquisa
   searchTerm: string = '';
-
-  // Flag para saber se está editando ou adicionando
   editando = signal<boolean>(false);
-
-  // Referência para a última remessa cadastrada
   ultimaRemessa=signal<Remessa | null>(null);
-
-  // Remessa sendo visualizada nos detalhes
   remessaVisualizada=signal<Remessa|null>(null);
 
   ngOnInit(): void {
@@ -194,9 +186,8 @@ export class RemessaComponent implements OnInit {
       this.loadRemessas();
     }
 
-    // Inicializa as remessas filtradas com todas as remessas
     this.remessasFiltradas.set([...this.remessas()]);
-    // Define a última remessa (se houver)
+
     if (this.remessas().length > 0) {
       const ultimaRemessa =this.remessas()[0];
       this.ultimaRemessa.set(ultimaRemessa);
@@ -207,7 +198,6 @@ export class RemessaComponent implements OnInit {
     return this.selectTable.set(table)
   }
 
-  // Filtrar remessas com base no termo de pesquisa
   filtrarRemessas(): void {
     if (!this.searchTerm) {
       this.remessasFiltradas.set([...this.remessas()]);
@@ -217,10 +207,9 @@ export class RemessaComponent implements OnInit {
     const term = this.searchTerm.toLowerCase();
     const filter = this.remessas().filter(
       (remessa) => {
-        // Busca no ID, data ou laboratório
+        
         return new Date(remessa.data).toLocaleDateString().toLowerCase().includes(term) ||
           this.getLaboratorioNome(remessa.destinoId).toLowerCase().includes(term) ||
-          // Busca nas amostras
           remessa.amostras.some(amostra =>
             amostra.amostraName.toLowerCase().includes(term) ||
             (amostra.subIdentificacao && amostra.subIdentificacao.toLowerCase().includes(term))
@@ -230,7 +219,7 @@ export class RemessaComponent implements OnInit {
     this.remessasFiltradas.set(filter);
   }
 
-  // Fechar formulário
+
   fecharFormulario(): void {
     this.#confirmModal.confirmWarning("Limpar", "Deseja limpar o formulário?").then((res) => {
       if (res) {
@@ -239,11 +228,10 @@ export class RemessaComponent implements OnInit {
     })
   }
 
-  // Resetar formulário
   resetarFormulario(): void {
     this.novaRemessa = {
       id: '',
-      data: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
+      data: new Date().toISOString().split('T')[0],
       destinoId: '',
       amostras: [],
     };
@@ -251,11 +239,10 @@ export class RemessaComponent implements OnInit {
     this.editando.set(false);
   }
 
-  // Adicionar amostra à remessa
   adicionarAmostraRemessa(): void {
     if (!this.amostraSelecionada) return;
     const elementosSimbolos = this.getElementoSimbolo(this.amostraSelecionada.elementosAnalisados) || []
-    // Cria uma nova amostra para a remessa
+
     const novaAmostraRemessa: AmostraRemessa = {
       amostraName: this.amostraSelecionada.amostraName,
       subIdentificacao: '',
@@ -263,9 +250,9 @@ export class RemessaComponent implements OnInit {
       dataFim: new Date().toISOString().split('T')[0],
       elementosSolicitados: [...elementosSimbolos],
     };
-    // Adiciona à lista de amostras da remessa
+
     this.novaRemessa.amostras.push(novaAmostraRemessa);
-    // Limpa a seleção atual
+
     this.amostraSelecionada = null;
   }
 
@@ -281,7 +268,6 @@ export class RemessaComponent implements OnInit {
     return simbolos
   }
 
-  // Remover amostra da remessa
   removerAmostraRemessa(index: number): void {
     const amostra = this.novaRemessa.amostras[index];
     this.#confirmModal.confirmWarning("Remover", `Deseja remover (${amostra.amostraName + ' ' + (amostra.subIdentificacao ?? "")}) da remessa?`).then((res) => {
@@ -291,28 +277,25 @@ export class RemessaComponent implements OnInit {
     })
   }
 
-  // Toggle elemento em uma amostra da remessa
   toggleElementoAmostra(amostraIndex: number, elementSimbol: string): void {
     const amostra = this.novaRemessa.amostras[amostraIndex];
     const index = amostra.elementosSolicitados.indexOf(elementSimbol);
 
     if (index === -1) {
-      // Adicionar elemento
       amostra.elementosSolicitados.push(elementSimbol);
     } else {
-      // Remover elemento
       amostra.elementosSolicitados.splice(index, 1);
     }
   }
 
-  // Salvar Rascunho
+
   salvarRascunho() {
     if (!this.novaRemessa.destinoId || this.novaRemessa.amostras.length === 0) {
       return;
     }
 
     if (this.editando()) {
-      // Atualizar remessa existente
+
       const index = this.remessas().findIndex(
         (r) => r.id === this.novaRemessa.id
       );
@@ -321,7 +304,6 @@ export class RemessaComponent implements OnInit {
         alert(`Remessa ${this.novaRemessa.id} atualizada com sucesso!`);
       }
     } else {
-      // Adicionar nova remessa
       const novaRemessa: Remessa = {
         data: this.novaRemessa.data,
         destinoId: this.novaRemessa.destinoId,
@@ -334,12 +316,11 @@ export class RemessaComponent implements OnInit {
     }
   }
 
-  // Salvar remessa
   salvarRemessa() {
-    if (!this.novaRemessa.destinoId || this.novaRemessa.amostras.length === 0) {
+    if (!this.novaRemessa.destinoId || this.novaRemessa.amostras.length === 0 || this.isLoading()) {
       return;
     }
-    // Adicionar nova remessa
+
     const novaRemessa: Remessa = {
       data: this.novaRemessa.data,
       destinoId: this.novaRemessa.destinoId,
@@ -347,13 +328,15 @@ export class RemessaComponent implements OnInit {
     };
     this.#confirmModal.confirmInfo('Atenção!', 'Após salvo os dados não poderão ser alterados!').then((res) => {
       if (res) {
+        this.isLoading.set(true);
         this.#remessasLabExternosService.create(novaRemessa).subscribe((res) => {
           if (res) {
             this.#toast.success(`Remessa salva com sucesso!`);
             this.remessas.update((remessas) => [...remessas, res]);
             this.ultimaRemessa.set(res);
             this.resetarFormulario();
-          }
+            this.remessasFiltradas.update(r=> [...r, res]);
+          } 
         })
         this.filtrarRemessas();
         return;
@@ -362,9 +345,10 @@ export class RemessaComponent implements OnInit {
         this.#toast.info(`Os dados foram salvos no rascunho!`);
       }
     })
+    this.isLoading.set(false);
   }
 
-  // Remover remessa
+
   removerRemessa(id: string): void {
     this.#confirmModal.confirmDelete('Deletar', 'Tem certeza que deseja remover esta remessa?').then((confirm) => {
       if (confirm) {
@@ -392,22 +376,20 @@ export class RemessaComponent implements OnInit {
 
   }
 
-  // Copiar remessa
   copiarRemessa(remessa: Remessa): void {
     this.novaRemessa = {
-      data: new Date().toISOString().split('T')[0], // Data atual
+      data: new Date().toISOString().split('T')[0],
       destinoId: remessa.destinoId,
       amostras: remessa.amostras.map(amostra => ({
         ...amostra,
-        dataInicio: amostra.dataInicio, // Data atual
-        dataFim: amostra.dataFim, // Data atual
+        dataInicio: amostra.dataInicio,
+        dataFim: amostra.dataFim,
       })),
     };
     this.editando.set(false);
     this.selectTable() !== 0 ? this.tableSelect(0) : null;
   }
 
-  // Carregar última remessa
   carregarUltimaRemessa(): void {
     if (!this.ultimaRemessa()) return;
     this.#confirmModal.confirmInfo("Copiar Remessa", "Os dados atuais não serão salvos!").then((res) => {
@@ -417,7 +399,7 @@ export class RemessaComponent implements OnInit {
     })
   }
 
-  // Carregar última remessa
+
   carregarRascunho(): void {
     if (isPlatformServer(this.#platformId)) return;
     const rascunho = window.localStorage.getItem('rascunhosRemessas')
@@ -447,14 +429,11 @@ export class RemessaComponent implements OnInit {
     this.editando.set(false);
   }
 
-  // Visualizar detalhes da remessa
   visualizarRemessa(remessa: Remessa): void {
     this.remessaVisualizada.set(remessa);
 
-    // Precisamos usar setTimeout para garantir que o ViewChild esteja disponível
-    // após a detecção de mudanças, especialmente importante com SSR
     setTimeout(() => {
-      // Usando a API nativa do elemento dialog
+
       if (this.remessaDialog?.nativeElement) {
         if (!this.remessaDialog.nativeElement.open) {
           this.remessaDialog.nativeElement.showModal();
@@ -463,39 +442,34 @@ export class RemessaComponent implements OnInit {
     });
   }
 
-  // Fechar detalhes da remessa
   fecharDetalhesRemessa(): void {
     if (this.remessaDialog?.nativeElement) {
       this.remessaDialog.nativeElement.close();
-      // Limpar a remessa visualizada após fechar o diálogo
+
       setTimeout(() => {
         this.remessaVisualizada.set(null);
-      }, 100); // Um pequeno delay para garantir animação suave
+      }, 100);
     }
   }
 
-  // Obter nome do laboratório pelo ID
   getLaboratorioNome(id: string): string {
     const lab = this.laboratorios().find(l => l.id === id);
     return lab ? lab.nome : 'Desconhecido';
   }
 
-  // Listar amostras da remessa em formato texto curto
   listarAmostras(remessa: Remessa): string {
     return remessa.amostras
       .map(a => a.amostraName + (a.subIdentificacao ? ` (${a.subIdentificacao})` : ''))
       .join(', ');
   }
 
-  // Gera um ID aleatório de 3 dígitos (simulando um ID de banco de dados)
   private gerarIdAleatorio(): string {
-    const numero = Math.floor(Math.random() * 900) + 100; // Gera número entre 100 e 999
+    const numero = Math.floor(Math.random() * 900) + 100; 
     return numero.toString().padStart(3, '0');
   }
 
 
   handleDialogClick(event: MouseEvent) {
-    // Verifica se o clique foi no backdrop e não no conteúdo
     if (event.target === this.remessaDialog.nativeElement) {
       this.fecharDetalhesRemessa();
     }

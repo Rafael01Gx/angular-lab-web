@@ -27,6 +27,7 @@ import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ToastrService } from '../../services/toastr.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-perfil',
@@ -60,6 +61,7 @@ import { ToastrService } from '../../services/toastr.service';
 export class PerfilComponent implements OnInit {
   #userService = inject(UserService);
   #authService = inject(AuthService);
+  #router = inject(Router)
   #toast = inject(ToastrService);
   #fb = inject(FormBuilder);
   #platformId = inject(PLATFORM_ID);
@@ -87,11 +89,13 @@ export class PerfilComponent implements OnInit {
       phone: [this.currentUser()?.phone || ''],
       area: [this.currentUser()?.area || ''],
       funcao: [this.currentUser()?.funcao || ''],
+      receives_email: [this.currentUser()?.receives_email || false],
       oldPassword: [''],
       password: [''],
       confirmPassword: [''],
     });
   }
+
 
   togglePasswordChange(event: any) {
     const checked = event.target.checked;
@@ -170,6 +174,7 @@ export class PerfilComponent implements OnInit {
           phone: formData.phone,
           area: formData.area,
           funcao: formData.funcao,
+          receives_email: formData.receives_email
         };
 
         if (this.showPasswordFields()) {
@@ -198,4 +203,8 @@ export class PerfilComponent implements OnInit {
       }
     }
   }
+  cancel(){
+    return this.#router.navigate(['/'])
+  }
+  
 }

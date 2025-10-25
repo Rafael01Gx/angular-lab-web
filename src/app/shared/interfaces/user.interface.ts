@@ -1,4 +1,4 @@
-import { Role } from "../enums/roles.enum";
+import { Role } from '../enums/roles.enum';
 
 export interface IUser {
   id?: string;
@@ -9,6 +9,7 @@ export interface IUser {
   area?: string;
   funcao?: string;
   authorization?: boolean;
+  receives_email?: boolean;
   role?: Role;
 }
 
@@ -18,6 +19,7 @@ export interface UpdateUserData {
   phone?: string;
   area?: string;
   funcao?: string;
+  receives_email?: boolean;
   oldPassword?: string;
   password?: string;
 }

@@ -41,6 +41,7 @@ const AMOSTRAS_KEY = makeStateKey<IAmostra[]>(
       [amostra]="selectedAmostra()"
       [isOpen]="isModalOpen()"
       (close)="handleClose()"
+      [isLoading]="isLoading()"
       (onRevisar)="handleRevisar($event)">
     </app-amostra-details-modal>
   `,
@@ -55,6 +56,7 @@ export class AproavacaoComponent implements OnInit {
   paginatedMeta = signal<PaginatedMeta | null>(null);
   selectedAmostra =  signal<IAmostra | null>(null);
   isModalOpen =signal<boolean>(false);
+  isLoading =signal<boolean>(false);
 
   ngOnInit() {
     const amostras = this.#transferState.get(AMOSTRAS_KEY, []);
@@ -69,7 +71,7 @@ export class AproavacaoComponent implements OnInit {
   private carregarAmostras(limit: number = 20, page: number = 1,status:string='EXECUCAO',progresso:number=100) {
     const query: Querys = { limit, page ,progresso,status};
     this.#amostraService
-      .findCompletePendingApproval(query)
+      .findComplete(query)
       .subscribe((res) => {
         if (res && res.data.length > 0) {
           this.amostras.update((v) => [...v, ...res.data]);
@@ -98,17 +100,20 @@ export class AproavacaoComponent implements OnInit {
 
   handleRevisar(amostra: IAmostra) {
     if(!amostra) return;
+    this.isLoading.set(true);
     const id = amostra.id
     this.#confirm.confirmWarning("Confirmar Assinatura?","Ao confirmar a assinatura, esta ação será irreversível. Todas as alterações na amostra serão bloqueadas e o Laudo de Análise poderá ser gerado. Deseja prosseguir?").then((confirm)=>{
       if(confirm){
          this.#amostraService.assinar(id,amostra).subscribe((res)=>{
       if(res){
         this.isModalOpen.set(false);
+        this.isLoading.set(false);
         this.#toast.success("A amostra foi assinada e concluida com sucesso!","Sucesso")
       }
     })
       }else{
         this.isModalOpen.set(false);
+        this.isLoading.set(false);
         this.#toast.warning("Não foram realizadas alterações!", "Info");
       }
     })

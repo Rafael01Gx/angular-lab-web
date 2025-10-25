@@ -43,7 +43,6 @@ export class AllOrdersByUserComponent implements OnInit {
             limit: this.paginateConfig().itemsPerPage,
             ...this.paginateConfig().advancedFilters
         };
-        console.log(query)
         this.#ordemService.findByUserAndFilters(query).subscribe({
             next: (response: PaginatedResponse<IOrders[]>) => {
                 this.ordensData.set(response);

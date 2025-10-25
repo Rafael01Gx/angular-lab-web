@@ -4,7 +4,8 @@ import {
   inject,
   input,
   OutputEmitterRef,
-  output
+  output,
+  signal
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -167,14 +168,14 @@ import {ToastrService} from '../../../services/toastr.service';
             </button>
             <button
               (click)="confirmarAlteracao()"
-              [disabled]="!podeConfirmar() || isLoading"
+              [disabled]="!podeConfirmar() || isLoading()"
               class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200 flex items-center justify-center gap-2">
               <ng-icon
                 name="heroArrowPath"
                 class="w-4 h-4"
-                [class.animate-spin]="isLoading">
+                [class.animate-spin]="isLoading()">
               </ng-icon>
-              {{ isLoading ? 'Alterando...' : 'Confirmar Alteração' }}
+              {{ isLoading() ? 'Alterando...' : 'Confirmar Alteração' }}
             </button>
           </div>
         </div>
@@ -212,7 +213,7 @@ export class StatusModalComponent implements OnInit {
   novoStatus: Status | '' = '';
   observacao = '';
   erro = '';
-  isLoading = false;
+  isLoading= signal<boolean>(false);
 
 
   ngOnInit() {
@@ -225,11 +226,11 @@ export class StatusModalComponent implements OnInit {
     this.novoStatus = '';
     this.observacao = '';
     this.erro = '';
-    this.isLoading = false;
+    this.isLoading.set(false);
   }
 
   fecharModal() {
-    if (!this.isLoading) {
+    if (!this.isLoading()) {
       this.resetForm();
       this.modalFechado.emit(true);
     }
@@ -240,6 +241,7 @@ export class StatusModalComponent implements OnInit {
   }
 
   async confirmarAlteracao() {
+    if(this.isLoading()) return;
     if (!this.podeConfirmar() || !this.ordem) return;
     const statusKey = keyOfStatus(this.novoStatus) as Status
     if (this.ordem()?.status === statusKey){
@@ -247,7 +249,7 @@ export class StatusModalComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.erro = '';
     try {
       const dados: AtualizarStatus = {
@@ -267,7 +269,7 @@ export class StatusModalComponent implements OnInit {
     } catch (error: any) {
       this.erro = error?.message || 'Erro ao alterar status. Tente novamente.';
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 

@@ -99,20 +99,17 @@
                     class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"
                   ></ng-icon>
                 </div>
-                <div
-                  *ngIf="
-                    profileForm.get('name')?.touched &&
-                    profileForm.get('name')?.errors
-                  "
+                @if(profileForm.get('name')?.touched &&
+                    profileForm.get('name')?.errors){<div
                   class="text-red-500 text-sm"
                 >
-                  <span *ngIf="profileForm.get('name')?.errors?.['required']"
+                  @if(profileForm.get('name')?.errors?.['required']){<span
                     >Nome é obrigatório</span
-                  >
-                  <span *ngIf="profileForm.get('name')?.errors?.['minlength']"
+                  >}
+                  @if(profileForm.get('name')?.errors?.['minlength']){<span
                     >Nome deve ter pelo menos 2 caracteres</span
-                  >
-                </div>
+                  >}
+                </div>}
               </div>
 
               <div class="space-y-2">
@@ -142,14 +139,15 @@
                     formControlName="phone"
                     class="w-full input-icon-left"
                     placeholder="(11) 99999-9999"
-                    mask="(00) 0 0000-0000"
-                    maxlength="15"
+                    mask="(00) 0000-0000||(00) 0 0000-0000"
+                    [dropSpecialCharacters]="false"
+                    maxlength="16"
                   />
                   <ng-icon name="heroPhone" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"></ng-icon>
                 </div>
-                <div *ngIf="profileForm.get('phone')?.touched && profileForm.get('phone')?.errors" class="text-red-500 text-sm">
-                  <span *ngIf="profileForm.get('phone')?.errors?.['pattern']">Formato inválido. Use: (xx) xxxx-xxxx ou (xx) x xxxx-xxxx</span>
-                </div>
+                @if(profileForm.get('phone')?.touched && profileForm.get('phone')?.errors){<div class="text-red-500 text-sm">
+                  @if(profileForm.get('phone')?.errors?.['pattern']){<span >Formato inválido. Use: (xx) xxxx-xxxx ou (xx) x xxxx-xxxx</span>}
+                </div>}
               </div>
 
               <div class="space-y-2">
@@ -170,7 +168,7 @@
                 </div>
               </div>
 
-              <div class="space-y-2 md:col-span-2">
+              <div class="space-y-2">
                 <label class="block text-sm font-medium text-gray-700"
                   >Função</label
                 >
@@ -187,6 +185,22 @@
                   ></ng-icon>
                 </div>
               </div>
+              
+               <div class="space-y-2 flex items-center">
+               
+                <div class="relative flex items-center ml-4 mt-4 gap-6">
+                   <p class="text-md font-medium text-gray-700"
+                  >Receber notificações por e-mail?</p
+                >
+                  <input
+                    type="checkbox"
+                    formControlName="receives_email"
+                    class=" w-4 h-4"
+                  />
+                 
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -219,8 +233,7 @@
                 </label>
               </div>
 
-              <div
-                *ngIf="showPasswordFields()"
+              @if(showPasswordFields()){<div
                 class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4"
               >
                 <div class="space-y-2">
@@ -249,18 +262,14 @@
                       ></ng-icon>
                     </button>
                   </div>
-                  <div
-                    *ngIf="
-                      profileForm.get('oldPassword')?.touched &&
-                      profileForm.get('oldPassword')?.errors
-                    "
+                  @if(profileForm.get('oldPassword')?.touched &&
+                      profileForm.get('oldPassword')?.errors){<div
                     class="text-red-500 text-sm"
                   >
-                    <span
-                      *ngIf="profileForm.get('oldPassword')?.errors?.['required']"
+                    @if(profileForm.get('oldPassword')?.errors?.['required']){<span
                       >Senha atual é obrigatória</span
-                    >
-                  </div>
+                    >}
+                  </div>}
                 </div>
 
                 <div class="space-y-2">
@@ -289,24 +298,19 @@
                       ></ng-icon>
                     </button>
                   </div>
-                  <div
-                    *ngIf="
-                      profileForm.get('password')?.touched &&
-                      profileForm.get('password')?.errors
-                    "
+                  @if( profileForm.get('password')?.touched &&
+                      profileForm.get('password')?.errors){<div
                     class="text-red-500 text-sm"
                   >
-                    <span
-                      *ngIf="profileForm.get('password')?.errors?.['required']"
+                    @if(profileForm.get('password')?.errors?.['required']){<span
                       >Nova senha é obrigatória</span
-                    >
-                    <span
-                      *ngIf="profileForm.get('password')?.errors?.['strongPassword']"
+                    >}
+                    @if(profileForm.get('password')?.errors?.['strongPassword']){<span
                     >
                       Senha deve ter: 8+ caracteres, 1 maiúscula, 1 minúscula, 1
                       número e 1 símbolo
-                    </span>
-                  </div>
+                    </span>}
+                  </div>}
                 </div>
 
                 <div class="space-y-2 md:col-span-2">
@@ -337,24 +341,19 @@
                       ></ng-icon>
                     </button>
                   </div>
-                  <div
-                    *ngIf="
-                      profileForm.get('confirmPassword')?.touched &&
-                      profileForm.get('confirmPassword')?.errors
-                    "
+                  @if(profileForm.get('confirmPassword')?.touched &&
+                      profileForm.get('confirmPassword')?.errors){<div
                     class="text-red-500 text-sm"
                   >
-                    <span
-                      *ngIf="profileForm.get('confirmPassword')?.errors?.['required']"
+                    @if(profileForm.get('confirmPassword')?.errors?.['required']){<span
                       >Confirmação de senha é obrigatória</span
-                    >
-                    <span
-                      *ngIf="profileForm.get('confirmPassword')?.errors?.['passwordMismatch']"
+                    >}
+                    @if(profileForm.get('confirmPassword')?.errors?.['passwordMismatch']){<span
                       >As senhas não coincidem</span
-                    >
-                  </div>
+                    >}
+                  </div>}
                 </div>
-              </div>
+              </div>}
             </div>
           </div>
         </div>
@@ -364,6 +363,7 @@
         >
           <button
             type="button"
+            (click)="cancel()"
             class="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium"
           >
             Cancelar
@@ -373,11 +373,10 @@
             [disabled]="profileForm.invalid || isLoading()"
             class="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center space-x-2"
           >
-            <ng-icon
-              *ngIf="isLoading()"
+            @if(isLoading()){<ng-icon
               name="heroCheck"
               class="animate-spin"
-            ></ng-icon>
+            ></ng-icon>}
             <span>{{ isLoading() ? "Salvando..." : "Salvar Alterações" }}</span>
           </button>
         </div>

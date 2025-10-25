@@ -42,9 +42,9 @@ findAllWithAnalystsAndCompleted(query?: Querys): Observable<PaginatedResponse<IA
   );
 }
 
-findCompletePendingApproval(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
+findComplete(query?: Querys): Observable<PaginatedResponse<IAmostra[]>> {
   const params = this.queryContructor(query);
-  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/aguardando-aprovacao`, {
+  return this.#http.get<PaginatedResponse<IAmostra[]>>(`${this.#apiUrl}/completas`, {
     params,
     withCredentials: true,
   }).pipe(
@@ -64,6 +64,14 @@ findCompletePendingApproval(query?: Querys): Observable<PaginatedResponse<IAmost
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
+
+  findAllWithUsersByOs(numberOs:string): Observable<IAmostra[]> {
+    return this.#http.get<IAmostra[]>(`${this.#apiUrl}/ordem-servico/${numberOs}`, {
+      withCredentials: true,
+    }).pipe(catchError(this.handleGetError.bind(this)));
+  }
+
+
 
   create(amostras: Partial<IAmostra[]>): Observable<IAmostra> {
     return this.#http.post<IAmostra>(`${this.#apiUrl}`, {amostras}, {
