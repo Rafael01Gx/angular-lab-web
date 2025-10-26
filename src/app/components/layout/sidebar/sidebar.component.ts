@@ -31,7 +31,7 @@ import {
 import { filter } from 'rxjs/operators';
 import { EMenuRoles, IMenuItem } from '../../../shared/interfaces/layout.interface';
 import { AuthService } from '../../../services/auth.service';
-import { menuItems } from '../../../shared/constants/menu-items';
+import { menuItems } from '../../../core/constants/menu-items';
 
 @Component({
   selector: 'app-sidebar',

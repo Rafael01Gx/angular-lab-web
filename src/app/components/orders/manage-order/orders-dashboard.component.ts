@@ -116,7 +116,7 @@ interface EstatisticasCard {
             {{ card.percentual }}%
               </span>
                     </div>
-                  }  --> 
+                  }  -->
                 </div>
               </div>
             }
@@ -135,7 +135,7 @@ interface EstatisticasCard {
               <div class="space-y-4">
                 @for (item of distribuicaoStatus(); track $index) {
                   <a
-                  [routerLink]="[(item.status == 'AUTORIZADA' || item.status == 'AGUARDANDO' ? '/manage-orders/waiting': '/')]"
+                  [routerLink]="[getLink(item.status)]"
                     class="flex items-center justify-between p-3 bg-slate-50 cursor-pointer hover:bg-slate-100 rounded-lg"
                   >
 
@@ -205,7 +205,7 @@ interface EstatisticasCard {
           <!-- Métricas Adicionais -->
           <div class="flex flex-2 gap-2">
 
-            <!-- Produtividade 
+            <!-- Produtividade
             <div class="bg-white flex-1 rounded-xl shadow-sm border border-slate-200/60 p-6">
               <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 bg-green-100 rounded-lg">
@@ -540,6 +540,20 @@ export class OrdersDashboardComponent implements OnInit, OnDestroy {
       .substring(0, 2);
   }
 
+  getLink(status: string):string {
+    switch (status) {
+      case 'AUTORIZADA':
+        return '/gerenciar-ordens/aguardando';
+      case 'AGUARDANDO':
+        return '/gerenciar-ordens/aguardando';
+      case 'EXECUCAO':
+        return '/gerenciar-ordens/aprovacao';
+      case 'FINALIZADA':
+        return '/gerenciar-ordens/buscar';
+      default:
+        return '/';
+    }
+  }
 
   protected readonly mapStatus = mapStatus;
   protected readonly Status = Status;

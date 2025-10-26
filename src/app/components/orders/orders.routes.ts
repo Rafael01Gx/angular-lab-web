@@ -3,7 +3,7 @@ import {Routes} from '@angular/router';
 
 export const ORDERS_ROUTES:Routes = [
   {
-    path: 'create',
+    path: 'nova',
     pathMatch: 'full',
     loadComponent: () =>
       import('./orders-create/orders-create.component').then(
@@ -11,7 +11,7 @@ export const ORDERS_ROUTES:Routes = [
       ),
   },
   {
-    path: 'pending',
+    path: 'pendentes',
     pathMatch: 'full',
     loadComponent: () =>
       import('./orders-pending-table/orders-pending-table.component').then(
@@ -19,7 +19,7 @@ export const ORDERS_ROUTES:Routes = [
       ),
   },
   {
-    path: 'all',
+    path: 'minhas',
     pathMatch: 'full',
     loadComponent: () =>
       import('./all-by-user/all-orders-by-user.component').then(

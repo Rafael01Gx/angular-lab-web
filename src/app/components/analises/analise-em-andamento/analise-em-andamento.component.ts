@@ -49,7 +49,7 @@ export class AnaliseEmAndamentoComponent implements OnInit {
   }
 
   incluirAnalise(data: { amostra: IAmostra, ensaio: ITipoAnalise }) {
-    this.#router.navigate([`analysis/include-results`], {
+    this.#router.navigate([`analises/incluir-resultados`], {
       queryParams: {
         amostra: data.amostra.id,
         config: data.ensaio.id
@@ -58,7 +58,7 @@ export class AnaliseEmAndamentoComponent implements OnInit {
   }
 
   editarAnalise(data: { amostra: IAmostra, ensaio: ITipoAnalise }) {
-    this.#router.navigate([`analysis/include-results`], {
+    this.#router.navigate([`analises/incluir-resultados`], {
       queryParams: {
         amostra: data.amostra.id,
         config: data.ensaio.id

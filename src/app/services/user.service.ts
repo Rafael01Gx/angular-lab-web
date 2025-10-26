@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import {firstValueFrom, map, Observable} from 'rxjs';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { USER } = API_ROUTES;
 

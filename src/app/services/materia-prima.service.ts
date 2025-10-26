@@ -4,7 +4,7 @@ import {environment} from '../../environments/environment';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {IMateriaPrima} from '../shared/interfaces/materia-prima.interface';
 import {ToastrService} from './toastr.service';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { MATERIAS_PRIMAS } = API_ROUTES;
 

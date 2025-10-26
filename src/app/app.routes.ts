@@ -24,7 +24,7 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'profile',
+        path: 'perfil',
         pathMatch: 'full',
         loadComponent: () =>
           import('./components/perfil/perfil.component').then(
@@ -32,61 +32,48 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'orders',
+        path: 'ordens',
         loadChildren: () =>
           import('./components/orders/orders.routes').then(
             (m) => m.ORDERS_ROUTES
           ),
       },
       {
-        path: 'manage-orders',
+        path: 'gerenciar-ordens',
         loadChildren: () =>
           import('./components/orders/manage-orders.routes').then(
             (m) => m.MANAGE_ORDERS_ROUTES
           ),
       },
       {
-        path: 'analysis',
+        path: 'analises',
         loadChildren: () =>
           import('./components/analises/analises.routes').then(
             (m) => m.ANALISES_ROUTES
           ),
       },
       {
-        path: 'access-management',
-        redirectTo: 'access-management/access-create',
-        pathMatch: 'full',
+        path: 'acessos',
+        loadChildren:()=>
+          import('./components/gerenciar-acesso/gerenciar-acesso.routes').then((m)=>
+            m.ACESSOS_ROUTES)
       },
       {
-        path: 'access-management/create-user',
-        loadComponent: () =>
-          import(
-            './components/gerenciar-acesso/user-registration/user-registration.component'
-          ).then((m) => m.UserRegistrationComponent),
-      },
-      {
-        path: 'access-management/authorize',
-        loadComponent: () =>
-          import(
-            './components/gerenciar-acesso/user-authorization/user-authorization.component'
-          ).then((m) => m.UserAuthorizationComponent),
-      },
-      {
-        path: 'samples',
+        path: 'amostras',
         loadComponent: () =>
           import('./components/amostras/amostras.component').then(
             (m) => m.AmostrasComponent
           ),
       },
       {
-        path: 'external-labs',
+        path: 'laboratorios-externos',
         loadChildren: () =>
           import(
             './components/laboratorios-externos/laboratorios-externos.routes'
           ).then((m) => m.LABORATORIOS_EXTERNOS_ROUTES),
       },
       {
-        path: 'settings',
+        path: 'configuracoes',
         loadChildren: () =>
           import('./components/configuracoes/settings.routes').then(
             (m) => m.SETTINGS_ROUTES

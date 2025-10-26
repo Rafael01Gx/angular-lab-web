@@ -342,7 +342,8 @@ export interface IPaginateConfigAndFilters {
             </button>
 
             <div class="flex gap-1">
-              @for (page of visiblePages(); track page) { @if (page === '...') {
+              @for (page of visiblePages(); track page) {
+                @if (page === '...') {
               <span class="px-3 py-2 text-gray-600">...</span>
               } @else {
               <button
@@ -375,7 +376,7 @@ export interface IPaginateConfigAndFilters {
               (ngModelChange)="onItemsPerPageChange()"
               class="px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
-              <option [value]="10">10</option>
+              <option [value]="15">15</option>
               <option [value]="25">25</option>
               <option [value]="50">50</option>
               <option [value]="100">100</option>
@@ -415,7 +416,7 @@ export class FilterOrdersTableComponent {
   ordensFiltradas = signal<IOrders[]>([]);
   isLoading = input<boolean>(false);
   currentPage = signal<number>(1);
-  itemsPerPage = signal<number>(10);
+  itemsPerPage = signal<number>(15);
   totalItems = signal<number>(0);
   totalPages = signal<number>(0);
   showAdvancedFilters = signal(false);
@@ -452,6 +453,7 @@ export class FilterOrdersTableComponent {
         this.totalPages.set(this.data()?.meta.totalPages!);
       }
     });
+
   }
 
   statusOptions = [
@@ -551,7 +553,7 @@ export class FilterOrdersTableComponent {
   }
 
   clearAdvancedFilters() {
-    this.advancedFilters.set({});
+    this.advancedFilters.update(v=> v={});
     this.currentPage.set(1);
     this.configAndFilters.emit(this.config());
   }
@@ -568,18 +570,21 @@ export class FilterOrdersTableComponent {
     if (this.currentPage() > 1) {
       this.currentPage.update((v) => v - 1);
     }
+    this.configAndFilters.emit(this.config());
   }
 
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update((v) => v + 1);
     }
+    this.configAndFilters.emit(this.config());
   }
 
   goToPage(page: number | string) {
     if (typeof page === 'number' && page !== this.currentPage()) {
       this.currentPage.set(page);
     }
+    this.configAndFilters.emit(this.config());
   }
 
   onItemsPerPageChange() {

@@ -3,7 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { AUTH } = API_ROUTES;
 

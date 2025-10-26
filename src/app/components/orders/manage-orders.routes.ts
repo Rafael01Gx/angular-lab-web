@@ -11,7 +11,7 @@ export const MANAGE_ORDERS_ROUTES: Routes = [
       ),
   },
   {
-    path: 'waiting',
+    path: 'aguardando',
     pathMatch: 'full',
     loadComponent: () =>
       import('./manage-order/manage-pending-orders.component').then(
@@ -19,7 +19,7 @@ export const MANAGE_ORDERS_ROUTES: Routes = [
       ),
   },
   {
-    path: 'executing',
+    path: 'aprovacao',
     pathMatch: 'full',
     loadComponent: () =>
       import('./manage-order/aproavacao.component').then(
@@ -27,7 +27,7 @@ export const MANAGE_ORDERS_ROUTES: Routes = [
       ),
   },
   {
-    path: 'search',
+    path: 'buscar',
     pathMatch: 'full',
     loadComponent: () =>
       import('./manage-order/search-orders.component').then(

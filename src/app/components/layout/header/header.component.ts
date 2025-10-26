@@ -17,7 +17,7 @@ import {
   heroBriefcase
 } from '@ng-icons/heroicons/outline';
 import { AuthService } from '../../../services/auth.service';
-import { routeMap } from '../../../shared/constants/menu-items';
+import { routeMap } from '../../../core/constants/menu-items';
 import { NotificationsService } from '../../../services/notification.service';
 import { NotificationsComponent } from "../../notification/notifications.component";
 
@@ -71,23 +71,23 @@ export class HeaderComponent implements OnInit {
   getCurrentRouteIcon(): string {
     const url = this.#router.url;
 
-    if (url.startsWith('/orders')) return 'heroClipboardDocumentList';         // Ordens de Serviço
-    if (url.startsWith('/samples')) return 'heroBeaker';                       // Amostras
-    if (url.startsWith('/analysis')) return 'heroBriefcase';                   // Análises
-    if (url.startsWith('/manage-orders')) return 'heroAdjustmentsHorizontal';  // Gerenciar OS
-    if (url.startsWith('/external-labs')) return 'heroListBullet';             // Laboratórios Externos
-    if (url.startsWith('/access-management')) return 'heroUserGroup';          // Gerenciar Acesso
-    if (url.startsWith('/settings')) return 'heroCog6Tooth';                   // Configurações
+    if (url.startsWith('/ordens')) return 'heroClipboardDocumentList';         // Ordens de Serviço
+    if (url.startsWith('/amostras')) return 'heroBeaker';                       // Amostras
+    if (url.startsWith('/analises')) return 'heroBriefcase';                   // Análises
+    if (url.startsWith('/gerenciar-ordens')) return 'heroAdjustmentsHorizontal';  // Gerenciar OS
+    if (url.startsWith('/laboratorios-externos')) return 'heroListBullet';             // Laboratórios Externos
+    if (url.startsWith('/acessos')) return 'heroUserGroup';          // Gerenciar Acesso
+    if (url.startsWith('/configuracoes')) return 'heroCog6Tooth';                   // Configurações
 
     return 'heroInformationCircle';
   }
 
   onNotificationClick(): void {
-    this.#router.navigate(['/notifications']);
+    this.#router.navigate(['/notificacoes']);
   }
 
   onProfileClick(): void {
-    this.#router.navigate(['/profile']);
+    this.#router.navigate(['/perfil']);
   }
 
   onLogout(): void {

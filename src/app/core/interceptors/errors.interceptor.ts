@@ -1,6 +1,6 @@
 import {HttpErrorResponse, HttpInterceptorFn} from '@angular/common/http';
 import {catchError, throwError} from 'rxjs';
-import {httpErrorMessages} from '../../shared/constants/http-error-messages';
+import {httpErrorMessages} from '../constants/http-error-messages';
 import {inject} from '@angular/core';
 import {ToastrService} from '../../services/toastr.service';
 

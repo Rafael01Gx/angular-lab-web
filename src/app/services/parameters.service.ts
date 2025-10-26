@@ -4,7 +4,7 @@ import {environment} from '../../environments/environment';
 import {IParameters} from '../shared/interfaces/parameters.interface';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {ToastrService} from './toastr.service';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { PARAMETROS_ANALISES } = API_ROUTES;
 

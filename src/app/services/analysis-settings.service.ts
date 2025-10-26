@@ -4,7 +4,7 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {IAnalysisSettings} from '../shared/interfaces/analysis-settings.interface';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {ToastrService} from './toastr.service';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { CONFIG_ANALISES } = API_ROUTES;
 

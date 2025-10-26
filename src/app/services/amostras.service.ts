@@ -5,7 +5,7 @@ import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, tap, throwError} from 'rxjs';
 import {IAmostra} from '../shared/interfaces/amostra.interface';
 import {PaginatedResponse, Querys} from '../shared/interfaces/querys.interface';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { AMOSTRAS } = API_ROUTES;
 

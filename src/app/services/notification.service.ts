@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 import { ToastrService } from './toastr.service';
 import { isPlatformBrowser } from '@angular/common';
 import { INotifications } from '../components/notification/notifications.component';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 import {filter} from 'rxjs/operators';
 
 const { NOTIFICACOES } = API_ROUTES;

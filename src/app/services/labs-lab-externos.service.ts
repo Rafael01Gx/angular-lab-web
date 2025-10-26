@@ -6,7 +6,7 @@ import {catchError, Observable, of, throwError} from 'rxjs';
 import {
   Laboratorio
 } from '../shared/interfaces/laboratorios-externos.interfaces';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { LABORATORIO_EXTERNO } = API_ROUTES;
 

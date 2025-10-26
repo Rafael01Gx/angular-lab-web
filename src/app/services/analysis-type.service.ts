@@ -4,7 +4,7 @@ import {environment} from '../../environments/environment';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {ITipoAnalise} from '../shared/interfaces/analysis-type.interface';
 import {ToastrService} from './toastr.service';
-import {API_ROUTES} from '../shared/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/routes.constant';
 
 const { TIPOS_DE_ANALISES } = API_ROUTES;
 
