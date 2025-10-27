@@ -46,7 +46,7 @@ jobs:
       - name: Deploy no EC2 via Docker Compose
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ec2-18-230-6-22.sa-east-1.compute.amazonaws.com
+          host: ec2-15-228-237-235.sa-east-1.compute.amazonaws.com
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
