@@ -65,7 +65,7 @@ export const menuItems: IMenuItem[] = [
         { id: 'amostras', label: 'Amostras', icon: 'heroSquare2Stack', route: '/laboratorios-externos/amostras' },
         { id: 'chemical-elements', label: 'Elementos Químicos', icon: 'heroBeaker', route: '/laboratorios-externos/elementos-quimicos' },
         { id: 'labs', label: 'Laboratórios', icon: 'heroGlobeAmericas', route: '/laboratorios-externos/laboratorios' },
-        { id: 'resultados', label: 'Resultados/Lançamento', icon: 'heroGlobeAmericas', route: '/laboratorios-externos/resultados' },
+        { id: 'resultados', label: 'Resultados/Lançamento', icon: 'heroCalculator', route: '/laboratorios-externos/resultados' },
       ],
       rolesAllowed:[EMenuRoles.OPERADOR,EMenuRoles.ADMIN],
     },

@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
+  heroCalculator,
   heroClipboardDocumentList,
   heroBeaker,
   heroCog6Tooth,
@@ -67,7 +68,8 @@ import { menuItems } from '../../../core/constants/menu-items';
       heroInformationCircle,
       heroMagnifyingGlass,
       heroDocumentMagnifyingGlass,
-      heroCalendarDateRange
+      heroCalendarDateRange,
+      heroCalculator
     })
   ],
   host: { class: 'block max-h-full'

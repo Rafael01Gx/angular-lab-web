@@ -47,6 +47,9 @@ interface FiltrosAvancados {
   ],
   templateUrl: './amostras-analise-externa-table.html',
   styleUrls: ['./amostras-analise-externa-table.css'],
+  host:{
+    class:'w-full h-full'
+  }
 })
 export class AmostrasAnaliseExternaTableComponent implements OnInit {
   #tranferState = inject(TransferState);
@@ -60,7 +63,7 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
   currentPage = signal(1);
   totalPages = signal(1);
   total = signal(0);
-  perPage = signal(10);
+  perPage = signal(30);
 
   filtros = signal<FiltrosAvancados>({});
 
