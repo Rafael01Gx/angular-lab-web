@@ -60,10 +60,12 @@ export const menuItems: IMenuItem[] = [
       icon: 'heroListBullet',
       expanded: false,
       children: [
+        { id: 'lab-ext-dashboard', label: 'Dashboard', icon: 'heroPresentationChartBar', route: '/laboratorios-externos/dashboard' },
         { id: 'remessa', label: 'Remessa', icon: 'heroArchiveBox', route: '/laboratorios-externos/remessa' },
         { id: 'amostras', label: 'Amostras', icon: 'heroSquare2Stack', route: '/laboratorios-externos/amostras' },
         { id: 'chemical-elements', label: 'Elementos Químicos', icon: 'heroBeaker', route: '/laboratorios-externos/elementos-quimicos' },
         { id: 'labs', label: 'Laboratórios', icon: 'heroGlobeAmericas', route: '/laboratorios-externos/laboratorios' },
+        { id: 'resultados', label: 'Resultados/Lançamento', icon: 'heroGlobeAmericas', route: '/laboratorios-externos/resultados' },
       ],
       rolesAllowed:[EMenuRoles.OPERADOR,EMenuRoles.ADMIN],
     },
@@ -124,6 +126,7 @@ export const routeMap: { [key: string]: string } = {
   '/laboratorios-externos/amostras': 'Amostras Externas',
   '/laboratorios-externos/elementos-quimicos': 'Elementos Químicos',
   '/laboratorios-externos/laboratorios': 'Laboratórios',
+  '/laboratorios-externos/resultados': 'Resultados Químicos',
 
   // --- Acessos ---
   '/acessos': 'Gerenciar Acesso',

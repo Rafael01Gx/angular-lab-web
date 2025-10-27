@@ -329,16 +329,24 @@ export class RemessaComponent implements OnInit {
     this.#confirmModal.confirmInfo('Atenção!', 'Após salvo os dados não poderão ser alterados!').then((res) => {
       if (res) {
         this.isLoading.set(true);
-        this.#remessasLabExternosService.create(novaRemessa).subscribe((res) => {
-          if (res) {
+        this.#remessasLabExternosService.create(novaRemessa).subscribe({
+          next:(res)=>{
+             this.isLoading.set(false);
             this.#toast.success(`Remessa salva com sucesso!`);
             this.remessas.update((remessas) => [...remessas, res]);
             this.ultimaRemessa.set(res);
             this.resetarFormulario();
             this.remessasFiltradas.update(r=> [...r, res]);
-          } 
+          
+          },
+        error:(err)=> {
+           this.isLoading.set(false);
+          this.salvarRascunho();
+          this.#toast.error(err.erro.message);
+        },
         })
         this.filtrarRemessas();
+         this.isLoading.set(false);
         return;
       } else {
         this.salvarRascunho()

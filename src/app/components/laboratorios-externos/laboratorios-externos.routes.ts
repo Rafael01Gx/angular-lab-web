@@ -29,5 +29,19 @@ export const LABORATORIOS_EXTERNOS_ROUTES: Routes = [
         './laboratorios/laboratorios.component'
         ).then((m) => m.LaboratoriosComponent),
   },
+  {
+    path: 'resultados',
+    loadComponent: () =>
+      import(
+        './tabela-amostras/amostras-analise-externa-table.component'
+        ).then((m) => m.AmostrasAnaliseExternaTableComponent),
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import(
+        './dashboard/lab-externo-dashboard.component'
+        ).then((m) => m.LabExternoDashboardComponent),
+  },
 
 ]

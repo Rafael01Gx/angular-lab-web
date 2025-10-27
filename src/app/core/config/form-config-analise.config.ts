@@ -56,3 +56,30 @@ export function formConfigEditarResultado(resultado: Record<string,ParametrosFor
     fields: fields
   }
 }
+
+
+export function formAnaliseExterna(data: AnaliseForm): FormConfig {
+  const fields: FormFieldBase[] = [];
+  data.parametros.forEach(p => {
+    const validators = [Validators.required,Validators.minLength(1)]
+    const field: FormFieldBase = {
+      label: `${p.descricao} ${p.subDescricao || ""}`,
+      type:'text',
+      formControlName: `id${p.id}`,
+      placeholder: '',
+      required: true,
+      unidadeResultado: p.unidadeResultado ,
+      mask: p.casasDecimais >= 1 ? `separator.${p.casasDecimais}` : '',
+      errorMessages: {
+        required: `${p.descricao+p.subDescricao} é obrigatório`,
+      },
+      validators
+    }
+    fields.push(field);
+  })
+  return {
+    title: data.nomeDescricao,
+    description: data.tipoAnalise.tipo,
+    fields: fields
+  }
+}

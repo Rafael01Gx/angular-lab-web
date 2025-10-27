@@ -52,6 +52,23 @@ export const API_ROUTES = {
     },
   },
 
+  AMOSTRAS_ANALISE_EXTERNA: {
+    BASE: 'amostra-analise-externa',
+    GET: {
+      FIND_ALL: '',
+      DASHBOARD_COMPLETO: 'dashboard',
+    },
+    POST: {
+      CREATE: '',
+    },
+    PATCH: {
+      UPDATE: '', // Param :id
+    },
+    DELETE: {
+      DELETE: '', // Param :id
+    },
+  },
+
   CONFIG_ANALISES: {
     BASE: 'config-analise',
     GET: {

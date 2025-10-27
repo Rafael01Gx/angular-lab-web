@@ -1,18 +1,24 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, throwError} from 'rxjs';
-import {AmostraLabExterno, AmostraLabExternoFull} from '../shared/interfaces/laboratorios-externos.interfaces';
 import {API_ROUTES} from '../core/constants/routes.constant';
+import {
+  AmostraAnaliseExterna,
+  AmostraAnaliseExternaQuery,
+  DashboardCompleto,
+  labsExtFiltrosAnalyticsQuery
+} from '../shared/interfaces/amostra-analise-externa.interfaces';
+import {PaginatedResponse} from '../shared/interfaces/querys.interface';
 
-const { AMOSTRAS_LAB_EXTERNO } = API_ROUTES;
+const { AMOSTRAS_ANALISE_EXTERNA } = API_ROUTES;
 
 @Injectable({
   providedIn: 'root',
 })
-export class AmostrasLabExternos {
-  #apiUrl = `${environment.apiURL}/${AMOSTRAS_LAB_EXTERNO.BASE}`;
+export class AmostraLabExternoService {
+  #apiUrl = `${environment.apiURL}/${AMOSTRAS_ANALISE_EXTERNA.BASE}`;
   #http = inject(HttpClient);
   #toastr = inject(ToastrService);
 
@@ -26,26 +32,43 @@ export class AmostrasLabExternos {
     return of([]);
   }
 
-  findAll(): Observable<AmostraLabExternoFull[]> {
-    return this.#http.get<AmostraLabExternoFull[]>(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.GET.FIND_ALL}`, {
+  findAll(filtros: AmostraAnaliseExternaQuery): Observable<PaginatedResponse<AmostraAnaliseExterna[]>> {
+
+    let params = new HttpParams();
+    if (filtros.analiseConcluida !== undefined)params = params.set('analiseConcluida', filtros.analiseConcluida.toString());
+    if (filtros.dataInicio)params = params.set('dataInicio', filtros.dataInicio);
+    if (filtros.dataFim) params = params.set('dataFim', filtros.dataFim);
+    if (filtros.amostraName) params = params.set('amostraName', filtros.amostraName);
+    if (filtros.labExternoId) params = params.set('labExternoId', filtros.labExternoId.toString());
+    if (filtros.page) params = params.set('page', filtros.page.toString());
+    if (filtros.limit) params = params.set('limit', filtros.limit.toString());
+
+    return this.#http.get<PaginatedResponse<AmostraAnaliseExterna[]>>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.GET.FIND_ALL}?${params}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
 
-  create(body: AmostraLabExterno): Observable<AmostraLabExternoFull> {
-    return this.#http.post<AmostraLabExternoFull>(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.POST.CREATE}`, body, {
+  update(id: number, body: AmostraAnaliseExterna): Observable<AmostraAnaliseExterna> {
+    return this.#http.patch<AmostraAnaliseExterna>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.PATCH.UPDATE+id}`, body, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
 
-  update(id: number, body: AmostraLabExterno): Observable<AmostraLabExterno> {
-    return this.#http.patch<AmostraLabExterno>(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.PATCH.UPDATE+id}`, body, {
+  getDashboardCompleto(filtros?: labsExtFiltrosAnalyticsQuery): Observable<DashboardCompleto> {
+    let params = new HttpParams();
+    if (filtros?.laboratorioId) params = params.set('laboratorioId', filtros.laboratorioId.toString());
+    if (filtros?.dataInicio) params = params.set('dataInicio', filtros.dataInicio.toString());
+    if (filtros?.dataFim) params = params.set('dataFim', filtros.dataFim.toString());
+    if (filtros?.analiseConcluida) params = params.set('analiseConcluida', filtros.analiseConcluida.toString());
+
+    return this.#http.get<DashboardCompleto>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.GET.DASHBOARD_COMPLETO}?${params}`, {
       withCredentials: true,
-    }).pipe(catchError(this.handleSetError.bind(this)));
+    }).pipe(catchError(this.handleGetError.bind(this)));
   }
+
 
   delete(id: number): Observable<any> {
-    return this.#http.delete(`${this.#apiUrl}/${AMOSTRAS_LAB_EXTERNO.DELETE.DELETE+id}`, {
+    return this.#http.delete(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.DELETE.DELETE+id}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }

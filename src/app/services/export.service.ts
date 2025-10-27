@@ -5,13 +5,13 @@ import { AgendamentoSemanal } from './agenda.service';
   providedIn: 'root'
 })
 export class ExportService {
-  
+
   /**
    * Exporta para CSV
    */
   exportarCSV(agendamentos: AgendamentoSemanal[], filename = 'agendamentos.csv') {
     const headers = ['Semana', 'Data Início', 'Data Fim', 'Tipo', 'Classe', 'Quantidade'];
-    
+
     const rows = agendamentos.flatMap(sem =>
       sem.tiposAnalise.map(tipo => [
         sem.semana,
@@ -104,7 +104,7 @@ export class ExportService {
           <p><strong>Total de Semanas:</strong> ${agendamentos.length}</p>
           <p><strong>Total de Amostras:</strong> ${agendamentos.reduce((acc, sem) => acc + sem.totalAmostras, 0)}</p>
         </div>
-        
+
         ${agendamentos.map(sem => `
           <h2>${sem.semana}</h2>
           <p><strong>Período:</strong> ${sem.dataInicio} até ${sem.dataFim}</p>
@@ -148,27 +148,3 @@ export class ExportService {
     window.URL.revokeObjectURL(url);
   }
 }
-
-// no componente
-// export class AgendamentoDashboardComponent {
-//   private exportService = inject(ExportService);
-
-//   exportar(formato: 'csv' | 'json' | 'excel' | 'html') {
-//     const dados = this.agendamentos();
-    
-//     switch (formato) {
-//       case 'csv':
-//         this.exportService.exportarCSV(dados);
-//         break;
-//       case 'json':
-//         this.exportService.exportarJSON(dados);
-//         break;
-//       case 'excel':
-//         this.exportService.exportarExcel(dados);
-//         break;
-//       case 'html':
-//         this.exportService.exportarHTML(dados);
-//         break;
-//     }
-//   }
-// }

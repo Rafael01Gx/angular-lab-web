@@ -1,0 +1,443 @@
+<div class="h-full w-full gap-1 bg-gradient-to-b from-blue-50/70 to-slate-50/50 p-0 rounded-sm flex flex-col">
+
+  <!-- Formulário de Cadastro -->
+  <div class="bg-white p-6 rounded-md shadow-md flex flex-col">
+    <div class="flex-1 flex justify-between items-center" >
+    <h2 class="text-xl font-semibold text-gray-900">Análises Externas</h2>
+      <!-- Header dos Filtros -->
+
+      <button
+        (click)="toggleFiltros()"
+        class="flex items-center ml-auto gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        <ng-icon name="heroFunnel" size="20"></ng-icon>
+        <span>Filtros Avançados</span>
+        <ng-icon [name]="filtrosExpanded() ? 'heroChevronUp' : 'heroChevronDown'" size="16"></ng-icon>
+      </button>
+
+
+    </div>
+    <div class="flex-1 flex flex-col justify-start items-start mt-4 gap-4">
+      <!-- Conteúdo dos Filtros -->
+      @if (filtrosExpanded()) {
+        <div class="flex-1 flex flex-col w-full border-t border-slate-200 p-4">
+          <div class="flex justify-between items-center gap-4">
+            <!-- Nome da Amostra -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Nome da Amostra
+              </label>
+              <input
+                type="text"
+                [value]="filtros().amostraName || ''"
+                (input)="atualizarFiltro('amostraName', $any($event.target).value)"
+                placeholder="Ex: ICP"
+                class="w-full input-primary"
+              />
+            </div>
+
+            <!-- Status da Análise -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Status da Análise
+              </label>
+              <select
+                [value]="filtros().analiseConcluida?.toString() || ''"
+                (change)="atualizarFiltro('analiseConcluida', $any($event.target).value === 'true' ? true : $any($event.target).value === 'false' ? false : undefined)"
+                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              >
+                <option value="">Todos</option>
+                <option value="false">Pendente</option>
+                <option value="true">Concluída</option>
+              </select>
+            </div>
+
+            <!-- ID do Laboratório -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                ID do Laboratório
+              </label>
+              <input
+                type="number"
+                [value]="filtros().labExternoId || ''"
+                (input)="atualizarFiltro('labExternoId', $any($event.target).value ? toNumber($any($event.target).value) : undefined)"
+                placeholder="Ex: 1"
+                class="w-full input-primary"
+              />
+            </div>
+
+            <!-- Data Início -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Data Início (Remessa)
+              </label>
+              <input
+                type="date"
+                [value]="filtros().dataInicio || ''"
+                (input)="atualizarFiltro('dataInicio', $any($event.target).value)"
+                class="w-full input-primary"
+              />
+            </div>
+
+            <!-- Data Fim -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Data Fim (Remessa)
+              </label>
+              <input
+                type="date"
+                [value]="filtros().dataFim || ''"
+                (input)="atualizarFiltro('dataFim', $any($event.target).value)"
+                class="w-full input-primary"
+              />
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="flex gap-3 mt-6">
+              <button
+                (click)="aplicarFiltros()"
+                class="px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Aplicar Filtros
+              </button>
+              <button
+                (click)="limparFiltros()"
+                class="px-4 py-2 bg-slate-200 text-slate-700 font-medium rounded-md hover:bg-slate-300 transition-colors"
+              >
+                Limpar
+              </button>
+            </div>
+          </div>
+
+
+        </div>
+      }
+    </div>
+  </div>
+
+    <div class="flex-1 flex">
+    <!-- Tabela -->
+    <div class="flex-1 flex flex-col min-h-0 bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden">
+
+      <!-- Tabela de Dados -->
+      @if (amostras().length > 0) {
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full min-h-0">
+            <thead class="bg-slate-50 border-b border-slate-200 sticky top-0 z-10 ">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                ID
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Amostra
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Laboratório
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Data Remessa
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Elementos
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Status
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Ações
+              </th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+
+            <!-- Loading -->
+              @if (loading()) {
+                <tr class="w-full">
+                  <td colspan="7" class="py-12">
+                    <div class="flex items-center justify-center w-full">
+                      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                    </div>
+                  </td>
+                </tr>
+              } @else {
+                @for (amostra of amostras(); track amostra.id) {
+                  <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                      #{{ amostra.id }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-slate-900">{{ amostra.amostraName }}</div>
+                      @if (amostra.subIdentificacao) {
+                        <div class="text-xs text-slate-500">{{ amostra.subIdentificacao }}</div>
+                      }
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm text-slate-900">{{ amostra.RemessaLabExterno.destino.nome }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                      {{ amostra.RemessaLabExterno.data | date: 'dd/MM/yyy' }}
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex flex-wrap gap-1">
+                        @for (elemento of amostra.elementosSolicitados; track elemento) {
+                          <span class="inline-flex items-center px-2 py-1 rounded-md bg-blue-100 text-blue-800 text-xs font-medium">
+                          {{ elemento }}
+                        </span>
+                        }
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      @if (amostra.analiseConcluida) {
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+                        Concluída
+                      </span>
+                      } @else {
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-medium">
+                        Pendente
+                      </span>
+                      }
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                      <div class="flex gap-2">
+                        @if (!amostra.analiseConcluida) {
+                          <button
+                            (click)="abrirModalLancamento(amostra)"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            title="Lançar Resultados"
+                          >
+                            <ng-icon name="heroPlus" size="16"></ng-icon>
+                            <span class="text-xs font-medium">Lançar</span>
+                          </button>
+                        } @else {
+                          <button
+                            (click)="abrirModalVisualizacao(amostra)"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-600 text-white rounded-md hover:bg-slate-700 transition-colors"
+                            title="Ver/Editar Resultados"
+                          >
+                            <ng-icon name="heroEye" size="16"></ng-icon>
+                            <span class="text-xs font-medium">Ver</span>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginação -->
+        <div class="flex items-center justify-between px-6 py-4 border-t border-slate-200">
+          <div class="text-sm text-slate-600">
+            Mostrando <span class="font-medium">{{ (currentPage() - 1) * perPage() + 1 }}</span> a
+            <span class="font-medium">{{ Math.min(currentPage() * perPage(), total()) }}</span> de
+            <span class="font-medium">{{ total() }}</span> resultados
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              (click)="paginaAnterior()"
+              [disabled]="!temPaginaAnterior()"
+              [class.opacity-50]="!temPaginaAnterior()"
+              [class.cursor-not-allowed]="!temPaginaAnterior()"
+              class="inline-flex items-center gap-1 px-3 py-2 border border-slate-300 rounded-md hover:bg-slate-50 transition-colors disabled:hover:bg-white"
+            >
+              <ng-icon name="heroChevronLeft" size="16"></ng-icon>
+              <span class="text-sm font-medium">Anterior</span>
+            </button>
+
+            <div class="flex gap-1">
+              @for (pagina of [].constructor(totalPages()); track $index; let i = $index) {
+                <button
+                  (click)="irParaPagina(i + 1)"
+                  [class.bg-blue-500]="currentPage() === i + 1"
+                  [class.text-white]="currentPage() === i + 1"
+                  [class.border-blue-500]="currentPage() === i + 1"
+                  class="px-3 py-2 border border-slate-300 rounded-md hover:bg-slate-50 transition-colors text-sm font-medium"
+                >
+                  {{ i + 1 }}
+                </button>
+              }
+            </div>
+
+            <button
+              (click)="proximaPagina()"
+              [disabled]="!temProximaPagina()"
+              [class.opacity-50]="!temProximaPagina()"
+              [class.cursor-not-allowed]="!temProximaPagina()"
+              class="inline-flex items-center gap-1 px-3 py-2 border border-slate-300 rounded-md hover:bg-slate-50 transition-colors disabled:hover:bg-white"
+            >
+              <span class="text-sm font-medium">Próxima</span>
+              <ng-icon name="heroChevronRight" size="16"></ng-icon>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Estado Vazio -->
+      @if (!loading() && amostras().length === 0) {
+        <div class="flex flex-col items-center justify-center py-12">
+          <div class="text-slate-400 mb-4">
+            <ng-icon name="heroFunnel" size="48"></ng-icon>
+          </div>
+          <p class="text-slate-600 font-medium">Nenhuma amostra encontrada</p>
+          <p class="text-slate-500 text-sm mt-1">Tente ajustar os filtros</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Modal de Lançamento de Resultados -->
+  @if (modalLancamento()) {
+    <div class="fixed inset-0 bg-black/10 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Lançar Resultados</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Amostra: {{ amostraSelecionada()?.amostraName }} (ID: #{{ amostraSelecionada()?.id }})
+            </p>
+          </div>
+          <button
+            (click)="fecharModalLancamento()"
+            class="p-2 hover:bg-slate-100 rounded-md transition-colors"
+          >
+            <ng-icon name="heroXMark" size="24" class="text-slate-600"></ng-icon>
+          </button>
+        </div>
+
+        <!-- Conteúdo -->
+        <div class="px-6 py-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+          <div class="space-y-4">
+            @for (elemento of amostraSelecionada()?.elementosSolicitados; track elemento) {
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">
+                  {{ elemento }}
+                </label>
+
+                <div class="relative">
+                  <input
+                    type="text"
+                    [value]="resultados()[elemento] || '0,00'"
+                    (input)="atualizarResultado(elemento, $any($event.target).value)"
+                    placeholder="Digite o resultado"
+                    class="w-full pr-10 input-primary"
+                  />
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium pointer-events-none">
+                  %
+                </span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200">
+          <button
+            (click)="fecharModalLancamento()"
+            class="px-4 py-2 border border-slate-300 text-slate-700 font-medium rounded-md hover:bg-slate-50 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            (click)="salvarResultados()"
+            class="px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Salvar Resultados
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal de Visualização/Edição de Resultados -->
+  @if (modalVisualizacao()) {
+    <div class="fixed inset-0 bg-black/10 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Visualizar/Editar Resultados</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Amostra: {{ amostraSelecionada()?.amostraName }} (ID: #{{ amostraSelecionada()?.id }})
+            </p>
+          </div>
+          <button
+            (click)="fecharModalVisualizacao()"
+            class="p-2 hover:bg-slate-100 rounded-md transition-colors"
+          >
+            <ng-icon name="heroXMark" size="24" class="text-slate-600"></ng-icon>
+          </button>
+        </div>
+
+        <!-- Conteúdo -->
+        <div class="px-6 py-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+          <div class="space-y-4">
+            @for (elemento of amostraSelecionada()?.elementosSolicitados; track elemento) {
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">
+                  {{ elemento }}
+                </label>
+                <div class="relative">
+                  <input
+                    type="text"
+                    [value]="resultados()[elemento] || ''"
+                    (input)="atualizarResultado(elemento, $any($event.target).value)"
+                    placeholder="Digite o resultado"
+                    class="w-full pr-10 px-4 py-2.5 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  />
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium pointer-events-none">
+                  %
+                </span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Informações Adicionais -->
+          <div class="mt-6 p-4 bg-slate-50 rounded-md border border-slate-200">
+            <h3 class="text-sm font-semibold text-slate-900 mb-3">Informações da Remessa</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-slate-600">Laboratório:</span>
+                <span class="font-medium text-slate-900">{{ amostraSelecionada()?.RemessaLabExterno?.destino?.nome! }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Data da Remessa:</span>
+                <span class="font-medium text-slate-900">{{ amostraSelecionada()?.RemessaLabExterno?.data! | date: 'dd/MM/yyy' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Data Início Análise:</span>
+                <span class="font-medium text-slate-900">{{ amostraSelecionada()?.dataInicio! | date: 'dd/MM/yyy'}}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Data Fim Análise:</span>
+                <span class="font-medium text-slate-900">{{ amostraSelecionada()?.dataFim! | date: 'dd/MM/yyy' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200">
+          <button
+            (click)="fecharModalVisualizacao()"
+            class="px-4 py-2 border border-slate-300 text-slate-700 font-medium rounded-md hover:bg-slate-50 transition-colors"
+          >
+            Fechar
+          </button>
+          <button
+            (click)="salvarEdicao()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+          >
+            <ng-icon name="heroPencilSquare" size="16"></ng-icon>
+            Salvar Alterações
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
