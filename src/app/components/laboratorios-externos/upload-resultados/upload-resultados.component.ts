@@ -17,6 +17,7 @@ import {
   heroChevronUp,
   heroDocumentText,
   heroChevronLeft,
+  heroMagnifyingGlass,
 } from '@ng-icons/heroicons/outline';
 import { UploadConfig } from '../../../shared/interfaces/upload-resultados.interface';
 import { AmostraLabExternoFullUpload } from '../../../shared/interfaces/laboratorios-externos.interfaces';
@@ -26,7 +27,7 @@ import {
 } from '../../../services/upload-resultado.service';
 import { AmostraLabExternoService } from '../../../services/amostras-analises-externas.service';
 import { ToastrService } from '../../../services/toastr.service';
-import { AmostraAnaliseExterna } from '../../../shared/interfaces/amostra-analise-externa.interfaces';
+import { catchError } from 'rxjs';
 
 @Component({
   selector: 'app-upload-resultados',
@@ -42,6 +43,7 @@ import { AmostraAnaliseExterna } from '../../../shared/interfaces/amostra-analis
       heroChevronUp,
       heroDocumentText,
       heroChevronLeft,
+      heroMagnifyingGlass,
     }),
   ],
   template: `
@@ -335,7 +337,8 @@ import { AmostraAnaliseExterna } from '../../../shared/interfaces/amostra-analis
                     </h3>
                   </div>
                   <p class="text-sm text-slate-600 mt-1">
-                    📅 {{ formatDate(amostra.dataInicio, amostra.dataFim) }}
+                    📅
+                    {{amostra.dataInicio | date:'dd/MM/yyyy'}} {{amostra.dataFim | date:'dd/MM/yyyy' }}
                   </p>
                 </div>
                 <button
@@ -391,6 +394,24 @@ import { AmostraAnaliseExterna } from '../../../shared/interfaces/amostra-analis
           </div>
         </div>
 
+        } @if (isNotFound()) {
+        <div
+          class="p-8 flex flex-col items-center justify-center text-center space-y-4"
+        >
+          <ng-icon
+            name="heroMagnifyingGlass"
+            class="h-12 w-12 text-slate-400"
+          ></ng-icon>
+
+          <h3 class="text-lg font-semibold text-slate-700">
+            Amostras não foram encontradas
+          </h3>
+
+          <p class="text-sm text-slate-500 max-w-prose">
+            Não encontramos amostras no arquivo ou com os filtros aplicados.
+            Verifique o arquivo ou tente novamente.
+          </p>
+        </div>
         }
       </div>
       @if (amostras().toString().length > 0) {
@@ -430,6 +451,7 @@ export class UploadResultadoComponent {
   selectedAmostras = signal<Set<number>>(new Set());
   expandedAmostras = signal<Set<number>>(new Set());
   isLoading = signal<boolean>(false);
+  isNotFound = signal<boolean>(false);
   isUploading = signal<boolean>(false);
 
   onFileChange(event: Event): void {
@@ -485,6 +507,14 @@ export class UploadResultadoComponent {
         this.isUploading.set(false);
         this.expandedAmostras.set(new Set());
         this.selectedFile.set(null);
+
+        if (result.length <= 0) {
+          this.isNotFound.set(true);
+
+          setTimeout(() => {
+            this.isNotFound.set(false);
+          }, 3000);
+        }
       },
       error: (err) => {
         this.isUploading.set(false);
@@ -523,10 +553,13 @@ export class UploadResultadoComponent {
       return a;
     });
     this.#amostraLabExternoService.updateMany(selectedData).subscribe({
-      next: () => {
+      next: (res) => {
         this.#toast.success('Resultados salvos com sucesso!');
         this.isLoading.set(false);
         this.handleClean();
+      },
+      error: (err) => {
+        this.isLoading.set(false);
       },
     });
   }
@@ -537,8 +570,8 @@ export class UploadResultadoComponent {
   }
 
   formatDate(inicio: string, fim: string): string {
-    const inicioDate = new Date(inicio).toLocaleDateString('pt-BR');
-    const fimDate = new Date(fim).toLocaleDateString('pt-BR');
+    const inicioDate = new Date(inicio).toLocaleDateString();
+    const fimDate = new Date(fim).toLocaleDateString();
     return inicio === fim ? inicioDate : `${inicioDate} à ${fimDate}`;
   }
 
