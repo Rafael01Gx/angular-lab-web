@@ -8,10 +8,12 @@ export interface AmostraAnaliseExternaQuery {
   limit?: number;
 }
 
-export interface ElementoAnalise {
+export interface ElementoResultado {
   elemento: string;
   valor: string;
+  unidade: string;
 }
+
 
 export interface AmostraAnaliseExterna {
   id: number;
@@ -20,7 +22,7 @@ export interface AmostraAnaliseExterna {
   dataInicio: string;
   dataFim: string;
   elementosSolicitados: string[];
-  elementosAnalisados: ElementoAnalise[] | Array<{ valor: string; elemento: string }> | null;
+  elementosAnalisados: ElementoResultado[] | null;
   analiseConcluida: boolean;
   createdAt: string;
   updatedAt: string;
@@ -103,6 +105,6 @@ interface IDetalhesEstatisticas {
 
 
 export interface SalvarResultadosDto {
-  elementosAnalisados: ElementoAnalise[];
+  elementosAnalisados: ElementoResultado[];
   analiseConcluida: boolean;
 }

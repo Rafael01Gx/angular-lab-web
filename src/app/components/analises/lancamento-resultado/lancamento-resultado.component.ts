@@ -224,7 +224,6 @@ import { AnalysisSettingsService } from '../../../services/analysis-settings.ser
 })
 export class LancamentoResultadoComponent {
   #route = inject(ActivatedRoute);
-  #cdr = inject(ChangeDetectorRef);
   #location = inject(Location);
   #amostrasService = inject(AmostrasService);
   #analiseConfigService = inject(AnalysisSettingsService);

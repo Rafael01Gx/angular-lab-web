@@ -11,6 +11,7 @@ import {
   labsExtFiltrosAnalyticsQuery
 } from '../shared/interfaces/amostra-analise-externa.interfaces';
 import {PaginatedResponse} from '../shared/interfaces/querys.interface';
+import { AmostraLabExternoFullUpload } from '../shared/interfaces/laboratorios-externos.interfaces';
 
 const { AMOSTRAS_ANALISE_EXTERNA } = API_ROUTES;
 
@@ -50,6 +51,11 @@ export class AmostraLabExternoService {
 
   update(id: number, body: AmostraAnaliseExterna): Observable<AmostraAnaliseExterna> {
     return this.#http.patch<AmostraAnaliseExterna>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.PATCH.UPDATE+id}`, body, {
+      withCredentials: true,
+    }).pipe(catchError(this.handleSetError.bind(this)));
+  }
+  updateMany(amostras: AmostraLabExternoFullUpload[]): Observable<AmostraAnaliseExterna[]> {
+    return this.#http.patch<AmostraAnaliseExterna[]>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.PATCH.UPDATE_MANY}`, {amostras}, {
       withCredentials: true,
     }).pipe(catchError(this.handleSetError.bind(this)));
   }
