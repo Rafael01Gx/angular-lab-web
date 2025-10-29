@@ -63,6 +63,7 @@ export const API_ROUTES = {
     },
     PATCH: {
       UPDATE: '', // Param :id
+      UPDATE_MANY: '',
     },
     DELETE: {
       DELETE: '', // Param :id

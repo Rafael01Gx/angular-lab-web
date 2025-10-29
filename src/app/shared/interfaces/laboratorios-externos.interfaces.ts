@@ -67,7 +67,7 @@ export interface AmostraLabExternoFullUpload {
   dataFim: string;
   elementosSolicitados: string[];
   elementosAnalisados: ElementoAnalisado[];
-  analiseConcluida: number;
+  analiseConcluida: boolean;
   createdAt: string;
   updatedAt: string;
   remessaLabExternoId: number;
