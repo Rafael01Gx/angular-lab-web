@@ -1,11 +1,9 @@
-// Interface para os elementos químicos
 export interface ElementoQuimico {
   id?:number;
   elementName: string;
   simbolo: string;
 }
 
-// Interface para as amostras
 export interface AmostraLabExterno {
   id?: number;
   amostraName: string;
@@ -18,14 +16,11 @@ export interface AmostraLabExternoFull {
   elementosAnalisados: ElementoQuimico[];
 }
 
-
-// Interface para o período
 export interface Periodo {
   inicio: string;
   fim: string;
 }
 
-// Interface para as amostras dentro da remessa
 export interface AmostraRemessa {
   id?: string;
   amostraName: string;
@@ -37,8 +32,6 @@ export interface AmostraRemessa {
   analiseConcluida?: boolean;
   remessaLabExternoId?: number;
 }
-
-// Interface para as remessas
 export interface Remessa {
   id?: string;
   data: string;
@@ -47,7 +40,6 @@ export interface Remessa {
   amostras: AmostraRemessa[];
 }
 
-// Interface para os laboratórios
 export interface Laboratorio {
   id: string;
   nome: string;
@@ -65,4 +57,24 @@ export interface Endereco {
   cidade: string;
   estado: string;
   pais: string;
+}
+
+export interface AmostraLabExternoFullUpload {
+  id: number;
+  amostraName: string;
+  subIdentificacao: string;
+  dataInicio: string;
+  dataFim: string;
+  elementosSolicitados: string[];
+  elementosAnalisados: ElementoAnalisado[];
+  analiseConcluida: number;
+  createdAt: string;
+  updatedAt: string;
+  remessaLabExternoId: number;
+}
+
+export interface ElementoAnalisado {
+  elemento: string;
+  valor: string;
+  unidade: string;
 }

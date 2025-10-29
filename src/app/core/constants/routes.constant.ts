@@ -246,6 +246,25 @@ export const API_ROUTES = {
       DELETE: '', // Param :id
     },
   },
+
+    UPLOAD: {
+    BASE: 'upload',
+    GET: {
+      GET_ALL: '',
+      GET_BY_ID: '',
+    },
+    POST: {
+      UPLOAD_RESULTADO: 'analise',
+
+    },
+    PATCH: {
+      UPDATE: '',
+      UPDATE_STATUS: '',
+    },
+    DELETE: {
+      DELETE: '',
+    },
+  },
 };
 
 

@@ -1,10 +1,18 @@
-<div class="h-full w-full gap-1 bg-gradient-to-b from-blue-50/70 to-slate-50/50 p-0 rounded-sm flex flex-col">
+<div class="h-full w-full gap-1 bg-gradient-to-b from-blue-50/70 to-slate-50/50 p-0 rounded-sm flex flex-col overflow-hidden">
 
   <!-- Formulário de Cadastro -->
   <div class="bg-white p-6 rounded-md shadow-md flex flex-col">
     <div class="flex-1 flex justify-between items-center" >
     <h2 class="text-xl font-semibold text-gray-900">Análises Externas</h2>
       <!-- Header dos Filtros -->
+
+            <button
+        routerLink="/laboratorios-externos/upload"
+        class="flex items-center ml-auto gap-2 px-4 py-2 button-gradient-blue"
+      >
+        <ng-icon name="heroDocumentArrowUp" size="20"></ng-icon>
+        <span>Carregar</span>
+      </button>
 
       <button
         (click)="toggleFiltros()"
@@ -115,7 +123,7 @@
     </div>
   </div>
 
-    <div class="flex-1 flex">
+    <div class="flex-1 flex min-h-0">
     <!-- Tabela -->
     <div class="flex-1 flex flex-col min-h-0 bg-white rounded-md shadow-sm border border-slate-200 overflow-hidden">
 
@@ -290,7 +298,7 @@
 
   <!-- Modal de Lançamento de Resultados -->
   @if (modalLancamento()) {
-    <div class="fixed inset-0 bg-black/10 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class=" fixed inset-0 bg-black/10 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
@@ -311,22 +319,22 @@
         <!-- Conteúdo -->
         <div class="px-6 py-6 overflow-y-auto max-h-[calc(90vh-180px)]">
           <div class="space-y-4">
-            @for (elemento of amostraSelecionada()?.elementosSolicitados; track elemento) {
+            @for (resultado of resultados(); track resultado.elemento) {
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">
-                  {{ elemento }}
+                  {{ resultado.elemento }}
                 </label>
 
                 <div class="relative">
                   <input
                     type="text"
-                    [value]="resultados()[elemento] || '0,00'"
-                    (input)="atualizarResultado(elemento, $any($event.target).value)"
+                    [value]="resultado.valor"
+                    (input)="atualizarResultado(resultado.elemento, $any($event.target).value)"
                     placeholder="Digite o resultado"
                     class="w-full pr-10 input-primary"
                   />
                   <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium pointer-events-none">
-                  %
+                  {{resultado.unidade}}
                 </span>
                 </div>
               </div>
@@ -376,21 +384,21 @@
         <!-- Conteúdo -->
         <div class="px-6 py-6 overflow-y-auto max-h-[calc(90vh-180px)]">
           <div class="space-y-4">
-            @for (elemento of amostraSelecionada()?.elementosSolicitados; track elemento) {
+            @for (resultado of resultados(); track resultado.elemento) {
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">
-                  {{ elemento }}
+                  {{ resultado.elemento }}
                 </label>
                 <div class="relative">
                   <input
                     type="text"
-                    [value]="resultados()[elemento] || ''"
-                    (input)="atualizarResultado(elemento, $any($event.target).value)"
+                    [value]="resultado.valor"
+                    (input)="atualizarResultado(resultado.elemento, $any($event.target).value)"
                     placeholder="Digite o resultado"
                     class="w-full pr-10 px-4 py-2.5 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   />
                   <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium pointer-events-none">
-                  %
+                  {{resultado.unidade}}
                 </span>
                 </div>
               </div>
