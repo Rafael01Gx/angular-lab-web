@@ -1,6 +1,5 @@
-// analise-externa.component.ts
-import { Component, signal, computed, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, computed, effect, OnInit, inject, TransferState, makeStateKey, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import { 
@@ -12,65 +11,18 @@ import {
   heroChevronRight
 } from '@ng-icons/heroicons/outline';
 import * as XLSX from 'xlsx';
+import { AmostraAnaliseExterna, AmostraAnaliseExternaQuery } from '../../../shared/interfaces/amostra-analise-externa.interfaces';
+import { PaginatedResponse } from '../../../shared/interfaces/querys.interface';
+import { AmostraLabExternoService } from '../../../services/amostras-analises-externas.service';
+import { tap } from 'rxjs';
 
-interface ElementoAnalisado {
-  valor: string;
-  unidade: string;
-  elemento: string;
-}
-
-interface Laboratorio {
-  id: number;
-  nome: string;
-  endereco: {
-    cidade: string;
-    estado: string;
-  };
-}
-
-interface RemessaLabExterno {
-  data: string;
-  destino: Laboratorio;
-}
-
-interface AmostraAnalise {
-  id: number;
-  amostraName: string;
-  subIdentificacao: string;
-  dataInicio: string;
-  dataFim: string;
-  elementosSolicitados: string[];
-  elementosAnalisados: ElementoAnalisado[];
-  analiseConcluida: boolean;
-  RemessaLabExterno: RemessaLabExterno;
-}
-
-interface AmostraAnaliseExternaQuery {
-  analiseConcluida?: boolean;
-  dataInicio?: string;
-  dataFim?: string;
-  amostraName?: string;
-  labExternoId?: number;
-  page?: number;
-  limit?: number;
-}
-
-interface ApiResponse {
-  data: AmostraAnalise[];
-  meta: {
-    total: number;
-    totalPages: number;
-    currentPage: number;
-    perPage: number;
-    elements: string[];
-  };
-}
+const AMOSTRA_META_KEY = makeStateKey<PaginatedResponse<AmostraAnaliseExterna[]>>("resultado-externo-table-meta");
 
 @Component({
   selector: 'app-resultado-externo-table',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIconComponent],
-  viewProviders: [
+  providers: [
     provideIcons({ 
       heroChevronDown, 
       heroChevronUp, 
@@ -81,15 +33,15 @@ interface ApiResponse {
     })
   ],
   template: `
-    <div class="h-full flex flex-col gap-4">
-      <!-- Header com Filtros -->
-      <div class="bg-white rounded-lg shadow-sm border border-zinc-300">
+    <div class="h-full flex flex-col gap-2">
+      <!-- Header -->
+      <div class="bg-white rounded-md shadow-sm border border-zinc-300">
         <div class="p-4 flex items-center justify-between">
           <h2 class="text-xl font-semibold text-zinc-800">Análises Externas</h2>
           <div class="flex gap-2">
             <button
               (click)="toggleFilters()"
-              class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               <ng-icon name="heroFunnel" size="20"></ng-icon>
               <span>Filtros</span>
@@ -100,7 +52,7 @@ interface ApiResponse {
             </button>
             <button
               (click)="exportToExcel()"
-              class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
             >
               <ng-icon name="heroArrowDownTray" size="20"></ng-icon>
               <span>Exportar</span>
@@ -119,7 +71,7 @@ interface ApiResponse {
                 <input
                   type="text"
                   [(ngModel)]="filters().amostraName"
-                  class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full px-3 py-2 border border-zinc-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Buscar amostra..."
                 />
               </div>
@@ -130,7 +82,7 @@ interface ApiResponse {
                 </label>
                 <select
                   [(ngModel)]="filters().labExternoId"
-                  class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full px-3 py-2 border border-zinc-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option [value]="undefined">Todos</option>
                   @for (lab of laboratorios(); track lab.id) {
@@ -141,23 +93,23 @@ interface ApiResponse {
 
               <div>
                 <label class="block text-sm font-medium text-zinc-700 mb-1">
-                  Data Início
+                  Data Início (Remessa)
                 </label>
                 <input
                   type="date"
                   [(ngModel)]="filters().dataInicio"
-                  class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full px-3 py-2 border border-zinc-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
                 <label class="block text-sm font-medium text-zinc-700 mb-1">
-                  Data Fim
+                  Data Fim (Remessa)
                 </label>
                 <input
                   type="date"
                   [(ngModel)]="filters().dataFim"
-                  class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full px-3 py-2 border border-zinc-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -167,7 +119,7 @@ interface ApiResponse {
                 </label>
                 <select
                   [(ngModel)]="filters().analiseConcluida"
-                  class="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full px-3 py-2 border border-zinc-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option [value]="undefined">Todos</option>
                   <option [value]="true">Concluída</option>
@@ -178,13 +130,13 @@ interface ApiResponse {
               <div class="md:col-span-2 lg:col-span-3 flex items-end gap-2">
                 <button
                   (click)="clearFilters()"
-                  class="px-4 py-2 text-zinc-700 border border-zinc-300 rounded-lg hover:bg-zinc-100 transition-colors"
+                  class="px-4 py-2 text-zinc-700 border border-zinc-300 rounded-md hover:bg-zinc-100 transition-colors"
                 >
                   Limpar Filtros
                 </button>
                 <button
                   (click)="applyFilters()"
-                  class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
                 >
                   Aplicar Filtros
                 </button>
@@ -195,77 +147,111 @@ interface ApiResponse {
       </div>
 
       <!-- Tabela -->
-      <div class="flex-1 bg-white rounded-lg shadow-sm border border-zinc-300 flex flex-col overflow-hidden">
-        <div class="flex-1 overflow-auto">
-          <table class="w-full">
-            <thead class="bg-zinc-100 sticky top-0 z-10">
-              <tr>
-                <th rowspan="2" class="px-4 py-3 text-left text-sm font-semibold text-zinc-700 border-b border-zinc-300">
-                  Amostra
-                </th>
-                <th rowspan="2" class="px-4 py-3 text-left text-sm font-semibold text-zinc-700 border-b border-zinc-300">
-                  Sub ID
-                </th>
-                <th rowspan="2" class="px-4 py-3 text-left text-sm font-semibold text-zinc-700 border-b border-zinc-300">
-                  Período
-                </th>
-                <th rowspan="2" class="px-4 py-3 text-left text-sm font-semibold text-zinc-700 border-b border-zinc-300">
-                  Laboratório
-                </th>
-                @for (element of elements(); track element) {
-                  <th class="px-4 py-2 text-center text-sm font-semibold text-zinc-700 border-b-0 border-l border-zinc-300 whitespace-nowrap">
-                    {{ element }}
+      <div class="flex-1 bg-white rounded-md shadow-lg border border-zinc-300 flex flex-col overflow-hidden min-h-0">
+        <div class="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-zinc-400 scrollbar-track-zinc-100 min-h-0">
+          <div class="overflow-x-auto h-full">
+            <table class="w-full min-w-max">
+              <thead class="bg-gradient-to-r from-blue-600/80 to-blue-700/80 sticky top-0 z-10 shadow-md">
+                <tr>
+                  <th rowspan="2" class="px-4 py-2 text-left text-sm font-bold text-white border-r border-blue-500 min-w-[200px]">
+                    <div class="flex items-center gap-2">
+                      <span>Amostra</span>
+                    </div>
                   </th>
-                }
-              </tr>
-              <tr>
-                @for (element of elements(); track element) {
-                  <th class="px-4 py-1 text-center text-xs font-medium text-zinc-500 border-b border-l border-zinc-300">
-                    %
+                  <th rowspan="2" class="px-4 py-2 text-left text-sm font-bold text-white border-r border-blue-500 min-w-[120px]">
+                    Sub ID
                   </th>
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @for (amostra of paginatedData(); track amostra.id) {
-                <tr class="hover:bg-zinc-50 transition-colors">
-                  <td class="px-4 py-3 text-sm text-zinc-900 border-b border-zinc-200">
-                    {{ amostra.amostraName }}
-                  </td>
-                  <td class="px-4 py-3 text-sm text-zinc-600 border-b border-zinc-200">
-                    {{ amostra.subIdentificacao || '-' }}
-                  </td>
-                  <td class="px-4 py-3 text-sm text-zinc-600 border-b border-zinc-200 whitespace-nowrap">
-                    {{ formatDate(amostra.dataInicio) }} à {{ formatDate(amostra.dataFim) }}
-                  </td>
-                  <td class="px-4 py-3 text-sm text-zinc-600 border-b border-zinc-200">
-                    {{ amostra.RemessaLabExterno.destino.nome }}
-                  </td>
+                  <th rowspan="2" class="px-4 py-2 text-left text-sm font-bold text-white border-r border-blue-500 min-w-[180px]">
+                    Período
+                  </th>
+                  <th rowspan="2" class="px-4 py-2 text-left text-sm font-bold text-white border-r border-blue-500 min-w-[200px]">
+                    Laboratório
+                  </th>
+                  <th rowspan="2" class="px-4 py-2 text-left text-sm font-bold text-white border-r border-blue-500 min-w-[180px]">
+                   Data/Remessa
+                 </th>
                   @for (element of elements(); track element) {
-                    <td class="px-4 py-3 text-sm text-zinc-900 border-b border-l border-zinc-200 text-center">
-                      {{ getElementValue(amostra, element) }}
-                    </td>
+                    <th class="px-4 py-2 text-center text-sm font-bold text-white border-r border-blue-500 whitespace-nowrap min-w-[100px]">
+                      {{ element }}
+                    </th>
                   }
                 </tr>
-              } @empty {
                 <tr>
-                  <td [attr.colspan]="elements().length + 4" class="px-4 py-8 text-center text-zinc-500">
-                    Nenhum resultado encontrado
-                  </td>
+                  @for (element of elements(); track element) {
+                    <th class="px-4 text-center text-xs font-semibold text-blue-100 border-r border-blue-500 ">
+                      %
+                    </th>
+                  }
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody class="divide-y divide-zinc-200">
+                @for (amostra of paginatedData(); track amostra.id; let idx = $index) {
+                  <tr class="group hover:bg-blue-50 transition-all duration-200 border-b border-zinc-200 ease-in-out" [class.bg-zinc-50]="idx % 2 === 0">
+                    <td class="px-4 py-2 text-sm font-semibold text-zinc-900 border-r border-zinc-200 whitespace-nowrap">
+                      <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-blue-500 group-hover:bg-blue-600 transition-colors"></div>
+                        {{ amostra.amostraName }}
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 text-sm text-zinc-600 border-r border-zinc-200 whitespace-nowrap">
+                      <span class="text-zinc-400 italic">{{ amostra.subIdentificacao || 'N/A' }}</span>
+                    </td>
+                    <td class="px-4 py-2 text-sm text-zinc-700 border-r border-zinc-200 whitespace-nowrap">
+                      <div class="flex items-center gap-1">
+                        <span class="font-medium">{{ formatDate(amostra.dataInicio) }}</span>
+                        <span class="text-zinc-400">→</span>
+                        <span class="font-medium">{{ formatDate(amostra.dataFim) }}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 text-sm text-zinc-700 border-r border-zinc-200 whitespace-nowrap">
+                      <div class="flex items-center gap-2">
+                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                        <span class="font-medium">{{ amostra.RemessaLabExterno.destino.nome }}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 text-sm text-zinc-700 border-r border-zinc-200 whitespace-nowrap">
+                    <div class="flex items-center gap-1">
+                      <span class="font-medium">{{ formatDate(amostra.RemessaLabExterno.data) }}</span>
+                    </div>
+                  </td>
+                    @for (element of elements(); track element) {
+                      <td class="px-4 py-4 text-sm font-mono text-zinc-900 border-r border-zinc-200 text-center whitespace-nowrap bg-white group-hover:bg-blue-50/50 transition-colors">
+                        <span class="inline-block px-2 py-1 rounded bg-zinc-100 group-hover:bg-blue-100 transition-colors">
+                          {{ getElementValue(amostra, element) }}
+                        </span>
+                      </td>
+                    }
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td [attr.colspan]="elements().length + 4" class="px-6 py-16 text-center">
+                      <div class="flex flex-col items-center gap-3">
+                        <div class="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center">
+                          <svg class="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-zinc-600 font-medium">Nenhum resultado encontrado</p>
+                          <p class="text-sm text-zinc-400 mt-1">Tente ajustar os filtros de busca</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Paginação -->
-        <div class="border-t border-zinc-200 px-4 py-3 flex items-center justify-between bg-zinc-50">
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-zinc-700">Itens por página:</span>
+        <div class="border-t border-zinc-200 px-4 py-2 flex items-center justify-between bg-gradient-to-r from-zinc-50 to-zinc-100">
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-zinc-700">Itens por página:</span>
             <select
               [(ngModel)]="filters().limit"
               (ngModelChange)="changeLimit()"
-              class="px-3 py-1 border border-zinc-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="px-4 py-2 border border-zinc-300 rounded-md text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm hover:border-zinc-400 transition-colors"
             >
               <option [value]="5">5</option>
               <option [value]="10">10</option>
@@ -275,25 +261,26 @@ interface ApiResponse {
             </select>
           </div>
 
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-zinc-700">
-              Página {{ currentPage() }} de {{ totalPages() }} 
-              ({{ totalItems() }} itens)
+          <div class="flex items-center gap-4">
+            <span class="text-sm font-medium text-zinc-700">
+              Página <span class="text-blue-600 font-bold">{{ currentPage() }}</span> de 
+              <span class="font-bold">{{ totalPages() }}</span> 
+              <span class="text-zinc-500 ml-2">({{ totalItems() }} itens)</span>
             </span>
-            <div class="flex gap-1">
+            <div class="flex gap-2">
               <button
                 (click)="previousPage()"
                 [disabled]="currentPage() === 1"
-                class="p-2 border border-zinc-300 rounded-lg hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                class="p-2 border-2 border-zinc-300 rounded-md hover:bg-blue-50 hover:border-blue-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-zinc-300 transition-all duration-200 shadow-sm"
               >
-                <ng-icon name="heroChevronLeft" size="20"></ng-icon>
+                <ng-icon name="heroChevronLeft" size="20" class="text-zinc-700"></ng-icon>
               </button>
               <button
                 (click)="nextPage()"
                 [disabled]="currentPage() === totalPages()"
-                class="p-2 border border-zinc-300 rounded-lg hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                class="p-2 border-2 border-zinc-300 rounded-md hover:bg-blue-50 hover:border-blue-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-zinc-300 transition-all duration-200 shadow-sm"
               >
-                <ng-icon name="heroChevronRight" size="20"></ng-icon>
+                <ng-icon name="heroChevronRight" size="20" class="text-zinc-700"></ng-icon>
               </button>
             </div>
           </div>
@@ -306,23 +293,53 @@ interface ApiResponse {
       display: block;
       height: 100%;
     }
+
+    /* Custom Scrollbar */
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #f4f4f5;
+      border-radius: 4px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #a1a1aa;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: #71717a;
+    }
+
+    .scrollbar-thumb-zinc-400::-webkit-scrollbar-thumb {
+      background: #a1a1aa;
+    }
+
+    .scrollbar-track-zinc-100::-webkit-scrollbar-track {
+      background: #f4f4f5;
+    }
   `]
 })
-export class ResultadoExternoTableComponent {
-  // Signals
+export class ResultadoExternoTableComponent implements OnInit {
+#amostraLabExternoService = inject(AmostraLabExternoService);
+#transferState = inject(TransferState);
+#platformId = inject(PLATFORM_ID)
   showFilters = signal(false);
-  mockData = signal<ApiResponse>(this.getMockData());
+  data = signal<PaginatedResponse<AmostraAnaliseExterna[]>| null>(null);
   filters = signal<AmostraAnaliseExternaQuery>({
     page: 1,
-    limit: 10
+    limit: 100
   });
 
-  // Computed signals
-  elements = computed(() => this.mockData().meta.elements);
-  currentPage = computed(() => this.mockData().meta.currentPage);
-  totalPages = computed(() => this.mockData().meta.totalPages);
-  totalItems = computed(() => this.mockData().meta.total);
-  paginatedData = computed(() => this.mockData().data);
+  elements = computed(() => this.data()?.meta.elements as [] ?? []);
+  currentPage = computed(() => this.data()?.meta.currentPage as number);
+  totalPages = computed(() => this.data()?.meta.totalPages  as number);
+  totalItems = computed(() => this.data()?.meta.total  as number);
+  paginatedData = computed(() => this.data()?.data as AmostraAnaliseExterna[]);
   
   laboratorios = computed(() => [
     {
@@ -337,14 +354,34 @@ export class ResultadoExternoTableComponent {
     }
   ]);
 
+  ngOnInit(): void {
+      const amostraKeyMetaData = this.#transferState.get(AMOSTRA_META_KEY,null)
+      if(amostraKeyMetaData && isPlatformBrowser(this.#platformId)){
+        this.data.set(amostraKeyMetaData)
+        return;
+      }
+
+      this.loadAmostraData()
+  }
+
+  loadAmostraData(){
+    this.#amostraLabExternoService.findAllWithResults(this.filters()).pipe(tap((data)=>{
+        if(isPlatformServer(this.#platformId) && data){
+            this.#transferState.set(AMOSTRA_META_KEY,data);
+        }
+    })).subscribe({
+        next:(metaData)=>{
+            this.data.set(metaData)
+        }
+    })
+  }
+
   toggleFilters() {
     this.showFilters.update(v => !v);
   }
 
   applyFilters() {
-    // Aqui você chamará seu service
-    // this.service.getAnalises(this.filters()).subscribe(...)
-    console.log('Aplicando filtros:', this.filters());
+    this.loadAmostraData();
   }
 
   clearFilters() {
@@ -374,8 +411,8 @@ export class ResultadoExternoTableComponent {
     }
   }
 
-  getElementValue(amostra: AmostraAnalise, element: string): string {
-    const elem = amostra.elementosAnalisados.find(e => e.elemento === element);
+  getElementValue(amostra: AmostraAnaliseExterna, element: string): string {
+    const elem = amostra.elementosAnalisados?.find(e => e.elemento === element);
     if (!elem) return '-';
     
     // Remove símbolos < e >
@@ -386,16 +423,13 @@ export class ResultadoExternoTableComponent {
     
     const numericValue = parseFloat(valor);
     
-    // Se não for um número válido, retorna o valor original
     if (isNaN(numericValue)) return elem.valor;
     
-    // Se a unidade for ppm, divide por 10000 para converter para %
-    if (elem.unidade.toLowerCase() === 'ppm') {
+    if (elem.unidade?.toLowerCase() === 'ppm') {
       const converted = numericValue / 10000;
       return converted.toFixed(4);
     }
     
-    // Caso contrário, retorna o valor como está (já em %)
     return numericValue.toString();
   }
 
@@ -412,11 +446,9 @@ export class ResultadoExternoTableComponent {
         'Data Início': this.formatDate(amostra.dataInicio),
         'Data Fim': this.formatDate(amostra.dataFim),
         'Laboratório': amostra.RemessaLabExterno.destino.nome,
-        'Cidade': amostra.RemessaLabExterno.destino.endereco.cidade,
-        'Estado': amostra.RemessaLabExterno.destino.endereco.estado
       };
 
-      this.elements().forEach(element => {
+      this.elements()?.forEach(element => {
         row[element] = this.getElementValue(amostra, element);
       });
 
@@ -427,7 +459,7 @@ export class ResultadoExternoTableComponent {
     
     // Ajustar largura das colunas
     const colWidths = Object.keys(data[0] || {}).map(key => ({
-      wch: Math.max(key.length, 15)
+      wch: Math.max(key?.length, 15)
     }));
     ws['!cols'] = colWidths;
 
@@ -438,89 +470,4 @@ export class ResultadoExternoTableComponent {
     XLSX.writeFile(wb, fileName);
   }
 
-  getMockData(): ApiResponse {
-    return {
-      data: [
-        {
-          id: 13,
-          amostraName: "Coque Interno",
-          subIdentificacao: "",
-          dataInicio: "2025-10-27",
-          dataFim: "2025-10-27",
-          elementosSolicitados: ["Cz", "Fe", "SiO₂", "CaO", "Al₂O₃", "MgO", "K₂O", "Na₂O", "Zn", "P", "S"],
-          elementosAnalisados: [
-            { valor: "19", unidade: "ppm", elemento: "Zn" },
-            { valor: "0,01", unidade: "%", elemento: "S" },
-            { valor: "56,51", unidade: "%", elemento: "Fe" },
-            { valor: "1,24", unidade: "%", elemento: "FeO" },
-            { valor: "2,07", unidade: "%", elemento: "Al2O3" },
-            { valor: "0,13", unidade: "%", elemento: "CaO" },
-            { valor: "0,03", unidade: "%", elemento: "Cr2O3" },
-            { valor: "80,4", unidade: "%", elemento: "Fe2O3" },
-            { valor: "<0,01", unidade: "%", elemento: "K2O" },
-            { valor: "<0,1", unidade: "%", elemento: "MgO" },
-            { valor: "0,042", unidade: "%", elemento: "Mn" },
-            { valor: "<0,1", unidade: "%", elemento: "Na2O" },
-            { valor: "0,084", unidade: "%", elemento: "P" },
-            { valor: "14,7", unidade: "%", elemento: "SiO2" },
-            { valor: "0,07", unidade: "%", elemento: "TiO2" },
-            { valor: "99,97", unidade: "%", elemento: "SOMA" },
-            { valor: "2,23", unidade: "%", elemento: "LOI" }
-          ],
-          analiseConcluida: true,
-          RemessaLabExterno: {
-            data: "2025-10-24T00:00:00.000Z",
-            destino: {
-              id: 1,
-              nome: "SENAI / FIEMG",
-              endereco: { cidade: "Belo Horizonte", estado: "MG" }
-            }
-          }
-        },
-        {
-          id: 11,
-          amostraName: "Minério de Ferro SFCON",
-          subIdentificacao: "",
-          dataInicio: "2025-10-27",
-          dataFim: "2025-10-27",
-          elementosSolicitados: ["Fe", "SiO₂", "FeO", "Fe₂O₃", "CaO", "Al₂O₃", "MgO", "K₂O", "Na₂O", "Zn", "Cr", "Mn", "PPC", "P", "TiO₂", "S"],
-          elementosAnalisados: [
-            { valor: "23", unidade: "ppm", elemento: "Zn" },
-            { valor: "0,009", unidade: "%", elemento: "S" },
-            { valor: "53,48", unidade: "%", elemento: "Fe" },
-            { valor: "1,67", unidade: "%", elemento: "FeO" },
-            { valor: "2,06", unidade: "%", elemento: "Al2O3" },
-            { valor: "0,42", unidade: "%", elemento: "CaO" },
-            { valor: "0,03", unidade: "%", elemento: "Cr2O3" },
-            { valor: "76,5", unidade: "%", elemento: "Fe2O3" },
-            { valor: "0,02", unidade: "%", elemento: "K2O" },
-            { valor: "0,11", unidade: "%", elemento: "MgO" },
-            { valor: "0,062", unidade: "%", elemento: "Mn" },
-            { valor: "<0,1", unidade: "%", elemento: "Na2O" },
-            { valor: "0,044", unidade: "%", elemento: "P" },
-            { valor: "18,7", unidade: "%", elemento: "SiO2" },
-            { valor: "0,08", unidade: "%", elemento: "TiO2" },
-            { valor: "99,92", unidade: "%", elemento: "SOMA" },
-            { valor: "1,82", unidade: "%", elemento: "LOI" }
-          ],
-          analiseConcluida: true,
-          RemessaLabExterno: {
-            data: "2025-10-16T00:00:00.000Z",
-            destino: {
-              id: 2,
-              nome: "SGS DO BRASIL",
-              endereco: { cidade: "Vespasiano", estado: "MG" }
-            }
-          }
-        }
-      ],
-      meta: {
-        total: 5,
-        totalPages: 3,
-        currentPage: 1,
-        perPage: 2,
-        elements: ["Zn", "S", "Fe", "FeO", "Al2O3", "CaO", "Cr2O3", "Fe2O3", "K2O", "MgO", "Mn", "Na2O", "P", "SiO2", "TiO2", "SOMA", "LOI"]
-      }
-    };
-  }
 }

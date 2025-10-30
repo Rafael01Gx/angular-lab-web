@@ -57,6 +57,7 @@ export const API_ROUTES = {
     GET: {
       FIND_ALL: '',
       DASHBOARD_COMPLETO: 'dashboard',
+      FIND_ALL_WITH_RESULTS:'resultados'
     },
     POST: {
       CREATE: '',

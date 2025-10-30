@@ -271,7 +271,7 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
 
   getEndereco(amostra: AmostraAnaliseExterna): any {
     try {
-      return JSON.parse(amostra.RemessaLabExterno.destino.endereco);
+      return JSON.parse(amostra.RemessaLabExterno.destino?.endereco!);
     } catch {
       return {};
     }

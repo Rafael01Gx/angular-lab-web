@@ -32,9 +32,9 @@ export interface AmostraAnaliseExterna {
     destino: {
       id: number;
       nome: string;
-      endereco: string;
-      telefone: string;
-      email: string;
+      endereco?: string;
+      telefone?: string;
+      email?: string;
     };
   };
 }

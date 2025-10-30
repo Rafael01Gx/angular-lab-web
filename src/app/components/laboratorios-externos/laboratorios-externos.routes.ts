@@ -44,14 +44,14 @@ export const LABORATORIOS_EXTERNOS_ROUTES: Routes = [
         ).then((m) => m.UploadResultadoComponent),
     },
   {
-    path: 'resultados',
+    path: 'lancamento',
     loadComponent: () =>
       import(
         './tabela-amostras/amostras-analise-externa-table.component'
         ).then((m) => m.AmostrasAnaliseExternaTableComponent),
   },
     {
-    path: 'tabela-resultados',
+    path: 'visualizar-resultados',
     loadComponent: () =>
       import(
         './tabela-resultados/resultados-externos-table.component'
