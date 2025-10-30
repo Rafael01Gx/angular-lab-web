@@ -97,8 +97,8 @@ const DATA_AMOSTRA_KEY = makeStateKey<DashboardCompleto>(
       </div>
 
       <!-- Filtros -->
-      <div class="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-        <div class="flex items-center gap-3 mb-4">
+      <div class="bg-white rounded-md shadow-lg px-6 flex flex-col gap-4 py-2 border border-slate-200">
+        <div class="flex items-center gap-3">
           <ng-icon
             name="heroFunnel"
             class="text-indigo-600"

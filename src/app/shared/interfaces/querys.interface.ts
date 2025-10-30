@@ -22,4 +22,6 @@ export interface PaginatedMeta {
   totalPages: number;
   currentPage: number;
   perPage: number;
+  elements?: string[]
 }
+

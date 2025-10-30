@@ -50,6 +50,13 @@ export const LABORATORIOS_EXTERNOS_ROUTES: Routes = [
         './tabela-amostras/amostras-analise-externa-table.component'
         ).then((m) => m.AmostrasAnaliseExternaTableComponent),
   },
+    {
+    path: 'tabela-resultados',
+    loadComponent: () =>
+      import(
+        './tabela-resultados/resultados-externos-table.component'
+        ).then((m) => m.ResultadoExternoTableComponent),
+  },
   {
     path: 'dashboard',
     loadComponent: () =>

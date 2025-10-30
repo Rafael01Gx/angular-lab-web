@@ -125,7 +125,7 @@
               <div
                 class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex-1"
               >
-                {{ amostra.dataAmostra }}
+                {{ amostra.dataAmostra | date:'dd/MM/yyyy'}}
               </div>
               <div
                 class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 flex-2"
@@ -193,7 +193,7 @@
       Cancelar
     </button>
     <button
-      [disabled]="isLoading() || amostras().length >= 0 "
+      [disabled]="isLoading() || amostras().length <= 0 "
       (click)="save()"
       class="px-6 py-3 max-h-[50px] bg-gradient-to-r from-violet-500/80 to-blue-600/80 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
     >

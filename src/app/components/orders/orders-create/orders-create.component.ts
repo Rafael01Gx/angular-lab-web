@@ -1,13 +1,13 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import {NgIconComponent, provideIcons} from '@ng-icons/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
   MultiSelectComponent,
   MultiSelectConfig,
 } from '../../layout/input-select/multi-select.component';
-import {AnalysisTypeService} from '../../../services/analysis-type.service';
-import {ITipoAnalise} from '../../../shared/interfaces/analysis-type.interface';
-import {IAmostra} from '../../../shared/interfaces/amostra.interface';
-import {FormsModule} from '@angular/forms';
+import { AnalysisTypeService } from '../../../services/analysis-type.service';
+import { ITipoAnalise } from '../../../shared/interfaces/analysis-type.interface';
+import { IAmostra } from '../../../shared/interfaces/amostra.interface';
+import { FormsModule } from '@angular/forms';
 import {
   heroArrowTurnRightDown,
   heroTrash,
@@ -16,13 +16,14 @@ import {
   heroCheck,
   heroPlus,
 } from '@ng-icons/heroicons/outline';
-import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
-import {OrderService} from '../../../services/order.service';
-import {EtiquetasService} from '../../../services/impressao-de-etiquetas.service';
+import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
+import { OrderService } from '../../../services/order.service';
+import { EtiquetasService } from '../../../services/impressao-de-etiquetas.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-orders-create',
-  imports: [NgIconComponent, MultiSelectComponent, FormsModule],
+  imports: [NgIconComponent, MultiSelectComponent, FormsModule, DatePipe],
   viewProviders: [
     provideIcons({
       heroArrowTurnRightDown,
@@ -41,14 +42,14 @@ export class OrdersCreateComponent implements OnInit {
   #confirm = inject(ConfirmationModalService);
   #etiqueta = inject(EtiquetasService);
 
-  isLoading= signal<boolean>(false)
+  isLoading = signal<boolean>(false)
   identificacao = signal('');
   data = signal('');
   observacao = signal('');
   clearSelect = signal(false);
-  ensaios= signal<ITipoAnalise[]>([]);
-  selectedEnsaios= signal<ITipoAnalise[]>([]);
-  amostras= signal<Partial<IAmostra>[] >([]);
+  ensaios = signal<ITipoAnalise[]>([]);
+  selectedEnsaios = signal<ITipoAnalise[]>([]);
+  amostras = signal<Partial<IAmostra>[]>([]);
 
   isValid = computed(() => {
     return (
@@ -94,12 +95,15 @@ export class OrdersCreateComponent implements OnInit {
       dataAmostra: this.data(),
       ensaiosSolicitados: this.selectedEnsaios(),
     };
-    this.amostras.update((amostras)=> [...amostras, amostra]);
+    this.amostras.update((amostras) => [...amostras, amostra]);
     this.clearForm();
   }
 
   rmAmostras(index: number) {
-    return this.amostras.update((amostras)=> amostras.splice(index, 1));
+    this.amostras.update(a =>
+      a.filter((_, i) => i !== index)
+    );
+    return;
   }
 
   clearForm() {
@@ -111,23 +115,23 @@ export class OrdersCreateComponent implements OnInit {
       this.clearSelect.update((value) => !value);
     }, 500);
   }
-  save(){
+  save() {
     const amostras = this.amostras()
-    if(!amostras){
+    if (!amostras) {
       return
     }
-    this.#confirm.confirmWarning("Enviar","Confirmar envio das remessa?").then((confirm)=>{
-      if(confirm){
+    this.#confirm.confirmWarning("Enviar", "Confirmar envio das remessa?").then((confirm) => {
+      if (confirm) {
         this.isLoading.set(true)
-        this.#orderService.create(amostras as  Partial<IAmostra[]>).subscribe((ordem)=>{
-          if(ordem){
-            setTimeout(()=>{
-              this.#confirm.confirmInfo("Imprimir","Deseja imprimir as etiquetas?").then((res)=>{
-                if(res){
-                  this.#etiqueta.gerarEtiquetaAmostrasOS(ordem).catch((err)=> console.log(err))
+        this.#orderService.create(amostras as Partial<IAmostra[]>).subscribe((ordem) => {
+          if (ordem) {
+            setTimeout(() => {
+              this.#confirm.confirmInfo("Imprimir", "Deseja imprimir as etiquetas?").then((res) => {
+                if (res) {
+                  this.#etiqueta.gerarEtiquetaAmostrasOS(ordem).catch((err) => console.log(err))
                 }
               })
-            },500)
+            }, 500)
           }
           this.clearForm();
           this.isLoading.set(false)
@@ -138,9 +142,9 @@ export class OrdersCreateComponent implements OnInit {
     })
   }
 
-  cancel(){
-    this.#confirm.confirmWarning("Limpar","Deseja limpar o formulário?").then((res)=>{
-      if(res){
+  cancel() {
+    this.#confirm.confirmWarning("Limpar", "Deseja limpar o formulário?").then((res) => {
+      if (res) {
         this.clearForm();
         this.observacao.set('');
         this.amostras.set([]);
