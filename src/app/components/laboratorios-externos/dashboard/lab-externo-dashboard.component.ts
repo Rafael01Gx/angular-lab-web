@@ -26,7 +26,8 @@ import {
   heroChevronDown,
   heroChevronUp,
 } from '@ng-icons/heroicons/outline';
-import * as XLSX from 'xlsx';
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FormsModule } from '@angular/forms';
@@ -629,80 +630,142 @@ export class LabExternoDashboardComponent implements OnInit {
     return date.toLocaleDateString('pt-BR');
   }
 
-  exportToExcel() {
-    const wb = XLSX.utils.book_new();
+async exportToExcel() {
+  const workbook = new Workbook();
+  const date = new Date().toLocaleString('pt-BR');
 
-    // Sheet 1: Visão Geral
-    const overview = [
-      ['Análises Laboratórios Externos'],
-      ['Data de Geração:', new Date().toLocaleString('pt-BR')],
-      [
-        'Período ',
-        this.dateStart() && this.dateEnd()
-          ? new Date(this.dateStart()).toLocaleString('pt-BR').split(',')[0] +
-            ' até ' +
-            new Date(this.dateEnd()).toLocaleString('pt-BR').split(',')[0]
-          : '',
-      ],
-      [],
-      ['Métricas Gerais'],
-      ['Total de Amostras', this.totalAmostras()],
-      ['Análises Concluídas', this.amostrasCompletas()],
-      ['Análises Pendentes', this.amostrasIncompletas()],
-      ['Percentual Concluído', `${this.percentualCompletas()}%`],
-      ['Média de Elementos por Amostra', this.mediaElementosPorAmostra()],
-    ];
-    const ws1 = XLSX.utils.aoa_to_sheet(overview);
-    XLSX.utils.book_append_sheet(wb, ws1, 'Visão Geral');
+  // 🧾 Sheet 1 - Visão Geral
+  const ws1 = workbook.addWorksheet('Visão Geral');
 
-    // Sheet 2: Por Laboratório
-    const labData = this.laboratorios().map((lab) => ({
-      Laboratório: lab.nome,
-      'Total Amostras': lab.totalAmostras,
-      Concluídas: lab.amostrasCompletas,
-      Pendentes: lab.amostrasIncompletas,
-      'Taxa de Conclusão (%)': lab.taxaConclusao,
-    }));
-    const ws2 = XLSX.utils.json_to_sheet(labData);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Por Laboratório');
+  ws1.addRow(['Análises Laboratórios Externos']);
+  ws1.addRow(['Data de Geração:', date]);
+  ws1.addRow([
+    'Período',
+    this.dateStart() && this.dateEnd()
+      ? new Date(this.dateStart()).toLocaleDateString('pt-BR') +
+        ' até ' +
+        new Date(this.dateEnd()).toLocaleDateString('pt-BR')
+      : '',
+  ]);
+  ws1.addRow([]);
+  ws1.addRow(['Métricas Gerais']);
+  ws1.addRow(['Total de Amostras', this.totalAmostras()]);
+  ws1.addRow(['Análises Concluídas', this.amostrasCompletas()]);
+  ws1.addRow(['Análises Pendentes', this.amostrasIncompletas()]);
+  ws1.addRow(['Percentual Concluído', `${this.percentualCompletas()}%`]);
+  ws1.addRow(['Média de Elementos por Amostra', this.mediaElementosPorAmostra()]);
 
-    // Sheet 3: Por Remessa
-    const remessaData = this.remessasStats().map((r) => ({
-      Data: this.formatDate(r.data),
-      Laboratório: r.laboratorio,
-      Total: r.totalAmostras,
-      Concluídas: r.amostrasCompletas,
-      Pendentes: r.amostrasIncompletas,
-      'Taxa (%)': r.taxaConclusao,
-    }));
-    const ws3 = XLSX.utils.json_to_sheet(remessaData);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Por Remessa');
+  // Estilo do título
+  ws1.getCell('A1').font = { bold: true, size: 16, color: { argb: '004085' } };
+  ws1.getRow(1).alignment = { horizontal: 'center' };
+  ws1.mergeCells('A1:B1');
+  ws1.getColumn(1).width = 35;
+  ws1.getColumn(2).width = 30;
 
-    // Sheet 4: Detalhamento de Amostras
-    const amostrasDetalhadas = this.filteredAmostras().map((a) => ({
-      ID: a.id,
-      Nome: a.amostraName,
-      'Sub-ID': a.subIdentificacao,
-      'Data Início': this.formatDate(a.dataInicio),
-      'Data Fim': this.formatDate(a.dataFim),
-      Laboratório: a.RemessaLabExterno.destino.nome,
-      'Data Remessa': this.formatDate(a.RemessaLabExterno.data),
-      'Elementos Solicitados': a.elementosSolicitados.join(', '),
-      'Qtd Elementos': a.elementosSolicitados.length,
-      Status: a.analiseConcluida ? 'Concluída' : 'Pendente',
-      'Criado em': new Date(a.createdAt).toLocaleString('pt-BR'),
-      'Atualizado em': new Date(a.updatedAt).toLocaleString('pt-BR'),
-    }));
-    const ws5 = XLSX.utils.json_to_sheet(amostrasDetalhadas);
-    XLSX.utils.book_append_sheet(wb, ws5, 'Detalhamento Amostras');
+  // 📊 Sheet 2 - Por Laboratório
+  const ws2 = workbook.addWorksheet('Por Laboratório');
+  const labData = this.laboratorios().map((lab) => ({
+    Laboratório: lab.nome,
+    'Total Amostras': lab.totalAmostras,
+    Concluídas: lab.amostrasCompletas,
+    Pendentes: lab.amostrasIncompletas,
+    'Taxa de Conclusão (%)': lab.taxaConclusao,
+  }));
 
-    XLSX.writeFile(
-      wb,
-      `relatorio-analises-laboratoriais-${
-        new Date().toISOString().split('T')[0]
-      }.xlsx`
-    );
-  }
+  ws2.columns = Object.keys(labData[0]).map((key) => ({ header: key, key, width: 22 }));
+  ws2.addRows(labData);
+
+  // Cabeçalho estilizado
+  ws2.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '007BFF' },
+    };
+    cell.alignment = { horizontal: 'center' };
+  });
+
+  // 📅 Sheet 3 - Por Remessa
+  const ws3 = workbook.addWorksheet('Por Remessa');
+  const remessaData = this.remessasStats().map((r) => ({
+    Data: this.formatDate(r.data),
+    Laboratório: r.laboratorio,
+    Total: r.totalAmostras,
+    Concluídas: r.amostrasCompletas,
+    Pendentes: r.amostrasIncompletas,
+    'Taxa (%)': r.taxaConclusao,
+  }));
+  ws3.columns = Object.keys(remessaData[0]).map((key) => ({ header: key, key, width: 22 }));
+  ws3.addRows(remessaData);
+
+  ws3.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '28A745' },
+    };
+    cell.alignment = { horizontal: 'center' };
+  });
+
+  // 🧬 Sheet 4 - Detalhamento
+  const ws4 = workbook.addWorksheet('Detalhamento Amostras');
+  const amostrasDetalhadas = this.filteredAmostras().map((a) => ({
+    ID: a.id,
+    Nome: a.amostraName,
+    'Sub-ID': a.subIdentificacao,
+    'Data Início': this.formatDate(a.dataInicio),
+    'Data Fim': this.formatDate(a.dataFim),
+    Laboratório: a.RemessaLabExterno.destino.nome,
+    'Data Remessa': this.formatDate(a.RemessaLabExterno.data),
+    'Elementos Solicitados': a.elementosSolicitados.join(', '),
+    'Qtd Elementos': a.elementosSolicitados.length,
+    Status: a.analiseConcluida ? 'Concluída' : 'Pendente',
+    'Criado em': new Date(a.createdAt).toLocaleString('pt-BR'),
+    'Atualizado em': new Date(a.updatedAt).toLocaleString('pt-BR'),
+  }));
+
+  ws4.columns = Object.keys(amostrasDetalhadas[0]).map((key) => ({
+    header: key,
+    key,
+    width: 25,
+  }));
+  ws4.addRows(amostrasDetalhadas);
+
+  // Cabeçalho com cor diferente
+  ws4.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '6C757D' },
+    };
+    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+  });
+
+  // Colorir status (verde/vermelho)
+  ws4.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return;
+    const statusCell = row.getCell('Status');
+    if (statusCell.value === 'Concluída') {
+      statusCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'C3E6CB' },
+      };
+    } else if (statusCell.value === 'Pendente') {
+      statusCell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'F5C6CB' },
+      };
+    }
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), `relatorio-analises-laboratoriais-${new Date().toISOString().split('T')[0]}.xlsx`);
+}
 
   exportToPDF() {
     const doc = new jsPDF();

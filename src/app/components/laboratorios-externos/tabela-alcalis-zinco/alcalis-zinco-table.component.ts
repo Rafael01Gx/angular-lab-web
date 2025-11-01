@@ -10,7 +10,8 @@ import {
   heroChevronLeft,
   heroChevronRight
 } from '@ng-icons/heroicons/outline';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 import { AmostraAnaliseExterna, AmostraAnaliseExternaQuery } from '../../../shared/interfaces/amostra-analise-externa.interfaces';
 import { PaginatedResponse } from '../../../shared/interfaces/querys.interface';
 import { AmostraLabExternoService } from '../../../services/amostras-analises-externas.service';
@@ -300,7 +301,7 @@ export class AlcalisZincoTableComponent implements OnInit {
     page: 1,
     limit: 25
   });
-  
+
   currentPage = computed(() => this.data()?.meta.currentPage as number);
   totalPages = computed(() => this.data()?.meta.totalPages as number);
   totalItems = computed(() => this.data()?.meta.total as number);
@@ -385,33 +386,83 @@ export class AlcalisZincoTableComponent implements OnInit {
     return numericValue.toString();
   }
 
-
   exportToExcel() {
-    const data = this.paginatedData().map(amostra => {
-      const row: any = {
-        'Amostra': amostra.amostraName,
-        'Data Início': amostra.dataInicio.toLocaleDateString('pt-BR'),
-        'Data Fim': amostra.dataFim.toLocaleDateString('pt-BR'),
-        'K2O': amostra.K2O,
-        'Na2O': amostra.Na2O,
-        'Zn': amostra.Zn,
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Análises Externas');
+
+    // Definição das colunas
+    sheet.columns = [
+      { header: 'Amostra', key: 'amostraName', width: 20 },
+      { header: 'Data Início', key: 'dataInicio', width: 15 },
+      { header: 'Data Fim', key: 'dataFim', width: 15 },
+      { header: 'K2O', key: 'K2O', width: 10 },
+      { header: 'Na2O', key: 'Na2O', width: 10 },
+      { header: 'Zn', key: 'Zn', width: 10 },
+    ];
+
+    // Estilo do cabeçalho
+    const headerRow = sheet.getRow(1);
+    headerRow.eachCell(cell => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFCCE5FF' }, // azul claro
       };
-      return row;
+      cell.font = {
+        bold: true,
+        color: { argb: 'FF000000' },
+        size: 12,
+      };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
     });
 
-    const ws = XLSX.utils.json_to_sheet(data);
+    // Inserir dados
+    this.paginatedData().forEach((amostra: any) => {
+      sheet.addRow({
+        amostraName: amostra.amostraName,
+        dataInicio: new Date(amostra.dataInicio).toLocaleDateString('pt-BR'),
+        dataFim: new Date(amostra.dataFim).toLocaleDateString('pt-BR'),
+        K2O: parseFloat(amostra.K2O) || 0,
+        Na2O: parseFloat(amostra.Na2O) || 0,
+        Zn: parseFloat(amostra.Zn) || 0,
+      });
+    });
 
-    // Ajustar largura das colunas
-    const colWidths = Object.keys(data[0] || {}).map(key => ({
-      wch: Math.max(key?.length, 15)
-    }));
-    ws['!cols'] = colWidths;
+    // Formatar as colunas numéricas
+    ['D', 'E', 'F'].forEach(colLetter => {
+      sheet.getColumn(colLetter).numFmt = '0.00'; // duas casas decimais
+      sheet.getColumn(colLetter).alignment = { horizontal: 'center' };
+    });
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Análises Externas');
+    // Ajuste de altura do cabeçalho
+    headerRow.height = 25;
 
-    const fileName = `analises_externas_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+    // Bordas nas linhas de dados
+    sheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+      row.eachCell(cell => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+    });
+
+    // Exportar o arquivo
+    workbook.xlsx.writeBuffer().then(buffer => {
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const fileName = `alcalis_e_zinco_${new Date().toISOString().split('T')[0]}.xlsx`;
+      saveAs(blob, fileName);
+    });
   }
-
 }

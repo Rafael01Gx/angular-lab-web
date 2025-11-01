@@ -10,7 +10,8 @@ import {
   heroChevronLeft,
   heroChevronRight
 } from '@ng-icons/heroicons/outline';
-import * as XLSX from 'xlsx';
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver';
 import { AmostraAnaliseExterna, AmostraAnaliseExternaQuery } from '../../../shared/interfaces/amostra-analise-externa.interfaces';
 import { PaginatedResponse } from '../../../shared/interfaces/querys.interface';
 import { AmostraLabExternoService } from '../../../services/amostras-analises-externas.service';
@@ -435,36 +436,84 @@ export class ResultadoExternoTableComponent implements OnInit {
     return date.toLocaleDateString('pt-BR');
   }
 
-  exportToExcel() {
-    const data = this.paginatedData().map(amostra => {
-      const row: any = {
-        'Amostra': amostra.amostraName,
-        'Sub ID': amostra.subIdentificacao || '-',
-        'Data Início': this.formatDate(amostra.dataInicio),
-        'Data Fim': this.formatDate(amostra.dataFim),
-        'Laboratório': amostra.RemessaLabExterno.destino.nome,
-      };
+async exportToExcel(): Promise<void> {
+  const workbook = new Workbook();
+  const sheet = workbook.addWorksheet('Análises Externas');
 
-      this.elements()?.forEach(element => {
-        row[element] = this.getElementValue(amostra, element);
-      });
+  // 📋 Montar os dados dinamicamente
+  const data = this.paginatedData().map((amostra) => {
+    const row: any = {
+      Amostra: amostra.amostraName,
+      'Sub ID': amostra.subIdentificacao || '-',
+      'Data Início': this.formatDate(amostra.dataInicio),
+      'Data Fim': this.formatDate(amostra.dataFim),
+      Laboratório: amostra.RemessaLabExterno.destino.nome,
+    };
 
-      return row;
+    // Adiciona os elementos dinâmicos (ex: K2O, Na2O, Zn...)
+    this.elements()?.forEach((element) => {
+      row[element] = this.getElementValue(amostra, element);
     });
 
-    const ws = XLSX.utils.json_to_sheet(data);
+    return row;
+  });
 
-    // Ajustar largura das colunas
-    const colWidths = Object.keys(data[0] || {}).map(key => ({
-      wch: Math.max(key?.length, 15)
-    }));
-    ws['!cols'] = colWidths;
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Análises Externas');
-
-    const fileName = `analises_externas_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+  if (!data.length) {
+    console.warn('Nenhum dado para exportar.');
+    return;
   }
 
+  // 🧱 Define as colunas automaticamente
+  const columns = Object.keys(data[0]).map((key) => ({
+    header: key,
+    key,
+    width: Math.max(key.length, 15),
+  }));
+
+  sheet.columns = columns;
+
+  // 🧾 Adiciona os dados
+  sheet.addRows(data);
+
+  // 🎨 Estiliza o cabeçalho
+  const headerRow = sheet.getRow(1);
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '007BFF' },
+    };
+    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+    cell.border = {
+      top: { style: 'thin', color: { argb: 'CCCCCC' } },
+      bottom: { style: 'thin', color: { argb: 'CCCCCC' } },
+    };
+  });
+
+  // 🔢 Formata colunas numéricas automaticamente (K2O, Na2O, Zn, etc.)
+  const numericColumns = this.elements?.() || [];
+  sheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return; // pula cabeçalho
+    numericColumns.forEach((colName) => {
+      const cell = row.getCell(colName);
+      if (!isNaN(Number(cell.value))) {
+        cell.numFmt = '0.00'; // exibe duas casas decimais
+        cell.alignment = { horizontal: 'right' };
+      }
+    });
+  });
+
+  // 🧩 Ajusta largura das colunas (mantendo largura mínima)
+  sheet.columns.forEach((column) => {
+    column.width = Math.max(15, column.header?.toString().length || 10);
+  });
+
+  // 💾 Exporta arquivo
+  const buffer = await workbook.xlsx.writeBuffer();
+  saveAs(
+    new Blob([buffer]),
+    `analises_externas_${new Date().toISOString().split('T')[0]}.xlsx`
+  );
+}
 }

@@ -1,33 +1,30 @@
 import { Injectable } from '@angular/core';
+import { saveAs } from 'file-saver';
+import { Workbook } from 'exceljs';
 import { AgendamentoSemanal } from './agenda.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExportService {
-
   /**
    * Exporta para CSV
    */
   exportarCSV(agendamentos: AgendamentoSemanal[], filename = 'agendamentos.csv') {
     const headers = ['Semana', 'Data Início', 'Data Fim', 'Tipo', 'Classe', 'Quantidade'];
 
-    const rows = agendamentos.flatMap(sem =>
-      sem.tiposAnalise.map(tipo => [
+    const rows = agendamentos.flatMap((sem) =>
+      sem.tiposAnalise.map((tipo) => [
         sem.semana,
         sem.dataInicio,
         sem.dataFim,
         tipo.tipo,
         tipo.classe,
-        tipo.quantidade
+        tipo.quantidade,
       ])
     );
 
-    const csv = [
-      headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
-
+    const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${c}"`).join(','))].join('\n');
     this.download(csv, filename, 'text/csv');
   }
 
@@ -40,10 +37,13 @@ export class ExportService {
   }
 
   /**
-   * Exporta para Excel (formato CSV que Excel reconhece)
+   * ✅ Exporta para Excel (com cores, formatação e colunas ajustadas)
    */
-  exportarExcel(agendamentos: AgendamentoSemanal[], filename = 'agendamentos.xlsx') {
-    // Criar uma planilha mais completa
+  async exportarExcel(agendamentos: AgendamentoSemanal[], filename = 'agendamentos.xlsx') {
+    const workbook = new Workbook();
+    const sheet = workbook.addWorksheet('Agendamentos Semanais');
+
+    // Cabeçalhos
     const headers = [
       'Semana',
       'Data Início',
@@ -52,29 +52,67 @@ export class ExportService {
       'Tipo Análise',
       'Classe',
       'Quantidade',
-      'Amostras'
+      'Amostras',
     ];
 
-    const rows = agendamentos.flatMap(sem =>
-      sem.tiposAnalise.map(tipo => [
-        sem.semana,
-        sem.dataInicio,
-        sem.dataFim,
-        sem.totalAmostras,
-        tipo.tipo,
-        tipo.classe,
-        tipo.quantidade,
-        tipo.amostras.map(a => a.nomeAmostra).join('; ')
-      ])
-    );
+    // Configura colunas
+    sheet.columns = headers.map((header) => ({
+      header,
+      key: header,
+      width: Math.max(header.length, 18),
+    }));
 
-    // UTF-8 BOM para Excel reconhecer acentos
-    const csv = '\uFEFF' + [
-      headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
+    // Adiciona linhas
+    agendamentos.forEach((sem) => {
+      sem.tiposAnalise.forEach((tipo) => {
+        sheet.addRow({
+          'Semana': sem.semana,
+          'Data Início': new Date(sem.dataInicio).toLocaleDateString('pt-BR'),
+          'Data Fim': new Date(sem.dataFim).toLocaleDateString('pt-BR'),
+          'Total Amostras': sem.totalAmostras,
+          'Tipo Análise': tipo.tipo,
+          'Classe': tipo.classe,
+          'Quantidade': tipo.quantidade,
+          'Amostras': tipo.amostras?.map((a) => a.nomeAmostra).join('; ') || '',
+        });
+      });
+    });
 
-    this.download(csv, filename, 'text/csv;charset=utf-8');
+    // 🎨 Estilo do cabeçalho
+    const headerRow = sheet.getRow(1);
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '2563EB' }, // azul Tailwind (blue-600)
+      };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'CCCCCC' } },
+        bottom: { style: 'thin', color: { argb: 'CCCCCC' } },
+      };
+    });
+
+    // 🔢 Formata números
+    sheet.eachRow((row, i) => {
+      if (i === 1) return;
+      const qtdCell = row.getCell('Quantidade');
+      const totalCell = row.getCell('Total Amostras');
+
+      if (!isNaN(Number(qtdCell.value))) qtdCell.numFmt = '0';
+      if (!isNaN(Number(totalCell.value))) totalCell.numFmt = '0';
+    });
+
+    // 🧭 Centraliza algumas colunas
+    ['Semana', 'Tipo Análise', 'Classe'].forEach((colKey) => {
+      const col = sheet.getColumn(colKey);
+      col.alignment = { horizontal: 'center' };
+    });
+
+    // 💾 Gera e baixa arquivo
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), filename);
   }
 
   /**
@@ -105,7 +143,9 @@ export class ExportService {
           <p><strong>Total de Amostras:</strong> ${agendamentos.reduce((acc, sem) => acc + sem.totalAmostras, 0)}</p>
         </div>
 
-        ${agendamentos.map(sem => `
+        ${agendamentos
+          .map(
+            (sem) => `
           <h2>${sem.semana}</h2>
           <p><strong>Período:</strong> ${sem.dataInicio} até ${sem.dataFim}</p>
           <p><strong>Total de Amostras:</strong> ${sem.totalAmostras}</p>
@@ -118,16 +158,22 @@ export class ExportService {
               </tr>
             </thead>
             <tbody>
-              ${sem.tiposAnalise.map(tipo => `
+              ${sem.tiposAnalise
+                .map(
+                  (tipo) => `
                 <tr>
                   <td>${tipo.tipo}</td>
                   <td>${tipo.classe}</td>
                   <td>${tipo.quantidade}</td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join('')}
             </tbody>
           </table>
-        `).join('')}
+        `
+          )
+          .join('')}
       </body>
       </html>
     `;
@@ -135,9 +181,6 @@ export class ExportService {
     this.download(html, filename, 'text/html');
   }
 
-  /**
-   * Função auxiliar para download
-   */
   private download(content: string, filename: string, mimeType: string) {
     const blob = new Blob([content], { type: mimeType });
     const url = window.URL.createObjectURL(blob);

@@ -6,7 +6,6 @@ import { AgendaCalendarComponent } from './agenda-calendar.component';
 import { AgendaDashboardComponent } from './agenda-dashboard.component';
 import { AnalyticsComponent } from "./analytics.component";
 import { ExportService } from '../../../services/export.service';
-import { FormatoExportacao, ExportModalComponent } from '../../modal/export-modal/export-modal.component';
 import { AgendamentoSemanal, AgendaService } from '../../../services/agenda.service';
 
 const AGENDA_KEY = makeStateKey<AgendamentoSemanal[]>('agenda-semanal-dashboard');
@@ -20,7 +19,6 @@ const AGENDA_KEY = makeStateKey<AgendamentoSemanal[]>('agenda-semanal-dashboard'
     AgendaCalendarComponent,
     NgIconComponent,
     AnalyticsComponent,
-    ExportModalComponent
   ],
   viewProviders: [provideIcons({ heroViewColumns, heroCalendar, heroChartBar,heroArrowDownTray })],
   template: `
@@ -62,8 +60,8 @@ const AGENDA_KEY = makeStateKey<AgendamentoSemanal[]>('agenda-semanal-dashboard'
                 <span>Analytics</span>
               </button>
                   <button
-      (click)="mostrarModalExportacao.set(true)"
-      class="flex items-center gap-2 px-4 py-2 bg-blue-600/80 text-white rounded-lg hover:bg-blue-700 transition-colors">
+      (click)="exportar()"
+      class="flex items-center gap-2 px-4 py-2 bg-green-600/80 text-white rounded-lg hover:bg-blue-700 transition-colors">
       <ng-icon name="heroArrowDownTray" size="20"></ng-icon>
       Exportar
     </button>
@@ -87,12 +85,7 @@ const AGENDA_KEY = makeStateKey<AgendamentoSemanal[]>('agenda-semanal-dashboard'
         }
       </div>
     </div>
-        <!-- Modal de Exportação -->
-    @if (mostrarModalExportacao()) {
-      <app-export-modal
-        (exportar)="exportar($event)"
-        (cancelar)="mostrarModalExportacao.set(false)" />
-    }
+
   `
 })
 export class AppComponent implements OnInit {
@@ -101,7 +94,6 @@ export class AppComponent implements OnInit {
   #platformId = inject(PLATFORM_ID);
   #transferState = inject(TransferState);
   visualizacao = signal<'dashboard' | 'calendario' | 'analytics'>('dashboard');
-  mostrarModalExportacao = signal(false);
   error = signal<string | null>(null);
   loading = signal(false);
   agendamentos = signal<AgendamentoSemanal[]>([]);
@@ -139,23 +131,9 @@ export class AppComponent implements OnInit {
     }
   }
 
-  exportar(formato: FormatoExportacao) {
+  exportar() {
     const dados = this.agendamentos();
-
-    switch (formato) {
-      case 'csv':
-        this.#exportService.exportarCSV(dados);
-        break;
-      case 'json':
-        this.#exportService.exportarJSON(dados);
-        break;
-      case 'excel':
-        this.#exportService.exportarExcel(dados);
-        break;
-      case 'html':
-        this.#exportService.exportarHTML(dados);
-        break;
-    }
+  this.#exportService.exportarExcel(dados);
   }
 
   carregarAgendamentos() {
