@@ -1,16 +1,33 @@
-import {CommonModule, isPlatformBrowser, isPlatformServer, TitleCasePipe} from '@angular/common';
-import {Component, inject, makeStateKey, OnInit, PLATFORM_ID, signal, TransferState} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {ElementoQuimico} from '../../../shared/interfaces/laboratorios-externos.interfaces';
-import {ElementoQuimicoLabExternosService} from '../../../services/elemento-quimico-lab-externos.service';
-import {ToastrService} from '../../../services/toastr.service';
-import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
+import { CommonModule, isPlatformBrowser, isPlatformServer, TitleCasePipe } from '@angular/common';
+import { Component, inject, makeStateKey, OnInit, PLATFORM_ID, signal, TransferState } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ElementoQuimico } from '../../../shared/interfaces/laboratorios-externos.interfaces';
+import { ElementoQuimicoLabExternosService } from '../../../services/elemento-quimico-lab-externos.service';
+import { ToastrService } from '../../../services/toastr.service';
+import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
+import { NgIcon, provideIcons } from "@ng-icons/core";
+import {
+  heroPencilSquare,
+  heroTrash,
+  heroPlus,
+  heroCheck,
+  heroXMark,
+  heroMagnifyingGlass
+} from "@ng-icons/heroicons/outline"
 
 const ELEMENT_KEY = makeStateKey<ElementoQuimico[]>('elementosQuimicosComponent');
 
 @Component({
   selector: 'app-elementos-quimicos',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgIcon],
+  viewProviders: [provideIcons({
+    heroPencilSquare,
+    heroTrash,
+    heroPlus,
+    heroCheck,
+    heroXMark,
+    heroMagnifyingGlass
+  })],
   templateUrl: './elementos-quimicos.component.html',
 })
 export class ElementosQuimicosComponent implements OnInit {
@@ -22,14 +39,15 @@ export class ElementosQuimicosComponent implements OnInit {
   elementos = signal<ElementoQuimico[]>([]);
   elementosFiltrados = signal<ElementoQuimico[]>([]);
   searchTerm: string = '';
+  edicao = signal<boolean>(false);
 
 
   // Novo elemento para cadastro
-  novoElemento: ElementoQuimico = {
+  elemento= signal <ElementoQuimico>( {
     id: undefined,
     elementName: '',
     simbolo: ''
-  };
+  });
 
   ngOnInit(): void {
     const elements = this.#transferState.get(ELEMENT_KEY, [])
@@ -70,42 +88,77 @@ export class ElementosQuimicosComponent implements OnInit {
 
 
   adicionarElemento(): void {
-    if (!this.novoElemento.elementName || !this.novoElemento.simbolo) return;
-    const novoElemento = {
-      elementName: this.novoElemento.elementName,
-      simbolo: this.novoElemento.simbolo
-    };
+    if (!this.elemento().elementName || !this.elemento().simbolo) return;
 
-    this.#elementService.create(novoElemento).subscribe(result => {
-      if (result) {
-        this.elementos.update(value => [...value, result]);
-        this.#toast.success('Elemento salvo com sucesso!')
+    if (this.edicao() && this.elemento().id) {
+      const id = this.elemento().id!
+      this.#elementService.update(id, this.elemento()).subscribe({
+        next: (result) => {
+          if (result) {
+            const elm = this.elementos().filter((e)=> e.id !== result.id)
+            this.elementos.update(value => [...elm, result]);
+            this.elementosFiltrados.update(value => [...elm, result]);
+            this.#toast.success('Elemento atualizado sucesso!')
+
+          }
+        }
+      })
+    } else {
+      const novoElemento = {
+        elementName: this.elemento().elementName,
+        simbolo: this.elemento().simbolo
+      };
+      this.#elementService.create(novoElemento).subscribe({
+        next:(result) => {
+        if (result) {
+            this.elementos.update(value => [...value, result]);
+            this.elementosFiltrados.update(value => [...value, result]);
+          this.#toast.success('Elemento salvo com sucesso!')
+        }
+
       }
-      this.filtrarElementos();
-    })
-
-
-    this.novoElemento = {
+      })
+    }
+    this.filtrarElementos();
+    this.elemento.set({
       id: undefined,
       elementName: '',
       simbolo: ''
-    };
+    });
+  }
+
+  editarElemento(el: ElementoQuimico) {
+    if (!el) return;
+    this.edicao.set(true);
+     this.elemento.set({
+      id: el.id,
+      elementName: el.elementName,
+      simbolo: el.simbolo
+    });
+  }
+  calcelarEdicao(){
+    this.edicao.set(false);
+     this.elemento.set({
+      id: undefined,
+      elementName: "",
+      simbolo: ""
+    });
   }
 
   removerElemento(id: number, name: string): void {
     this.#confirmationModalService.confirmDelete('Remover Elemento', 'Tem certeza que deseja remover este elemento?').then((res) => {
-        if (res) {
-          this.#elementService.delete(id).subscribe(result => {
-              if (result) {
-                this.elementos.update(value => value.filter((el) => el.id !== id))
-                this.filtrarElementos();
-                this.#toast.success(`Elemento ${name} removido com sucesso!`);
-              }
-            }
-          )
-          ;
+      if (res) {
+        this.#elementService.delete(id).subscribe(result => {
+          if (result) {
+            this.elementos.update(value => value.filter((el) => el.id !== id))
+            this.filtrarElementos();
+            this.#toast.success(`Elemento ${name} removido com sucesso!`);
+          }
         }
+        )
+          ;
       }
+    }
     )
   }
 

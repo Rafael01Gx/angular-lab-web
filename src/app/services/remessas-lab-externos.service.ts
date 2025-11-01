@@ -1,10 +1,12 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {Remessa} from '../shared/interfaces/laboratorios-externos.interfaces';
 import {API_ROUTES} from '../core/constants/api-routes.constant';
+import { PaginatedResponse, Querys } from '../shared/interfaces/querys.interface';
+import { query } from 'express';
 
 const { REMESSA_LAB_EXTERNO } = API_ROUTES;
 
@@ -26,8 +28,12 @@ export class RemessasLabExternosService {
     return of([]);
   }
 
-  findAll(): Observable<Remessa[]> {
-    return this.#http.get<Remessa[]>(`${this.#apiUrl}/${REMESSA_LAB_EXTERNO.GET.FIND_ALL}`, {
+  findAll(query:Querys): Observable<PaginatedResponse<Remessa[]>> {
+    let params = new HttpParams();
+    if(query.page) params = params.append('page',query.page.toString());
+    if(query.limit) params = params.append('limit',query.limit.toString());
+    return this.#http.get<PaginatedResponse<Remessa[]>>(`${this.#apiUrl}/${REMESSA_LAB_EXTERNO.GET.FIND_ALL}`, {
+      params,
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }

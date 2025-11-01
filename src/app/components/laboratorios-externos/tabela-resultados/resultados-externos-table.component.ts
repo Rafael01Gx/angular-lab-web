@@ -240,7 +240,7 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
             <select
               [(ngModel)]="filters().limit"
               (ngModelChange)="changeLimit()"
-              class="px-4 py-2 border border-zinc-300 rounded-md text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm hover:border-zinc-400 transition-colors"
+              class="input-primary"
             >
               <option [value]="5">5</option>
               <option [value]="10">10</option>
@@ -322,7 +322,7 @@ export class ResultadoExternoTableComponent implements OnInit {
   data = signal<PaginatedResponse<AmostraAnaliseExterna[]> | null>(null);
   filters = signal<AmostraAnaliseExternaQuery>({
     page: 1,
-    limit: 100
+    limit: 50
   });
 
   elements = computed(() => this.data()?.meta.elements as [] ?? []);

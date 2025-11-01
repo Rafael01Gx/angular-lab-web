@@ -198,9 +198,22 @@
             }
           </tbody>
         </table>
-      </div>
+      </div>   
+      }
 
-      <!-- Paginação -->
+      <!-- Estado Vazio -->
+      @if (!loading() && amostras().length === 0) {
+      <div class="flex flex-col items-center justify-center py-12">
+        <div class="text-slate-400 mb-4">
+          <ng-icon name="heroFunnel" size="48"></ng-icon>
+        </div>
+        <p class="text-slate-600 font-medium">Nenhuma amostra encontrada</p>
+        <p class="text-slate-500 text-sm mt-1">Tente ajustar os filtros</p>
+      </div>
+      }
+    </div>
+
+          <!-- Paginação -->
       <div class="flex items-center justify-between px-6 py-4 border-t border-slate-200">
         <div class="text-sm text-slate-600">
           Mostrando <span class="font-medium">{{ (currentPage() - 1) * perPage() + 1 }}</span> a
@@ -234,19 +247,6 @@
           </button>
         </div>
       </div>
-      }
-
-      <!-- Estado Vazio -->
-      @if (!loading() && amostras().length === 0) {
-      <div class="flex flex-col items-center justify-center py-12">
-        <div class="text-slate-400 mb-4">
-          <ng-icon name="heroFunnel" size="48"></ng-icon>
-        </div>
-        <p class="text-slate-600 font-medium">Nenhuma amostra encontrada</p>
-        <p class="text-slate-500 text-sm mt-1">Tente ajustar os filtros</p>
-      </div>
-      }
-    </div>
   </div>
 
   <!-- Modal de Lançamento de Resultados -->

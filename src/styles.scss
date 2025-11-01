@@ -142,6 +142,9 @@ button{
 .table-th {
  @apply px-4 py-2 text-left text-sm font-bold text-white border-r border-blue-500;
 }
+.table-th-tx-xs {
+ @apply px-4 py-2 text-left text-xs font-bold text-white border-r border-blue-500;
+}
 .table-th-t-center {
  @apply px-4 py-2 text-center text-sm font-bold text-white border-r border-blue-500;
 }

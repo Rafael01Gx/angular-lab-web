@@ -1,4 +1,4 @@
-import {CommonModule, isPlatformBrowser, isPlatformServer} from '@angular/common';
+import { CommonModule, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import {
   Component, effect,
   ElementRef,
@@ -10,17 +10,17 @@ import {
   TransferState,
   ViewChild
 } from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {EtiquetasService} from '../../../services/impressao-de-etiquetas.service';
+import { FormsModule } from '@angular/forms';
+import { EtiquetasService } from '../../../services/impressao-de-etiquetas.service';
 import {
   AmostraLabExterno, AmostraRemessa,
   ElementoQuimico,
   Laboratorio,
   Remessa
 } from '../../../shared/interfaces/laboratorios-externos.interfaces';
-import {ConfirmationModalService} from '../../../services/confirmation-modal.service';
-import {ToastrService} from '../../../services/toastr.service';
-import {NgIcon, provideIcons} from '@ng-icons/core';
+import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
+import { ToastrService } from '../../../services/toastr.service';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   heroPencilSquare,
   heroArrowPathRoundedSquare,
@@ -28,22 +28,24 @@ import {
   heroMagnifyingGlass,
   heroTrash,
   heroPlus,
-  heroEye, heroClipboardDocument, heroXMark, heroPaperClip, heroPrinter,heroArrowDownOnSquare
+  heroEye, heroClipboardDocument, heroXMark, heroPaperClip, heroPrinter, heroArrowDownOnSquare
 } from '@ng-icons/heroicons/outline'
-import {LabsLabExternosService} from '../../../services/labs-lab-externos.service';
-import {AmostrasLabExternos} from '../../../services/amostras-lab-externos.service';
-import {ElementoQuimicoLabExternosService} from '../../../services/elemento-quimico-lab-externos.service';
-import {map} from 'rxjs';
-import {RemessasLabExternosService} from '../../../services/remessas-lab-externos.service';
+import { LabsLabExternosService } from '../../../services/labs-lab-externos.service';
+import { AmostrasLabExternos } from '../../../services/amostras-lab-externos.service';
+import { ElementoQuimicoLabExternosService } from '../../../services/elemento-quimico-lab-externos.service';
+import { map } from 'rxjs';
+import { RemessasLabExternosService } from '../../../services/remessas-lab-externos.service';
+import { FooterPaginateComponent } from "../../tables/pagination/pagination.component";
+import { PaginatedMeta, PaginatedResponse, Querys } from '../../../shared/interfaces/querys.interface';
 
 const LABORATORIOS_KEY = makeStateKey<Laboratorio[]>('appRemessaLaboratorios');
 const ELEMENTOS_KEY = makeStateKey<ElementoQuimico[]>('appRemessaElementos');
 const KEY_AMOSTRAS = makeStateKey<AmostraLabExterno[]>('appRemessaAmostras');
-const REMESSAS_KEY = makeStateKey<Remessa[]>('appRemessaRemessas');
+const REMESSAS_KEY = makeStateKey<PaginatedResponse<Remessa[]>>('appRemessaRemessas');
 
 @Component({
   selector: 'app-remessa',
-  imports: [CommonModule, FormsModule, NgIcon],
+  imports: [CommonModule, FormsModule, NgIcon, FooterPaginateComponent],
   viewProviders: [provideIcons({
     heroPencilSquare,
     heroArrowPathRoundedSquare,
@@ -54,7 +56,7 @@ const REMESSAS_KEY = makeStateKey<Remessa[]>('appRemessaRemessas');
     heroPlus,
     heroEye,
     heroClipboardDocument,
-    heroPaperClip, heroPrinter,heroArrowDownOnSquare
+    heroPaperClip, heroPrinter, heroArrowDownOnSquare
   })],
   templateUrl: './remessa.component.html',
 })
@@ -70,12 +72,13 @@ export class RemessaComponent implements OnInit {
   #elementService = inject(ElementoQuimicoLabExternosService);
   etiquetasService = inject(EtiquetasService);
   selectTable = signal<number>(0)
-
+  paginatedMeta = signal<PaginatedMeta | null>(null);
   elementos = signal<ElementoQuimico[]>([]);
   amostras = signal<AmostraLabExterno[]>([]);
   laboratorios = signal<Laboratorio[]>([]);
   isLoading = signal<boolean>(false);
-
+  page = signal<number>(1);
+  limit = signal<number>(20);
   remessas = signal<Remessa[]>([])
   remessasFiltradas = signal<Remessa[]>([])
 
@@ -89,15 +92,15 @@ export class RemessaComponent implements OnInit {
   amostraSelecionada: AmostraLabExterno | null = null;
   searchTerm: string = '';
   editando = signal<boolean>(false);
-  ultimaRemessa=signal<Remessa | null>(null);
-  remessaVisualizada=signal<Remessa|null>(null);
+  ultimaRemessa = signal<Remessa | null>(null);
+  remessaVisualizada = signal<Remessa | null>(null);
 
   ngOnInit(): void {
     this.loadAllData();
   }
   constructor() {
     effect(() => {
-      if(this.remessas()){
+      if (this.remessas()) {
         this.ultimaRemessa.set(this.remessas()[0])
       }
     });
@@ -144,12 +147,16 @@ export class RemessaComponent implements OnInit {
   }
 
   loadRemessas() {
-    this.#remessasLabExternosService.findAll().subscribe(remessas => {
-      if (remessas) {
-        this.remessas.set(remessas)
-        this.remessasFiltradas.set(remessas)
-        if (isPlatformServer(this.#platformId)) {
-          this.#transferState.set(REMESSAS_KEY, remessas);
+    const querys: Querys = { page: this.page(), limit: this.limit() }
+    this.#remessasLabExternosService.findAll(querys).subscribe({
+      next: (res) => {
+        if (res) {
+          this.paginatedMeta.set(res.meta)
+          this.remessas.set(res.data)
+          this.remessasFiltradas.set(res.data)
+          if (isPlatformServer(this.#platformId)) {
+            this.#transferState.set(REMESSAS_KEY, res);
+          }
         }
       }
     })
@@ -159,7 +166,7 @@ export class RemessaComponent implements OnInit {
     const laboratorios = this.#transferState.get(LABORATORIOS_KEY, null);
     const elementos = this.#transferState.get(ELEMENTOS_KEY, null);
     const amostras = this.#transferState.get(KEY_AMOSTRAS, null);
-    const remessas = this.#transferState.get(REMESSAS_KEY, null);
+    const remessasKey = this.#transferState.get(REMESSAS_KEY, null);
     if (laboratorios && isPlatformBrowser(this.#platformId)) {
       this.laboratorios.set(laboratorios);
       this.#transferState.remove(LABORATORIOS_KEY);
@@ -178,9 +185,10 @@ export class RemessaComponent implements OnInit {
     } else {
       this.loadAmostras();
     }
-    if (remessas && isPlatformBrowser(this.#platformId)) {
-      this.remessas.set(remessas);
-      this.remessasFiltradas.set(remessas);
+    if (remessasKey && isPlatformBrowser(this.#platformId)) {
+      this.remessas.set(remessasKey.data);
+      this.remessasFiltradas.set(remessasKey.data);
+      this.paginatedMeta.set(remessasKey.meta);
       this.#transferState.remove(REMESSAS_KEY);
     } else {
       this.loadRemessas();
@@ -189,7 +197,7 @@ export class RemessaComponent implements OnInit {
     this.remessasFiltradas.set([...this.remessas()]);
 
     if (this.remessas().length > 0) {
-      const ultimaRemessa =this.remessas()[0];
+      const ultimaRemessa = this.remessas()[0];
       this.ultimaRemessa.set(ultimaRemessa);
     }
   }
@@ -207,7 +215,7 @@ export class RemessaComponent implements OnInit {
     const term = this.searchTerm.toLowerCase();
     const filter = this.remessas().filter(
       (remessa) => {
-        
+
         return new Date(remessa.data).toLocaleDateString().toLowerCase().includes(term) ||
           this.getLaboratorioNome(remessa.destinoId).toLowerCase().includes(term) ||
           remessa.amostras.some(amostra =>
@@ -218,7 +226,6 @@ export class RemessaComponent implements OnInit {
     );
     this.remessasFiltradas.set(filter);
   }
-
 
   fecharFormulario(): void {
     this.#confirmModal.confirmWarning("Limpar", "Deseja limpar o formulário?").then((res) => {
@@ -271,7 +278,7 @@ export class RemessaComponent implements OnInit {
   removerAmostraRemessa(index: number): void {
     const amostra = this.novaRemessa.amostras[index];
     this.#confirmModal.confirmWarning("Remover", `Deseja remover (${amostra.amostraName + ' ' + (amostra.subIdentificacao ?? "")}) da remessa?`).then((res) => {
-      if(res) {
+      if (res) {
         this.novaRemessa.amostras.splice(index, 1);
       }
     })
@@ -288,7 +295,6 @@ export class RemessaComponent implements OnInit {
     }
   }
 
-
   salvarRascunho() {
     if (!this.novaRemessa.destinoId || this.novaRemessa.amostras.length === 0) {
       return;
@@ -300,14 +306,14 @@ export class RemessaComponent implements OnInit {
         (r) => r.id === this.novaRemessa.id
       );
       if (index !== -1) {
-        this.remessas()[index] = {...this.novaRemessa};
+        this.remessas()[index] = { ...this.novaRemessa };
         alert(`Remessa ${this.novaRemessa.id} atualizada com sucesso!`);
       }
     } else {
       const novaRemessa: Remessa = {
         data: this.novaRemessa.data,
         destinoId: this.novaRemessa.destinoId,
-        amostras: [...this.novaRemessa.amostras.map(amostra => ({...amostra}))],
+        amostras: [...this.novaRemessa.amostras.map(amostra => ({ ...amostra }))],
       };
       if (isPlatformBrowser(this.#platformId)) {
         window.localStorage.setItem('rascunhosRemessas', JSON.stringify(novaRemessa))
@@ -324,29 +330,29 @@ export class RemessaComponent implements OnInit {
     const novaRemessa: Remessa = {
       data: this.novaRemessa.data,
       destinoId: this.novaRemessa.destinoId,
-      amostras: [...this.novaRemessa.amostras.map(amostra => ({...amostra}))],
+      amostras: [...this.novaRemessa.amostras.map(amostra => ({ ...amostra }))],
     };
     this.#confirmModal.confirmInfo('Atenção!', 'Após salvo os dados não poderão ser alterados!').then((res) => {
       if (res) {
         this.isLoading.set(true);
         this.#remessasLabExternosService.create(novaRemessa).subscribe({
-          next:(res)=>{
-             this.isLoading.set(false);
+          next: (res) => {
+            this.isLoading.set(false);
             this.#toast.success(`Remessa salva com sucesso!`);
             this.remessas.update((remessas) => [...remessas, res]);
             this.ultimaRemessa.set(res);
             this.resetarFormulario();
-            this.remessasFiltradas.update(r=> [...r, res]);
-          
+            this.remessasFiltradas.update(r => [...r, res]);
+
           },
-        error:(err)=> {
-           this.isLoading.set(false);
-          this.salvarRascunho();
-          this.#toast.error(err.erro.message);
-        },
+          error: (err) => {
+            this.isLoading.set(false);
+            this.salvarRascunho();
+            this.#toast.error(err.erro.message);
+          },
         })
         this.filtrarRemessas();
-         this.isLoading.set(false);
+        this.isLoading.set(false);
         return;
       } else {
         this.salvarRascunho()
@@ -355,7 +361,6 @@ export class RemessaComponent implements OnInit {
     })
     this.isLoading.set(false);
   }
-
 
   removerRemessa(id: string): void {
     this.#confirmModal.confirmDelete('Deletar', 'Tem certeza que deseja remover esta remessa?').then((confirm) => {
@@ -368,7 +373,6 @@ export class RemessaComponent implements OnInit {
             if (remessaIndex !== -1) {
               const remessaRemovida = this.remessas()[remessaIndex];
               this.remessas().splice(remessaIndex, 1);
-              // Atualiza a última remessa se necessário
               if (this.ultimaRemessa() && this.ultimaRemessa()?.id === id) {
                 const ultimaRemessa = this.remessas().length > 0 ? this.remessas()[0] : null;
                 this.ultimaRemessa.set(ultimaRemessa);
@@ -407,7 +411,6 @@ export class RemessaComponent implements OnInit {
     })
   }
 
-
   carregarRascunho(): void {
     if (isPlatformServer(this.#platformId)) return;
     const rascunho = window.localStorage.getItem('rascunhosRemessas')
@@ -432,7 +435,7 @@ export class RemessaComponent implements OnInit {
     this.novaRemessa = {
       data: rascunhoRemessa.data,
       destinoId: rascunhoRemessa.destinoId,
-      amostras: [...rascunhoRemessa.amostras.map(amostra => ({...amostra}))],
+      amostras: [...rascunhoRemessa.amostras.map(amostra => ({ ...amostra }))],
     };
     this.editando.set(false);
   }
@@ -472,10 +475,9 @@ export class RemessaComponent implements OnInit {
   }
 
   private gerarIdAleatorio(): string {
-    const numero = Math.floor(Math.random() * 900) + 100; 
+    const numero = Math.floor(Math.random() * 900) + 100;
     return numero.toString().padStart(3, '0');
   }
-
 
   handleDialogClick(event: MouseEvent) {
     if (event.target === this.remessaDialog.nativeElement) {
@@ -502,7 +504,7 @@ export class RemessaComponent implements OnInit {
     }
   }
 
-  imprimirRelacao(data?:Remessa) {
+  imprimirRelacao(data?: Remessa) {
     const remessa = data ? data : this.novaRemessa;
     if (remessa.amostras.length == 0) return;
     const destino = this.laboratorios().find(l => l.id == remessa.destinoId);
@@ -515,5 +517,14 @@ export class RemessaComponent implements OnInit {
       console.log(err)
 
     }
+  }
+
+  pageChange(page?: number, limit?: number) {
+    if (page && limit) {
+      this.page.set(page);
+      this.limit.set(limit);
+      this.loadRemessas()
+    }
+
   }
 }
