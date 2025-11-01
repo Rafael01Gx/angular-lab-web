@@ -57,6 +57,13 @@ export const LABORATORIOS_EXTERNOS_ROUTES: Routes = [
         './tabela-resultados/resultados-externos-table.component'
         ).then((m) => m.ResultadoExternoTableComponent),
   },
+    {
+    path: 'alcalis-zinco',
+    loadComponent: () =>
+      import(
+        './tabela-alcalis-zinco/alcalis-zinco-table.component'
+        ).then((m) => m.AlcalisZincoTableComponent),
+  },
   {
     path: 'dashboard',
     loadComponent: () =>

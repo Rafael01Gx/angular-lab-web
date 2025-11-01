@@ -56,6 +56,7 @@ export const API_ROUTES = {
     BASE: 'amostra-analise-externa',
     GET: {
       FIND_ALL: '',
+      FIND_ALL_ALCALIS_ZINCO:'alcaliszinco',
       DASHBOARD_COMPLETO: 'dashboard',
       FIND_ALL_WITH_RESULTS:'resultados'
     },

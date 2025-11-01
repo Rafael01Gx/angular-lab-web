@@ -3,7 +3,7 @@ import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, tap, throwError} from 'rxjs';
-import {API_ROUTES} from '../core/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/api-routes.constant';
 import { UploadConfig } from '../shared/interfaces/upload-resultados.interface';
 import { AmostraLabExternoFullUpload } from '../shared/interfaces/laboratorios-externos.interfaces';
 

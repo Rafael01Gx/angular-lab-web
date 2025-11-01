@@ -22,8 +22,12 @@ import { PaginatedResponse } from '../../../shared/interfaces/querys.interface';
 import { tap } from 'rxjs';
 import { RouterLink } from "@angular/router";
 import { ConfirmationModalService } from '../../../services/confirmation-modal.service';
+import { LabsLabExternosService } from '../../../services/labs-lab-externos.service';
+import { Laboratorio } from '../../../shared/interfaces/laboratorios-externos.interfaces';
 
 const AMOSTRAS_ANALISE_EXTERNA_KEY = makeStateKey<PaginatedResponse<AmostraAnaliseExterna[]>>('amostraAnaliseExterna-table')
+const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
+
 interface FiltrosAvancados {
   analiseConcluida?: boolean;
   dataInicio?: string;
@@ -36,7 +40,7 @@ interface FiltrosAvancados {
   selector: 'app-amostras-analise-externa-table',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIconComponent, DatePipe, RouterLink],
-  providers: [
+  viewProviders: [
     provideIcons({
       heroChevronDown,
       heroChevronUp,
@@ -47,17 +51,18 @@ interface FiltrosAvancados {
       heroPlus,
       heroChevronLeft,
       heroChevronRight,
-      heroDocumentArrowUp,heroTrash
+      heroDocumentArrowUp, heroTrash
     }),
   ],
   templateUrl: './amostras-analise-externa-table.html',
   styleUrls: ['./amostras-analise-externa-table.css'],
-  host:{
-    class:'w-full h-full'
+  host: {
+    class: 'w-full h-full'
   }
 })
 export class AmostrasAnaliseExternaTableComponent implements OnInit {
-  #tranferState = inject(TransferState);
+  #transferState = inject(TransferState);
+  #labsLabExternosService = inject(LabsLabExternosService);
   #confirm = inject(ConfirmationModalService)
   #platformId = inject(PLATFORM_ID);
   #amostrasAnaliseExt = inject(AmostraLabExternoService);
@@ -65,7 +70,7 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
   amostras = signal<AmostraAnaliseExterna[]>([]);
   loading = signal(false);
   filtrosExpanded = signal(false);
-
+  laboratorios = signal<Laboratorio[] | null>(null);
   currentPage = signal(1);
   totalPages = signal(1);
   total = signal(0);
@@ -84,16 +89,37 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
 
 
   ngOnInit() {
-    const amostraKeyData = this.#tranferState.get(AMOSTRAS_ANALISE_EXTERNA_KEY, null);
+    const amostraKeyData = this.#transferState.get(AMOSTRAS_ANALISE_EXTERNA_KEY, null);
+    const labsKey = this.#transferState.get(LABS_KEY, null)
     if (amostraKeyData && isPlatformBrowser(this.#platformId)) {
       this.amostras.set(amostraKeyData.data);
       this.currentPage.set(amostraKeyData.meta.currentPage);
       this.totalPages.set(amostraKeyData.meta.totalPages);
       this.total.set(amostraKeyData.meta.total);
-      this.#tranferState.remove(AMOSTRAS_ANALISE_EXTERNA_KEY)
+      this.#transferState.remove(AMOSTRAS_ANALISE_EXTERNA_KEY)
       return;
+    } else {
+      this.carregarAmostras();
     }
-    this.carregarAmostras();
+    if (labsKey && isPlatformBrowser(this.#platformId)) {
+      this.laboratorios.set(labsKey);
+    }
+    else {
+      this.loadLabs()
+    }
+
+  }
+
+  loadLabs() {
+    this.#labsLabExternosService.findAll().pipe(tap((data) => {
+      if (isPlatformServer(this.#platformId) && data) {
+        this.#transferState.set(LABS_KEY, data);
+      }
+    })).subscribe({
+      next: (labs) => {
+        this.laboratorios.set(labs)
+      }
+    })
   }
 
   carregarAmostras() {
@@ -107,7 +133,7 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
 
     this.#amostrasAnaliseExt.findAll(params).pipe(tap((data) => {
       if (data && isPlatformServer(this.#platformId)) {
-        this.#tranferState.set(AMOSTRAS_ANALISE_EXTERNA_KEY, data)
+        this.#transferState.set(AMOSTRAS_ANALISE_EXTERNA_KEY, data)
       }
     })).subscribe({
       next: (response) => {
@@ -182,14 +208,14 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
     valor = valor.replace('.', ',');
     const index = this.resultados().findIndex((item) => item.elemento === elemento);
     if (index !== -1) {
-        this.resultados.update(resultadosAntigos => {
-            const resultadosNovos = [...resultadosAntigos];
-            resultadosNovos[index] = {
-                ...resultadosNovos[index],
-                valor: valor 
-            };
-            return resultadosNovos;
-        });
+      this.resultados.update(resultadosAntigos => {
+        const resultadosNovos = [...resultadosAntigos];
+        resultadosNovos[index] = {
+          ...resultadosNovos[index],
+          valor: valor
+        };
+        return resultadosNovos;
+      });
     }
   }
 
@@ -232,17 +258,17 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
     const amostra = this.amostraSelecionada();
     if (!amostra) return;
     amostra.elementosAnalisados = this.resultados()
-    this.updateAmostra(amostra.id,amostra);
+    this.updateAmostra(amostra.id, amostra);
   }
 
-  remover(){
-     const amostra = this.amostraSelecionada();
+  remover() {
+    const amostra = this.amostraSelecionada();
     if (!amostra) return;
-    this.#confirm.confirmDelete(amostra.amostraName,"Deseja remover os resultados de análise?").then((confirm)=>{
-      if(confirm){
-    amostra.elementosAnalisados = []
-    amostra.analiseConcluida = false;
-    this.updateAmostra(amostra.id,amostra);
+    this.#confirm.confirmDelete(amostra.amostraName, "Deseja remover os resultados de análise?").then((confirm) => {
+      if (confirm) {
+        amostra.elementosAnalisados = []
+        amostra.analiseConcluida = false;
+        this.updateAmostra(amostra.id, amostra);
       }
     })
 
@@ -254,7 +280,7 @@ export class AmostrasAnaliseExternaTableComponent implements OnInit {
     this.resultados.set([]);
   }
 
-  updateAmostra(id: number, amostra:AmostraAnaliseExterna){
+  updateAmostra(id: number, amostra: AmostraAnaliseExterna) {
     this.#amostrasAnaliseExt.update(id, amostra).subscribe({
       next: () => {
         this.fecharModalVisualizacao();

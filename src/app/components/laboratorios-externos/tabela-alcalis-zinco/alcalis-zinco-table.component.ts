@@ -15,14 +15,12 @@ import { AmostraAnaliseExterna, AmostraAnaliseExternaQuery } from '../../../shar
 import { PaginatedResponse } from '../../../shared/interfaces/querys.interface';
 import { AmostraLabExternoService } from '../../../services/amostras-analises-externas.service';
 import { tap } from 'rxjs';
-import { LabsLabExternosService } from '../../../services/labs-lab-externos.service';
-import { Laboratorio } from '../../../shared/interfaces/laboratorios-externos.interfaces';
+import { AnaliseAlcalisZinco } from '../../../shared/interfaces/alcalis-zinco.interface';
 
-const AMOSTRA_META_KEY = makeStateKey<PaginatedResponse<AmostraAnaliseExterna[]>>("resultado-externo-table-meta");
-const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
+const ALCALIS_ZINCO_META_KEY = makeStateKey<PaginatedResponse<AnaliseAlcalisZinco[]>>("alcalis-zinco-table-meta");
 
 @Component({
-  selector: 'app-resultado-externo-table',
+  selector: 'app-alcalis-zinco-table',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIconComponent],
   viewProviders: [
@@ -40,7 +38,7 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
       <!-- Header -->
       <div class="bg-white rounded-md shadow-sm border border-zinc-300">
         <div class="p-4 flex items-center justify-between">
-          <h2 class="text-xl font-semibold text-gray-900">Análises Externas</h2>
+          <h2 class="text-xl font-semibold text-zinc-800">Análises Álcalis e Zinco</h2> 
           <div class="flex gap-2">
             <button
               (click)="exportToExcel()"
@@ -79,24 +77,10 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
                 />
               </div>
 
-              <div class="flex-1">
-                <label class="block text-sm font-medium text-zinc-700 mb-1">
-                  Laboratório
-                </label>
-                <select
-                  [(ngModel)]="filters().labExternoId"
-                  class="w-full px-3 py-2 border border-zinc-300 rounded-md focus:ring-2 focus:ring-blue-500/80 focus:border-transparent"
-                >
-                  <option [value]="undefined">Todos</option>
-                  @for (lab of laboratorios(); track lab.id) {
-                    <option [value]="lab.id">{{ lab.nome }}</option>
-                  }
-                </select>
-              </div>
 
               <div class="flex-1">
                 <label class="block text-sm font-medium text-zinc-700 mb-1">
-                  Data Início (Remessa)
+                  Data Início
                 </label>
                 <input
                   type="date"
@@ -107,7 +91,7 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
 
               <div class="flex-1">
                 <label class="block text-sm font-medium text-zinc-700 mb-1">
-                  Data Fim (Remessa)
+                  Data Fim
                 </label>
                 <input
                   type="date"
@@ -147,30 +131,29 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
                       <span>Amostra</span>
                     </div>
                   </th>
-                  <th rowspan="2" class="table-th min-w-[120px]">
-                    Sub ID
-                  </th>
-                  <th rowspan="2" class="table-th min-w-[180px]">
+                  <th rowspan="2" class="px-4 py-2 text-left text-sm font-bold text-white border-r border-blue-500 min-w-[180px]">
                     Período
                   </th>
-                  <th rowspan="2" class="table-th min-w-[200px]">
-                    Laboratório
-                  </th>
-                  <th rowspan="2" class="table-th min-w-[180px]">
-                   Data/Remessa
-                 </th>
-                  @for (element of elements(); track element) {
-                    <th class="table-th-t-center whitespace-nowrap min-w-[100px]">
-                      {{ element }}
+                    <th class="px-4 py-2 text-center text-sm font-bold text-white border-r border-blue-500 whitespace-nowrap min-w-[100px]">
+                      K2O
                     </th>
-                  }
+                    <th class="px-4 py-2 text-center text-sm font-bold text-white border-r border-blue-500 whitespace-nowrap min-w-[100px]">
+                      Na2O
+                    </th>
+                    <th class="px-4 py-2 text-center text-sm font-bold text-white border-r border-blue-500 whitespace-nowrap min-w-[100px]">
+                      Zn
+                    </th>
                 </tr>
                 <tr>
-                  @for (element of elements(); track element) {
                     <th class="px-4 text-center text-xs font-semibold text-blue-100 border-r border-blue-500 ">
                       %
                     </th>
-                  }
+                    <th class="px-4 text-center text-xs font-semibold text-blue-100 border-r border-blue-500 ">
+                      %
+                    </th>
+                    <th class="px-4 text-center text-xs font-semibold text-blue-100 border-r border-blue-500 ">
+                      %
+                    </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-zinc-200">
@@ -182,38 +165,34 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
                         {{ amostra.amostraName }}
                       </div>
                     </td>
-                    <td class="px-4 py-2 text-sm text-zinc-600 border-r border-zinc-200 whitespace-nowrap">
-                      <span class="text-zinc-400 italic">{{ amostra.subIdentificacao || 'N/A' }}</span>
-                    </td>
                     <td class="px-4 py-2 text-sm text-zinc-700 border-r border-zinc-200 whitespace-nowrap">
                       <div class="flex items-center gap-1">
-                        <span class="font-medium">{{ formatDate(amostra.dataInicio) }}</span>
+                        <span class="font-medium">{{ amostra.dataInicio | date: 'dd/MM/yyyy'}}</span>
                         <span class="text-zinc-400">→</span>
-                        <span class="font-medium">{{ formatDate(amostra.dataFim) }}</span>
+                        <span class="font-medium">{{ amostra.dataFim | date: 'dd/MM/yyyy'}}</span>
                       </div>
                     </td>
-                    <td class="px-4 py-2 text-sm text-zinc-700 border-r border-zinc-200 whitespace-nowrap">
-                      <div class="flex items-center gap-2">
-                        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                        <span class="font-medium">{{ amostra.RemessaLabExterno.destino.nome }}</span>
-                      </div>
-                    </td>
-                    <td class="px-4 py-2 text-sm text-zinc-700 border-r border-zinc-200 whitespace-nowrap">
-                    <div class="flex items-center gap-1">
-                      <span class="font-medium">{{ formatDate(amostra.RemessaLabExterno.data) }}</span>
-                    </div>
-                  </td>
-                    @for (element of elements(); track element) {
+
                       <td class="px-4 py-4 text-sm font-mono text-zinc-900 border-r border-zinc-200 text-center whitespace-nowrap bg-white group-hover:bg-blue-50/50 transition-colors">
                         <span class="inline-block px-2 py-1 rounded bg-zinc-100 group-hover:bg-blue-100 transition-colors">
-                          {{ getElementValue(amostra, element) }}
+                          {{ amostra.K2O }}
                         </span>
                       </td>
-                    }
+                      <td class="px-4 py-4 text-sm font-mono text-zinc-900 border-r border-zinc-200 text-center whitespace-nowrap bg-white group-hover:bg-blue-50/50 transition-colors">
+                        <span class="inline-block px-2 py-1 rounded bg-zinc-100 group-hover:bg-blue-100 transition-colors">
+                          {{ amostra.Na2O }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-4 text-sm font-mono text-zinc-900 border-r border-zinc-200 text-center whitespace-nowrap bg-white group-hover:bg-blue-50/50 transition-colors">
+                        <span class="inline-block px-2 py-1 rounded bg-zinc-100 group-hover:bg-blue-100 transition-colors">
+                          {{ amostra.Zn }}
+                        </span>
+                      </td>
+                    
                   </tr>
                 } @empty {
                   <tr>
-                    <td [attr.colspan]="elements().length + 4" class="px-6 py-16 text-center">
+                    <td [attr.colspan]="5" class="px-6 py-16 text-center">
                       <div class="flex flex-col items-center gap-3">
                         <div class="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center">
                           <svg class="w-8 h-8 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,8 +221,6 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
               (ngModelChange)="changeLimit()"
               class="px-4 py-2 border border-zinc-300 rounded-md text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm hover:border-zinc-400 transition-colors"
             >
-              <option [value]="5">5</option>
-              <option [value]="10">10</option>
               <option [value]="25">25</option>
               <option [value]="50">50</option>
               <option [value]="100">100</option>
@@ -313,62 +290,40 @@ const LABS_KEY = makeStateKey<Laboratorio[]>("resultado-externo-labs");
     }
   `]
 })
-export class ResultadoExternoTableComponent implements OnInit {
+export class AlcalisZincoTableComponent implements OnInit {
   #amostraLabExternoService = inject(AmostraLabExternoService);
-  #labsLabExternosService = inject(LabsLabExternosService);
   #transferState = inject(TransferState);
   #platformId = inject(PLATFORM_ID)
   showFilters = signal(false);
-  data = signal<PaginatedResponse<AmostraAnaliseExterna[]> | null>(null);
+  data = signal<PaginatedResponse<AnaliseAlcalisZinco[]> | null>(null);
   filters = signal<AmostraAnaliseExternaQuery>({
     page: 1,
-    limit: 100
+    limit: 25
   });
-
-  elements = computed(() => this.data()?.meta.elements as [] ?? []);
+  
   currentPage = computed(() => this.data()?.meta.currentPage as number);
   totalPages = computed(() => this.data()?.meta.totalPages as number);
   totalItems = computed(() => this.data()?.meta.total as number);
-  paginatedData = computed(() => this.data()?.data as AmostraAnaliseExterna[]);
-
-  laboratorios = signal<Laboratorio[] | null>(null);
+  paginatedData = computed(() => this.data()?.data as AnaliseAlcalisZinco[]);
 
   ngOnInit(): void {
-    const amostraKeyMetaData = this.#transferState.get(AMOSTRA_META_KEY, null)
-    const labsKey = this.#transferState.get(LABS_KEY, null)
+    const amostraKeyMetaData = this.#transferState.get(ALCALIS_ZINCO_META_KEY, null)
     if (amostraKeyMetaData && isPlatformBrowser(this.#platformId)) {
       this.data.set(amostraKeyMetaData)
       return;
-    } else {
+    }
+
     this.loadAmostraData()
-    }
-    if(labsKey && isPlatformBrowser(this.#platformId)){
-      this.laboratorios.set(labsKey);
-    }
-    else{this.loadLabs()
-    }
   }
 
   loadAmostraData() {
-    this.#amostraLabExternoService.findAllWithResults(this.filters()).pipe(tap((data) => {
+    this.#amostraLabExternoService.findfindAllAlcalisZincoAll(this.filters()).pipe(tap((data) => {
       if (isPlatformServer(this.#platformId) && data) {
-        this.#transferState.set(AMOSTRA_META_KEY, data);
+        this.#transferState.set(ALCALIS_ZINCO_META_KEY, data);
       }
     })).subscribe({
       next: (metaData) => {
         this.data.set(metaData)
-      }
-    })
-  }
-
-  loadLabs() {
-    this.#labsLabExternosService.findAll().pipe(tap((data) => {
-      if (isPlatformServer(this.#platformId) && data) {
-        this.#transferState.set(LABS_KEY, data);
-      }
-    })).subscribe({
-      next: (labs) => {
-        this.laboratorios.set(labs)
       }
     })
   }
@@ -430,25 +385,17 @@ export class ResultadoExternoTableComponent implements OnInit {
     return numericValue.toString();
   }
 
-  formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('pt-BR');
-  }
 
   exportToExcel() {
     const data = this.paginatedData().map(amostra => {
       const row: any = {
         'Amostra': amostra.amostraName,
-        'Sub ID': amostra.subIdentificacao || '-',
-        'Data Início': this.formatDate(amostra.dataInicio),
-        'Data Fim': this.formatDate(amostra.dataFim),
-        'Laboratório': amostra.RemessaLabExterno.destino.nome,
+        'Data Início': amostra.dataInicio.toLocaleDateString('pt-BR'),
+        'Data Fim': amostra.dataFim.toLocaleDateString('pt-BR'),
+        'K2O': amostra.K2O,
+        'Na2O': amostra.Na2O,
+        'Zn': amostra.Zn,
       };
-
-      this.elements()?.forEach(element => {
-        row[element] = this.getElementValue(amostra, element);
-      });
-
       return row;
     });
 

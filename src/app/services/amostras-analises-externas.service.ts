@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { environment } from '../../environments/environment';
 import { ToastrService } from './toastr.service';
 import { catchError, Observable, of, throwError } from 'rxjs';
-import { API_ROUTES } from '../core/constants/routes.constant';
+import { API_ROUTES } from '../core/constants/api-routes.constant';
 import {
   AmostraAnaliseExterna,
   AmostraAnaliseExternaQuery,
@@ -12,6 +12,7 @@ import {
 } from '../shared/interfaces/amostra-analise-externa.interfaces';
 import { PaginatedResponse } from '../shared/interfaces/querys.interface';
 import { AmostraLabExternoFullUpload } from '../shared/interfaces/laboratorios-externos.interfaces';
+import { AnaliseAlcalisZinco } from '../shared/interfaces/alcalis-zinco.interface';
 
 const { AMOSTRAS_ANALISE_EXTERNA } = API_ROUTES;
 
@@ -35,10 +36,18 @@ export class AmostraLabExternoService {
 
   findAll(filtros: AmostraAnaliseExternaQuery): Observable<PaginatedResponse<AmostraAnaliseExterna[]>> {
     const querys = this.queryConstructor(filtros)
+    console.log(querys)
     return this.#http.get<PaginatedResponse<AmostraAnaliseExterna[]>>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.GET.FIND_ALL}?${querys}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
   }
+  findfindAllAlcalisZincoAll(filtros: AmostraAnaliseExternaQuery): Observable<PaginatedResponse<AnaliseAlcalisZinco[]>> {
+    const querys = this.queryConstructor(filtros)
+    return this.#http.get<PaginatedResponse<AnaliseAlcalisZinco[]>>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.GET.FIND_ALL_ALCALIS_ZINCO}?${querys}`, {
+      withCredentials: true,
+    }).pipe(catchError(this.handleGetError.bind(this)));
+  }
+
   findAllWithResults(filtros: AmostraAnaliseExternaQuery): Observable<PaginatedResponse<AmostraAnaliseExterna[]>> {
     const querys = this.queryConstructor(filtros)
     return this.#http.get<PaginatedResponse<AmostraAnaliseExterna[]>>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.GET.FIND_ALL_WITH_RESULTS}?${querys}`, {

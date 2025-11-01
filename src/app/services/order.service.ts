@@ -6,7 +6,7 @@ import {IOrders, IOrderStatistics} from '../shared/interfaces/orders.interface';
 import {IAmostra} from '../shared/interfaces/amostra.interface';
 import {ToastrService} from './toastr.service';
 import {PaginatedResponse, Querys} from '../shared/interfaces/querys.interface';
-import {API_ROUTES} from '../core/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/api-routes.constant';
 
 const { ORDENS_DE_SERVICO } = API_ROUTES;
 

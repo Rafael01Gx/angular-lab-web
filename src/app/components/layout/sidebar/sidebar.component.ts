@@ -28,7 +28,8 @@ import {
   heroMagnifyingGlass,
   heroDocumentMagnifyingGlass,
   heroCalendarDateRange,
-  heroTableCells
+  heroTableCells,
+  heroCubeTransparent
 } from '@ng-icons/heroicons/outline';
 import { filter } from 'rxjs/operators';
 import { EMenuRoles, IMenuItem } from '../../../shared/interfaces/layout.interface';
@@ -71,7 +72,8 @@ import { menuItems } from '../../../core/constants/menu-items';
       heroDocumentMagnifyingGlass,
       heroCalendarDateRange,
       heroCalculator,
-      heroTableCells
+      heroTableCells,
+      heroCubeTransparent
     })
   ],
   host: { class: 'block max-h-full'

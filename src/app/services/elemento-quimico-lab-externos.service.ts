@@ -4,7 +4,7 @@ import {environment} from '../../environments/environment';
 import {ToastrService} from './toastr.service';
 import {catchError, Observable, of, throwError} from 'rxjs';
 import {ElementoQuimico} from '../shared/interfaces/laboratorios-externos.interfaces';
-import {API_ROUTES} from '../core/constants/routes.constant';
+import {API_ROUTES} from '../core/constants/api-routes.constant';
 
 const { ELEMENTO_QUIMICO } = API_ROUTES;
 

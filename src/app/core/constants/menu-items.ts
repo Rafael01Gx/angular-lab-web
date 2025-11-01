@@ -67,6 +67,7 @@ export const menuItems: IMenuItem[] = [
         { id: 'labs', label: 'Laboratórios', icon: 'heroGlobeAmericas', route: '/laboratorios-externos/laboratorios' },
         { id: 'lancamento', label: 'Lançamento', icon: 'heroCalculator', route: '/laboratorios-externos/lancamento' },
         { id: 'resultados', label: 'Resultados', icon: 'heroTableCells', route: '/laboratorios-externos/visualizar-resultados' },
+        { id: 'alcaliszinco', label: 'Álcalis e Zinco', icon: 'heroCubeTransparent', route: '/laboratorios-externos/alcalis-zinco' },
       ],
       rolesAllowed:[EMenuRoles.OPERADOR,EMenuRoles.ADMIN],
     },
