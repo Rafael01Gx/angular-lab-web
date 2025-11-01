@@ -17,13 +17,14 @@ import { PaginatedResponse } from '../../../shared/interfaces/querys.interface';
 import { AmostraLabExternoService } from '../../../services/amostras-analises-externas.service';
 import { tap } from 'rxjs';
 import { AnaliseAlcalisZinco } from '../../../shared/interfaces/alcalis-zinco.interface';
+import { NgxMaskPipe } from 'ngx-mask';
 
 const ALCALIS_ZINCO_META_KEY = makeStateKey<PaginatedResponse<AnaliseAlcalisZinco[]>>("alcalis-zinco-table-meta");
 
 @Component({
   selector: 'app-alcalis-zinco-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, NgxMaskPipe],
   viewProviders: [
     provideIcons({
       heroChevronDown,
@@ -176,17 +177,17 @@ const ALCALIS_ZINCO_META_KEY = makeStateKey<PaginatedResponse<AnaliseAlcalisZinc
 
                       <td class="px-4 py-4 text-sm font-mono text-zinc-900 border-r border-zinc-200 text-center whitespace-nowrap bg-white group-hover:bg-blue-50/50 transition-colors">
                         <span class="inline-block px-2 py-1 rounded bg-zinc-100 group-hover:bg-blue-100 transition-colors">
-                          {{ amostra.K2O }}
+                          {{ amostra.K2O | mask: decimalMask(amostra.K2O)  }}
                         </span>
                       </td>
                       <td class="px-4 py-4 text-sm font-mono text-zinc-900 border-r border-zinc-200 text-center whitespace-nowrap bg-white group-hover:bg-blue-50/50 transition-colors">
                         <span class="inline-block px-2 py-1 rounded bg-zinc-100 group-hover:bg-blue-100 transition-colors">
-                          {{ amostra.Na2O }}
+                          {{ amostra.Na2O | mask: decimalMask(amostra.Na2O) }}
                         </span>
                       </td>
                       <td class="px-4 py-4 text-sm font-mono text-zinc-900 border-r border-zinc-200 text-center whitespace-nowrap bg-white group-hover:bg-blue-50/50 transition-colors">
                         <span class="inline-block px-2 py-1 rounded bg-zinc-100 group-hover:bg-blue-100 transition-colors">
-                          {{ amostra.Zn }}
+                          {{ amostra.Zn | mask: decimalMask(amostra.Zn) }}
                         </span>
                       </td>
                     
@@ -464,5 +465,16 @@ export class AlcalisZincoTableComponent implements OnInit {
       const fileName = `alcalis_e_zinco_${new Date().toISOString().split('T')[0]}.xlsx`;
       saveAs(blob, fileName);
     });
+  }
+
+  decimalMask(stringNumber: string): string {
+    const decimalNumbers = stringNumber.split('.')[1]
+    const decimalPlaces = decimalNumbers?.length || 0
+    let mask = ""
+
+    if (decimalPlaces <= 2) return mask = "0.00";
+    if (decimalPlaces == 3) return mask = "0.000";
+    if (decimalPlaces >= 4) return mask = "0.0000";
+    return mask;
   }
 }
