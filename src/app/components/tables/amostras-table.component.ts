@@ -432,7 +432,7 @@ export class AmostrasTableComponent {
   }
 
   onBasicSearchChange() {
-    console.log('Busca básica:', this.basicSearch());
+    // implementar ...
   }
 
   applyAdvancedFilters() {

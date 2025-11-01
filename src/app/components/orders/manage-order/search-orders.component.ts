@@ -80,7 +80,6 @@ export class SearchOrdersComponent implements OnInit {
     }
 
     setConfigAndFilters(event:IPaginateConfigAndFilters){
-      console.log(event);
         this.paginateConfig.set(event);
         this.loadOrdens();
     }

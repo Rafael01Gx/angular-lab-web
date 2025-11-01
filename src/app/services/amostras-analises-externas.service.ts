@@ -36,7 +36,6 @@ export class AmostraLabExternoService {
 
   findAll(filtros: AmostraAnaliseExternaQuery): Observable<PaginatedResponse<AmostraAnaliseExterna[]>> {
     const querys = this.queryConstructor(filtros)
-    console.log(querys)
     return this.#http.get<PaginatedResponse<AmostraAnaliseExterna[]>>(`${this.#apiUrl}/${AMOSTRAS_ANALISE_EXTERNA.GET.FIND_ALL}?${querys}`, {
       withCredentials: true,
     }).pipe(catchError(this.handleGetError.bind(this)));
