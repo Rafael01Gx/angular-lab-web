@@ -7,8 +7,8 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import {firstValueFrom, map, Observable} from 'rxjs';
-import {API_ROUTES} from '../core/constants/api-routes.constant';
+import { firstValueFrom, map, Observable } from 'rxjs';
+import { API_ROUTES } from '../core/constants/api-routes.constant';
 
 const { USER } = API_ROUTES;
 
@@ -22,7 +22,7 @@ export class UserService {
   update(user: UpdateUserData): Observable<IUserResponse> {
     const id = this.#authService.currentUser()?.id;
     return this.#http
-      .patch<IUserResponse>(`${this.#apiUrl}/${USER.PATCH.UPDATE+id}`, user, {
+      .patch<IUserResponse>(`${this.#apiUrl}/${USER.PATCH.UPDATE + id}`, user, {
         withCredentials: true,
       })
       .pipe(
@@ -40,10 +40,14 @@ export class UserService {
       this.#http.get<IUser[]>(`${this.#apiUrl}/${USER.GET.GET_ALL}`, { withCredentials: true })
     );
   }
+   findAllAdmins(): Observable<IUser[]> {
+    return this.#http.get<IUser[]>(`${this.#apiUrl}/${USER.GET.GET_ALL_ADMIN}`, { withCredentials: true })
+
+  }
 
   async updateStatus(id: string, user: IUser): Promise<IUserResponse> {
     return firstValueFrom(
-      this.#http.patch<IUserResponse>(`${this.#apiUrl}/${USER.PATCH.UPDATE_STATUS+id}`, user, {
+      this.#http.patch<IUserResponse>(`${this.#apiUrl}/${USER.PATCH.UPDATE_STATUS + id}`, user, {
         withCredentials: true,
       })
     )

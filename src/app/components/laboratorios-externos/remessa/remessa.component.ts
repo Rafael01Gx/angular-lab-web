@@ -37,6 +37,7 @@ import { map } from 'rxjs';
 import { RemessasLabExternosService } from '../../../services/remessas-lab-externos.service';
 import { FooterPaginateComponent } from "../../tables/pagination/pagination.component";
 import { PaginatedMeta, PaginatedResponse, Querys } from '../../../shared/interfaces/querys.interface';
+import { EtiquetaLaboratorioModalComponent } from '../moda-etiqueta/etiqueta-laboratorio-modal.component';
 
 const LABORATORIOS_KEY = makeStateKey<Laboratorio[]>('appRemessaLaboratorios');
 const ELEMENTOS_KEY = makeStateKey<ElementoQuimico[]>('appRemessaElementos');
@@ -45,7 +46,7 @@ const REMESSAS_KEY = makeStateKey<PaginatedResponse<Remessa[]>>('appRemessaRemes
 
 @Component({
   selector: 'app-remessa',
-  imports: [CommonModule, FormsModule, NgIcon, FooterPaginateComponent],
+  imports: [CommonModule, FormsModule, NgIcon, FooterPaginateComponent,EtiquetaLaboratorioModalComponent],
   viewProviders: [provideIcons({
     heroPencilSquare,
     heroArrowPathRoundedSquare,
@@ -70,6 +71,8 @@ export class RemessaComponent implements OnInit {
   #amostrasLabExternos = inject(AmostrasLabExternos);
   #remessasLabExternosService = inject(RemessasLabExternosService);
   #elementService = inject(ElementoQuimicoLabExternosService);
+  modalEtiquetaOpen= signal<boolean>(false); 
+  laboratorioEtiqueta= signal<Laboratorio|null>(null); 
   etiquetasService = inject(EtiquetasService);
   selectTable = signal<number>(0)
   paginatedMeta = signal<PaginatedMeta | null>(null);
@@ -527,4 +530,15 @@ export class RemessaComponent implements OnInit {
     }
 
   }
+abrirModal(destino:Laboratorio){
+  this.modalEtiquetaOpen.set(true);
+  this.laboratorioEtiqueta.set(destino);
+}
+  
+  fecharModal(event:boolean) {
+    if(event){
+      this.modalEtiquetaOpen.set(false);
+    }
+  }
+
 }

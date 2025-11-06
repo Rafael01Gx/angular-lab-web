@@ -1,5 +1,7 @@
+import { IUser } from "./user.interface";
+
 export interface ElementoQuimico {
-  id?:number;
+  id?: number;
   elementName: string;
   simbolo: string;
 }
@@ -27,8 +29,8 @@ export interface AmostraRemessa {
   subIdentificacao?: string | null;
   dataInicio: string;
   dataFim: string;
-  elementosSolicitados: string[] ;
-  elementosAnalisados?: string[] ;
+  elementosSolicitados: string[];
+  elementosAnalisados?: string[];
   analiseConcluida?: boolean;
   remessaLabExternoId?: number;
 }
@@ -77,4 +79,14 @@ export interface ElementoAnalisado {
   elemento: string;
   valor: string;
   unidade: string;
+}
+
+export interface EtiquetaLaboratorio {
+  laboratorio: Partial<Laboratorio>,
+  dados: { 
+    descricao: string,
+    subdescricao: string,
+    descricaoRodape: string,
+    rodape: string },
+  user: IUser
 }

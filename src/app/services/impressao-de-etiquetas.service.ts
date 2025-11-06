@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import {ElementoQuimico, Remessa} from '../shared/interfaces/laboratorios-externos.interfaces';
-import {IOrders} from '../shared/interfaces/orders.interface';
+import { ElementoQuimico, EtiquetaLaboratorio, Laboratorio, Remessa } from '../shared/interfaces/laboratorios-externos.interfaces';
+import { IOrders } from '../shared/interfaces/orders.interface';
+import { IUser } from '../shared/interfaces/user.interface';
+import { formatarTelefone } from '../shared/utils/tel-format';
 
 export interface PrintOptions {
   filename?: string;
@@ -17,7 +19,7 @@ export interface PrintOptions {
   providedIn: 'root',
 })
 export class EtiquetasService {
-  constructor() {}
+  constructor() { }
 
   /**
    * Gera o HTML para impressão das etiquetas de amostras
@@ -574,19 +576,19 @@ export class EtiquetasService {
 
 
   dateToBr(data: string): string | null {
-    const [ ano, mes, dia ] = data.split('-');
+    const [ano, mes, dia] = data.split('-');
     const dataFormatada = `${dia}/${mes}/${ano}`
     return dataFormatada;
   }
 
-  private etiqueta_de_amostras_ordem(ordem:IOrders):string{
+  private etiqueta_de_amostras_ordem(ordem: IOrders): string {
     let paginasHtml = '';
     for (let item in ordem.amostras) {
       const amostra = ordem.amostras[item];
       const solicitante = ordem.solicitante;
       const numeroOs = ordem.id;
       const observacao = ordem.observacao;
-      const ensaios = amostra.ensaiosSolicitados.map((ensaios)=> ensaios.tipo);
+      const ensaios = amostra.ensaiosSolicitados.map((ensaios) => ensaios.tipo);
 
       const paginaHtml = `
 
@@ -654,7 +656,7 @@ export class EtiquetasService {
 
       paginasHtml += paginaHtml;
     }
-    const css= ` <style>
+    const css = ` <style>
         body {
           margin: 0;
           padding: 0;
@@ -924,4 +926,286 @@ export class EtiquetasService {
       }
     }
   }
+
+  imprimirEtiquetaLaboratorioBrowser(config: EtiquetaLaboratorio): void { 
+    const { laboratorio, dados, user } = config
+    // Criar um iframe para a impressão
+    const iframeImprimir = document.createElement('iframe');
+    iframeImprimir.style.position = 'absolute';
+    iframeImprimir.style.top = '-9999px';
+    iframeImprimir.style.left = '-9999px';
+    iframeImprimir.style.width = '29.7cm';
+    iframeImprimir.style.height = '21cm';
+
+    document.body.appendChild(iframeImprimir);
+
+    const iframeDoc = iframeImprimir.contentDocument || iframeImprimir.contentWindow?.document;
+
+    if (iframeDoc) {
+      iframeDoc.open();
+      iframeDoc.write(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etiqueta Laboratório - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .etiqueta {
+            width: 297mm;
+            height: 210mm;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 2px solid #1a5490;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .header {
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid #1a5490;
+        }
+
+        .header-description {
+            text-align: center;
+            color: #1a5490;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Logo */
+        .logo-section {
+            padding: 5px 10px;
+            display: flex;
+            justify-content: start;
+
+
+        }
+
+        .sub-footer {
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            width: 120px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #1a5490;
+            overflow: hidden;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        /* Destinatário */
+        .destinatario {
+            position: relative;
+            padding: 30px 50px 25px;
+            text-align: center;
+        }
+
+        .destinatario h2 {
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #1a5490;
+            margin-bottom: 18px;
+            letter-spacing: 2px;
+        }
+
+        .destinatario-info {
+            color: #333;
+            font-size: 18px;
+            line-height: 1.8;
+            font-weight: 600;
+        }
+
+        .destinatario-info div {
+            margin-bottom: 5px;
+        }
+
+        /* Conteúdo Central */
+        .conteudo {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .material-section {
+            width: 100%;
+            height: 70%;
+            max-width: 750px;
+            text-align: center;
+
+        }
+
+        .info-row {
+            margin-bottom: 5px;
+        }
+
+        .label {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a5490;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            font-size: 30px;
+            font-weight: 700;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .divider {
+            width: 80px;
+            height: 2px;
+            background: #1a5490;
+            margin: 25px auto;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px 40px;
+            text-align: center;
+            border-top: 2px solid #1a5490;
+        }
+
+        .sub-footer-area {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #1a5490;
+        }
+
+        .footer-responsavel {
+            font-size: 14px;
+            color: #555;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+                background: white;
+            }
+
+            .etiqueta {
+                width: 297mm;
+                height: 210mm;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="etiqueta">
+        <div class="header">
+            <div class="header-description">
+                Etiqueta de Identificação
+            </div>
+        </div>
+
+        <div class="destinatario">
+            <div class="logo-container">
+                <img src="/img/arcelor.png" alt="" srcset="">
+            </div>
+            <h2>${laboratorio.nome}</h2>
+            <div class="destinatario-info">
+                <div>${laboratorio.endereco?.logradouro}, ${laboratorio.endereco?.numero}</div>
+                <div>Bairro: ${laboratorio.endereco?.bairro}, CEP: ${laboratorio.endereco?.cep}</div>
+                <div>${laboratorio.endereco?.cidade} - ${laboratorio.endereco?.estado}. Tel: ${formatarTelefone(laboratorio?.telefone!)}</div>
+            </div>
+        </div>
+
+        <div class="conteudo">
+            <div class="material-section">
+                <div class="info-row">
+                    <div class="content">${dados.descricao}</div>
+                </div>
+                <div class="info-row">
+                    <div class="content">${dados.subdescricao}</div>
+                </div>
+            </div>
+        </div>
+        <div class="sub-footer">
+            <h3 class="sub-footer-area">${dados.descricaoRodape}</h3>
+        </div>
+        <div class="footer">
+            <div class="footer-responsavel">
+                Responsável: ${user.name} | Tel: ${formatarTelefone(user?.phone!) }  | Email:  ${user.email}
+            </div>
+             <div class="footer-responsavel">
+                ${dados.rodape || "João Monlevade - MG"}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+      `);
+      iframeDoc.close();
+
+      setTimeout(() => {
+        iframeImprimir.contentWindow?.print();
+        setTimeout(() => {
+          document.body.removeChild(iframeImprimir);
+        }, 1000);
+      }, 500);
+    }
+  }
+
+
+
 }
