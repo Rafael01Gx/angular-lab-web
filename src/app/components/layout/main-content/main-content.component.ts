@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, inject, PLATFORM_ID, signal, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -38,12 +38,11 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
     `,
   ],
 })
-export class MainContentComponent {
+export class MainContentComponent implements OnInit {
   sidebarExpanded = signal(true);
   platformID = inject(PLATFORM_ID);
 
 
-  constructor() {}
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformID)) {

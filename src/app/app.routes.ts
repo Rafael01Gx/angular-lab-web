@@ -3,6 +3,8 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { authGuard } from './core/guards/auth.guard';
 import { loginGuard } from './core/guards/login.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { Role } from './shared/enums/roles.enum';
 
 export const routes: Routes = [
   {
@@ -33,6 +35,8 @@ export const routes: Routes = [
       },
       {
         path: 'ordens',
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN, Role.USUARIO] },
         loadChildren: () =>
           import('./components/orders/orders.routes').then(
             (m) => m.ORDERS_ROUTES
@@ -40,6 +44,8 @@ export const routes: Routes = [
       },
       {
         path: 'gerenciar-ordens',
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN] },
         loadChildren: () =>
           import('./components/orders/manage-orders.routes').then(
             (m) => m.MANAGE_ORDERS_ROUTES
@@ -47,6 +53,8 @@ export const routes: Routes = [
       },
       {
         path: 'analises',
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN, Role.OPERADOR] },
         loadChildren: () =>
           import('./components/analises/analises.routes').then(
             (m) => m.ANALISES_ROUTES
@@ -54,12 +62,16 @@ export const routes: Routes = [
       },
       {
         path: 'acessos',
-        loadChildren:()=>
-          import('./components/gerenciar-acesso/gerenciar-acesso.routes').then((m)=>
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN] },
+        loadChildren: () =>
+          import('./components/gerenciar-acesso/gerenciar-acesso.routes').then((m) =>
             m.ACESSOS_ROUTES)
       },
       {
         path: 'amostras',
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN, Role.USUARIO] },
         loadComponent: () =>
           import('./components/amostras/amostras.component').then(
             (m) => m.AmostrasComponent
@@ -67,6 +79,8 @@ export const routes: Routes = [
       },
       {
         path: 'laboratorios-externos',
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN, Role.OPERADOR] },
         loadChildren: () =>
           import(
             './components/laboratorios-externos/laboratorios-externos.routes'
@@ -74,6 +88,8 @@ export const routes: Routes = [
       },
       {
         path: 'configuracoes',
+        canActivate: [roleGuard],
+        data: { roles: [Role.ADMIN, Role.OPERADOR] },
         loadChildren: () =>
           import('./components/configuracoes/settings.routes').then(
             (m) => m.SETTINGS_ROUTES
@@ -81,6 +97,12 @@ export const routes: Routes = [
       },
 
     ],
+  },
+  {
+    path: 'unauthorized',
+    loadComponent: () =>
+      import('./pages/unauthorized/unauthorized.component')
+        .then(m => m.UnauthorizedPage),
   },
   { path: '**', redirectTo: '/', pathMatch: 'full' },
 ];
