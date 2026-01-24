@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { AnaliseForm, ParametrosForm } from '../../../shared/interfaces/form-analise.interface';
 import {
   LancamentoResultadoFormComponent
@@ -319,7 +319,7 @@ export class LancamentoResultadoComponent {
           if (res) {
             this.#toast.info("Análise removida com sucesso!");
             this.currentAnalise.set(null)
-            this.amostra.update(v => res);
+            this.amostra.set(res);
           }
         });
       }
