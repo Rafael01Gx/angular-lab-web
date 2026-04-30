@@ -631,6 +631,7 @@ export class LabExternoDashboardComponent implements OnInit {
   }
 
 async exportToExcel() {
+ if (this.totalAmostras() <= 0) return console.log("Sem dados para exportar");
   const workbook = new Workbook();
   const date = new Date().toLocaleString('pt-BR');
 
