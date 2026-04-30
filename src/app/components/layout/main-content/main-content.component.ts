@@ -8,35 +8,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
   selector: 'app-main-content',
   imports: [RouterOutlet, HeaderComponent, SidebarComponent],
   templateUrl: './main-content.component.html',
-  styles: [
-    `
-      :host {
-        display: block;
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      .overflow-y-auto::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .overflow-y-auto::-webkit-scrollbar-track {
-        @apply bg-slate-100/50 rounded-full;
-      }
-
-      .overflow-y-auto::-webkit-scrollbar-thumb {
-        @apply bg-slate-300 rounded-full hover:bg-slate-400;
-      }
-
-      .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-        @apply bg-slate-400;
-      }
-
-      main {
-        transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
-      }
-    `,
-  ],
+  styleUrl: './main-content.component.scss',
 })
 export class MainContentComponent implements OnInit {
   sidebarExpanded = signal(true);

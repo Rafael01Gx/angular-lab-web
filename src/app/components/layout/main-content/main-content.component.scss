@@ -1,0 +1,27 @@
+@reference "tailwindcss";
+
+:host {
+    display: block;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    @apply bg-slate-100 opacity-50 rounded-full;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full hover:bg-slate-400;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+}
+
+main {
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+}

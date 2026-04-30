@@ -5,6 +5,8 @@ export const API_ROUTES = {
       LOGIN: 'login',
       REGISTER: 'register',
       LOGOUT: 'logout',
+      REQUEST_RESET_PASSWORD: 'forgot-password',
+      RESET_PASSWORD: 'reset-password',
     },
     GET: {
       PROFILE: 'profile',
@@ -56,9 +58,9 @@ export const API_ROUTES = {
     BASE: 'amostra-analise-externa',
     GET: {
       FIND_ALL: '',
-      FIND_ALL_ALCALIS_ZINCO:'alcaliszinco',
+      FIND_ALL_ALCALIS_ZINCO: 'alcaliszinco',
       DASHBOARD_COMPLETO: 'dashboard',
-      FIND_ALL_WITH_RESULTS:'resultados'
+      FIND_ALL_WITH_RESULTS: 'resultados'
     },
     POST: {
       CREATE: '',
@@ -144,7 +146,7 @@ export const API_ROUTES = {
       GET_UNREAD_COUNT: 'unread/count',
       GET_ALL_NOTIFICATIONS_ADMIN: 'admin/all',
       GET_NOTIFICATION_STATS_ADMIN: 'admin/stats',
-      GET_NOTIFICATION_BY_ID:  '', // Param :id
+      GET_NOTIFICATION_BY_ID: '', // Param :id
     },
     POST: {
       NOTIFY_ALL_ADMINS: 'admin/broadcast',
@@ -235,7 +237,7 @@ export const API_ROUTES = {
     BASE: 'user',
     GET: {
       GET_ALL: '',
-      GET_ALL_ADMIN:'admins',
+      GET_ALL_ADMIN: 'admins',
       GET_BY_ID: '', // Param :id
     },
     POST: {
@@ -251,7 +253,7 @@ export const API_ROUTES = {
     },
   },
 
-    UPLOAD: {
+  UPLOAD: {
     BASE: 'upload',
     GET: {
       GET_ALL: '',

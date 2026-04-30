@@ -1,9 +1,9 @@
 import { IUser, IUserResponse } from '../shared/interfaces/user.interface';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
-import {API_ROUTES} from '../core/constants/api-routes.constant';
+import { API_ROUTES } from '../core/constants/api-routes.constant';
 
 const { AUTH } = API_ROUTES;
 
@@ -18,7 +18,7 @@ export class AuthService {
   currentUser = this.#user$.asReadonly();
   isLogin = computed(() => !!this.#user$());
 
-  constructor() {}
+  constructor() { }
 
   login(email: string, password: string): Observable<IUserResponse> {
     return this.#http
@@ -64,6 +64,30 @@ export class AuthService {
         withCredentials: true,
       })
     );
+  }
+
+  async resetPasswordRequest(email: string): Promise<void> {
+    firstValueFrom(
+      this.#http.post(`${this.#apiUrl}/${AUTH.POST.REQUEST_RESET_PASSWORD}`, { email }, {
+        withCredentials: true,
+      })
+    );
+  }
+
+  async resetPasswordFromToken(token: string, email: string, password: string): Promise<void> {
+    if (!token || !password) {
+      return;
+    }
+    const params = new HttpParams().set('token', token);
+    this.#http
+      .post<void>(`${this.#apiUrl}/${AUTH.POST.RESET_PASSWORD}`, {
+        email,
+        password,
+      }, {
+        params,
+        withCredentials: true,
+      });
+    return;
   }
 
   setUser(user: IUser) {

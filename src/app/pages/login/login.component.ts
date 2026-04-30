@@ -18,15 +18,15 @@ import {
   heroUsers,
 } from '@ng-icons/heroicons/outline';
 import { AuthService } from '../../services/auth.service';
-import {Router} from '@angular/router';
-import {catchError, throwError} from 'rxjs';
-import {HttpErrorResponse} from '@angular/common/http';
+import { Router, RouterLink } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, RouterLink],
   viewProviders: [
     provideIcons({
       heroEye,
@@ -151,7 +151,7 @@ import {HttpErrorResponse} from '@angular/common/http';
                   <span class="text-sm text-slate-600">Lembrar-me</span>
                 </label>
                 <a
-                  href="#"
+                  routerLink="/forgot-password"
                   class="text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
                 >
                   Esqueceu a senha?
@@ -197,7 +197,8 @@ export class LoginComponent implements OnInit {
   #router = inject(Router);
   #platformId = inject(PLATFORM_ID);
 
-  errMessage = signal<string|null>(null)
+
+  errMessage = signal<string | null>(null)
 
   loginData = {
     email: '',
@@ -209,7 +210,7 @@ export class LoginComponent implements OnInit {
   isLoading = false;
 
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
 
   togglePassword(): void {
@@ -223,25 +224,25 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     if (isPlatformBrowser(this.#platformId)) {
 
-        this.#authService
-          .login(this.loginData.email, this.loginData.password).pipe(
-            catchError((err:HttpErrorResponse)=>{
-              this.isLoading = false;
-              if(err.status == 401){
-                this.errMessage.set('E-mail ou senha incorretos.')
-                setTimeout(()=>{
-                  this.errMessage.set(null)
-                },5000)
-              }
-              return throwError(() => new Error(err.message))
-            })
-        )
-          .subscribe({
-            next: () => {
-              this.isLoading = false;
-              this.#router.navigate(['/']);
+      this.#authService
+        .login(this.loginData.email, this.loginData.password).pipe(
+          catchError((err: HttpErrorResponse) => {
+            this.isLoading = false;
+            if (err.status == 401) {
+              this.errMessage.set('E-mail ou senha incorretos.')
+              setTimeout(() => {
+                this.errMessage.set(null)
+              }, 5000)
             }
-          });
+            return throwError(() => new Error(err.message))
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.#router.navigate(['/']);
+          }
+        });
     }
 
 
