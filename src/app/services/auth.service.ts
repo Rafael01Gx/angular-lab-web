@@ -75,16 +75,12 @@ export class AuthService {
   }
 
   async resetPasswordFromToken(token: string, email: string, password: string): Promise<void> {
-    if (!token || !password) {
-      return;
-    }
-    const params = new HttpParams().set('token', token);
+    console.log(`${this.#apiUrl}/${AUTH.POST.RESET_PASSWORD}?token=${token}`)
     this.#http
-      .post<void>(`${this.#apiUrl}/${AUTH.POST.RESET_PASSWORD}`, {
+      .post<void>(`${this.#apiUrl}/${AUTH.POST.RESET_PASSWORD}?token=${token}`, {
         email,
         password,
       }, {
-        params,
         withCredentials: true,
       });
     return;
