@@ -74,16 +74,14 @@ export class AuthService {
     );
   }
 
-  async resetPasswordFromToken(token: string, email: string, password: string): Promise<void> {
-    console.log(`${this.#apiUrl}/${AUTH.POST.RESET_PASSWORD}?token=${token}`)
-    this.#http
-      .post<void>(`${this.#apiUrl}/${AUTH.POST.RESET_PASSWORD}?token=${token}`, {
+  async resetPasswordFromToken(token: string, email: string, password: string): Promise<{ message: string }> {
+    return firstValueFrom(this.#http
+      .post<{ message: string }>(`${this.#apiUrl}/${AUTH.POST.RESET_PASSWORD}?token=${token}`, {
         email,
         password,
       }, {
         withCredentials: true,
-      });
-    return;
+      })).then(res => { console.log(res); return res; });
   }
 
   setUser(user: IUser) {
