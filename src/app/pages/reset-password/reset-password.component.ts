@@ -1,6 +1,5 @@
 import {
   Component,
-  computed,
   inject,
   OnInit,
   PLATFORM_ID,
@@ -170,8 +169,8 @@ interface PasswordRule {
                       }
                     </div>
                     <!-- Label -->
-                    <p class="text-xs font-medium" [class]="strengthLabelClass()">
-                      {{ strengthLabel() }}
+                    <p class="text-xs font-medium" [class]="strengthLabelClass">
+                      {{ strengthLabel }}
                     </p>
                     <!-- Rules checklist -->
                     <ul class="space-y-1 mt-2">
@@ -232,7 +231,7 @@ interface PasswordRule {
               <!-- Submit Button -->
               <button
                 type="submit"
-                [disabled]="!canSubmit() || isLoading()"
+                [disabled]="!canSubmit || isLoading()"
                 class="w-full py-3 px-4 bg-gradient-to-r from-red-500 to-orange-600 text-white rounded-xl
                        font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
                        transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
@@ -310,34 +309,34 @@ export class ResetPasswordComponent implements OnInit {
     { label: 'Pelo menos um caractere especial (!@#$...)', test: (pw) => /[^a-zA-Z0-9]/.test(pw) },
   ];
 
-  readonly passwordStrength = computed(() => {
+  get passwordStrength(): number {
     return this.passwordRules.filter((r) => r.test(this.password)).length;
-  });
+  }
 
-  readonly strengthLabel = computed(() => {
-    const score = this.passwordStrength();
+  get strengthLabel(): string {
+    const score = this.passwordStrength;
     if (score === 0) return '';
     if (score === 1) return 'Muito fraca';
     if (score === 2) return 'Fraca';
     if (score === 3) return 'Moderada';
     return 'Forte';
-  });
+  }
 
-  readonly strengthLabelClass = computed(() => {
-    const score = this.passwordStrength();
+  get strengthLabelClass(): string {
+    const score = this.passwordStrength;
     if (score <= 1) return 'text-red-500';
     if (score === 2) return 'text-orange-500';
     if (score === 3) return 'text-yellow-600';
     return 'text-green-600';
-  });
+  }
 
-  readonly canSubmit = computed(() => {
+  get canSubmit(): boolean {
     return (
-      this.passwordStrength() === 4 &&
+      this.passwordStrength === 4 &&
       this.password === this.confirmPassword &&
       this.confirmPassword.length > 0
     );
-  });
+  }
 
   ngOnInit(): void {
     this.#route.queryParams.subscribe((params) => {
@@ -351,7 +350,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   getSegmentClass(index: number): string {
-    const score = this.passwordStrength();
+    const score = this.passwordStrength;
     if (index >= score) return 'bg-slate-200';
     if (score === 1) return 'bg-red-400';
     if (score === 2) return 'bg-orange-400';
@@ -368,7 +367,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
-    if (!this.canSubmit()) return;
+    if (!this.canSubmit) return;
     if (!isPlatformBrowser(this.#platformId)) return;
 
     this.isLoading.set(true);
